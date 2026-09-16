@@ -1,0 +1,13 @@
+{
+  "dataset": "male-cns:v1.0",
+  "typed_neurons": 164506,
+  "type_graph": {
+    "types": 11751,
+    "edges": 243439,
+    "synapses_between_typed_neurons": 122318556
+  },
+  "spatial_graph": {
+    "nodes": 23073,
+    "edges": 490884
+  }
+}

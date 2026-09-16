@@ -21,3 +21,32 @@ One-sided test in that direction. N = 1000 uniform random permutations of the po
 3. Synapse-centroid positions for every node, in place of soma positions, with the full permutation.
 
 A result in which the real cost is not lower than the permutations, for the primary or any secondary analysis, is reported as such.
+
+## Procedure
+
+The hypothesis above was committed in `39892c5` before the spatial graph was built.
+
+- Graph: 23,073 (cell type, hemisphere) nodes and 490,884 directed edges. 22,139 nodes are placed at their soma centroid and 934 at their synapse centroid.
+- Real edge lengths: median 154.3 µm, mean 189.6 µm, 95th percentile 562.2 µm, maximum 1003.9 µm.
+- Permutations: 1000 per analysis, seeded from 20560916. Compartment groups for the within-compartment analysis: brain 16,052, vnc 7,021 nodes.
+
+## Result
+
+| analysis | real cost | permuted mean ± sd | permuted range | permutations ≤ real | z | real / permuted | p | p < 0.05 |
+|---|---|---|---|---|---|---|---|---|
+| Soma positions, unweighted cost, all nodes permuted (primary) | 9.309e+07 µm | 2.03e+08 ± 3.94e+05 | 2.018e+08 – 2.041e+08 | 0 / 1000 | -278.8 | 0.459 | 0.0010 | yes |
+| Synapse-weighted cost | 1.034e+10 µm·synapses | 3.231e+10 ± 5.9e+08 | 3.041e+10 – 3.406e+10 | 0 / 1000 | -37.3 | 0.320 | 0.0010 | yes |
+| Permutation within compartment | 9.309e+07 µm | 1.279e+08 ± 2.22e+05 | 1.271e+08 – 1.287e+08 | 0 / 1000 | -156.9 | 0.728 | 0.0010 | yes |
+| Synapse-centroid positions | 4.88e+07 µm | 1.76e+08 ± 3.77e+05 | 1.748e+08 – 1.773e+08 | 0 / 1000 | -337.4 | 0.277 | 0.0010 | yes |
+
+## Reading
+
+Primary analysis: the real placement costs 0.459 times the mean permuted placement (z = -278.8, p = 0.0010; 0 of 1000 permutations at or below the real cost). H is supported.
+
+- Synapse-weighted cost: real cost lower than the permuted mean, ratio 0.320, z = -37.3, p = 0.0010.
+- Permutation within compartment: real cost lower than the permuted mean, ratio 0.728, z = -156.9, p = 0.0010.
+- Synapse-centroid positions: real cost lower than the permuted mean, ratio 0.277, z = -337.4, p = 0.0010.
+
+With 1000 permutations the smallest attainable p is 0.0010, so the z-score and the cost ratio carry the size of the effect. The test compares the real placement with random placements of the same positions; it does not show that the real placement is the cheapest possible one.
+
+![Permutation distributions](spatial_optimality.png)

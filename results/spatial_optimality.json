@@ -1,0 +1,59 @@
+{
+  "preregistration_commit": "39892c5",
+  "seed": 20560916,
+  "alpha": 0.05,
+  "analyses": {
+    "primary": {
+      "real": 93094951.27162534,
+      "null_mean": 203008048.71636757,
+      "null_sd": 394230.2977200951,
+      "null_min": 201771645.07831073,
+      "null_max": 204149897.4673209,
+      "n_permutations": 1000,
+      "n_at_or_below_real": 0,
+      "z_score": -278.8042879514576,
+      "cost_ratio": 0.4585776369965155,
+      "p_value": 0.000999000999000999,
+      "significant": true
+    },
+    "weighted": {
+      "real": 10340313508.397861,
+      "null_mean": 32313895277.99702,
+      "null_sd": 589849918.0450723,
+      "null_min": 30405781737.047085,
+      "null_max": 34061963542.055218,
+      "n_permutations": 1000,
+      "n_at_or_below_real": 0,
+      "z_score": -37.25283516597876,
+      "cost_ratio": 0.31999588472513013,
+      "p_value": 0.000999000999000999,
+      "significant": true
+    },
+    "within_compartment": {
+      "real": 93094951.27162534,
+      "null_mean": 127947933.06602623,
+      "null_sd": 222120.76671368963,
+      "null_min": 127130703.03991216,
+      "null_max": 128658690.81079888,
+      "n_permutations": 1000,
+      "n_at_or_below_real": 0,
+      "z_score": -156.910055327361,
+      "cost_ratio": 0.7276002748992016,
+      "p_value": 0.000999000999000999,
+      "significant": true
+    },
+    "synapse_positions": {
+      "real": 48802638.896004304,
+      "null_mean": 175975846.4381626,
+      "null_sd": 376881.68743531423,
+      "null_min": 174829818.54538563,
+      "null_max": 177335161.00798675,
+      "n_permutations": 1000,
+      "n_at_or_below_real": 0,
+      "z_score": -337.43535911116817,
+      "cost_ratio": 0.2773257801214976,
+      "p_value": 0.000999000999000999,
+      "significant": true
+    }
+  }
+}

@@ -1,0 +1,45 @@
+"""Shared paths, constants, and the neuPrint client factory."""
+
+import os
+from pathlib import Path
+
+import pandas as pd
+import requests
+from neuprint import Client, set_default_client
+
+ROOT = Path(__file__).resolve().parents[1]
+DATA = ROOT / "data"
+RESULTS = ROOT / "results"
+ASSETS = ROOT / "assets"
+WEB_DATA = ROOT / "web" / "public" / "data"
+
+NEUPRINT_SERVER = "https://neuprint.janelia.org"
+DATASET = "male-cns:v1.0"
+SEED = 20260916
+
+
+def get_client() -> Client:
+    """Return a neuPrint client for the male CNS dataset and register it as the default.
+
+    Uses the token in ``NEUPRINT_APPLICATION_CREDENTIALS`` when set. Without a token the
+    client makes anonymous requests, which neuprint.janelia.org accepts for public datasets.
+    """
+    token = os.environ.get("NEUPRINT_APPLICATION_CREDENTIALS")
+    if token:
+        client = Client(NEUPRINT_SERVER, dataset=DATASET, token=token)
+    else:
+        resp = requests.get(f"{NEUPRINT_SERVER}/api/dbmeta/datasets", timeout=60)
+        resp.raise_for_status()
+        Client.DATASETS_CACHE[NEUPRINT_SERVER] = resp.json()
+        client = Client(NEUPRINT_SERVER, dataset=DATASET, token="anonymous")
+        client.session.headers.pop("Authorization")
+    set_default_client(client)
+    return client
+
+
+def markdown_table(frame: pd.DataFrame) -> list[str]:
+    """Rows of a GitHub-flavored Markdown table; missing values render as empty cells."""
+    header = "| " + " | ".join(str(c) for c in frame.columns) + " |"
+    rule = "|" + "---|" * len(frame.columns)
+    rows = ["| " + " | ".join("" if pd.isna(v) else str(v) for v in row) + " |" for row in frame.itertuples(index=False)]
+    return [header, rule, *rows]

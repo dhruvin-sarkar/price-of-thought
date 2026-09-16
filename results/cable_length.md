@@ -20,6 +20,6 @@ Spearman ρ = 0.428, one-sided p = 5.47e-24. **H9 is supported.**
 | cb intrinsic | 150 | 0.015 | 0.853 | 1,428 µm | 111 µm | 13.9 |
 | vnc intrinsic | 150 | 0.018 | 0.831 | 1,713 µm | 99 µm | 18.0 |
 
-Per-superclass correlations are descriptive. Per-neuron values: `cable_length.csv`.
+Per-superclass correlations are descriptive. Within every superclass |ρ| is below 0.12, so the overall correlation comes from differences between superclasses: neurons whose outputs lie far from the soma, such as descending and ascending neurons, have more cable, but among neurons of one superclass soma-to-output distance does not predict cable length. Node positions therefore track the between-class structure of wiring cost, not the cable of individual neurons. Per-neuron values: `cable_length.csv`.
 
 ![Cable length](cable_length.png)

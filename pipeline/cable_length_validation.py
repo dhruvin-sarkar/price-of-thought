@@ -160,7 +160,12 @@ def write_report(s: dict) -> None:
             for k, v in s["by_superclass"].items()
         ],
         "",
-        "Per-superclass correlations are descriptive. Per-neuron values: `cable_length.csv`.",
+        "Per-superclass correlations are descriptive. Within every superclass |ρ| is below "
+        f"{max(abs(v['spearman_rho']) for v in s['by_superclass'].values()) + 0.005:.2f}, so the overall correlation "
+        "comes from differences between superclasses: neurons whose outputs lie far from the soma, such as descending "
+        "and ascending neurons, have more cable, but among neurons of one superclass soma-to-output distance does not "
+        "predict cable length. Node positions therefore track the between-class structure of wiring cost, not the "
+        "cable of individual neurons. Per-neuron values: `cable_length.csv`.",
         "",
         "![Cable length](cable_length.png)",
         "",

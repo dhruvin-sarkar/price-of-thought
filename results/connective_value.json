@@ -1,0 +1,238 @@
+{
+  "preregistration_commit": "e62c6df",
+  "n_nulls": 1000,
+  "sets": {
+    "sensory": 751,
+    "motor": 367,
+    "sensory_brain": 390,
+    "sensory_vnc": 361,
+    "motor_brain": 86,
+    "motor_vnc": 281
+  },
+  "removal_sets": {
+    "crossing": {
+      "edges": 36943,
+      "cost_um": 22371156.450188637,
+      "mean_length_um": 605.5587377903429
+    },
+    "incident": {
+      "edges": 100126,
+      "cost_um": 36048999.903140575,
+      "mean_length_um": 360.03635322634057
+    },
+    "longest_non_connective": {
+      "edges": 84008,
+      "cost_um": 22371175.56713092,
+      "min_length_um": 207.03662981972806
+    },
+    "non_connective_candidates": {
+      "edges": 390758,
+      "mean_length_um": 145.98792953307358
+    }
+  },
+  "intact": {
+    "flow": 8731,
+    "flow_brain_to_vnc": 6423,
+    "flow_vnc_to_brain": 2228,
+    "pairs": 269011
+  },
+  "real": {
+    "crossing": {
+      "flow": 7768,
+      "flow_brain_to_vnc": 2664,
+      "flow_vnc_to_brain": 1986,
+      "pairs": 269011
+    },
+    "incident": {
+      "flow": 6613,
+      "flow_brain_to_vnc": 221,
+      "flow_vnc_to_brain": 685,
+      "pairs": 267910
+    },
+    "longest": {
+      "flow": 7769,
+      "flow_brain_to_vnc": 5301,
+      "flow_vnc_to_brain": 2056,
+      "pairs": 267910
+    }
+  },
+  "families": {
+    "crossing_cost": {
+      "flow": {
+        "real": 963.0,
+        "null_mean": 2689.312,
+        "null_sd": 40.584797421963096,
+        "null_min": 2573.0,
+        "null_max": 2827.0,
+        "n_at_or_above_real": 1000,
+        "ratio": 0.3580841494032675,
+        "z_score": -42.53592748169735,
+        "p_value": 1.0,
+        "significant": false
+      },
+      "pairs": {
+        "real": 0.0,
+        "null_mean": 3490.303,
+        "null_sd": 915.5622367706088,
+        "null_min": 734.0,
+        "null_max": 6606.0,
+        "n_at_or_above_real": 1000,
+        "ratio": 0.0,
+        "z_score": -3.812196331197618,
+        "p_value": 1.0,
+        "significant": false
+      },
+      "flow_brain_to_vnc": {
+        "real": 3759.0,
+        "null_mean": 2051.787,
+        "null_sd": 35.407221047440345,
+        "null_min": 1948.0,
+        "null_max": 2175.0,
+        "n_at_or_above_real": 0,
+        "ratio": 1.8320615151572752,
+        "z_score": 48.21652051463152,
+        "p_value": 0.000999000999000999,
+        "significant": true
+      },
+      "flow_vnc_to_brain": {
+        "real": 242.0,
+        "null_mean": 554.787,
+        "null_sd": 19.196252944966297,
+        "null_min": 492.0,
+        "null_max": 616.0,
+        "n_at_or_above_real": 1000,
+        "ratio": 0.43620344384421406,
+        "z_score": -16.29416953906205,
+        "p_value": 1.0,
+        "significant": false
+      },
+      "random_edges_removed": {
+        "mean": 153244.018,
+        "min": 152667,
+        "max": 153763
+      },
+      "random_cost_ratio": {
+        "min": 0.9999921509788209,
+        "max": 1.0000075092001295
+      }
+    },
+    "incident_cost": {
+      "flow": {
+        "real": 2118.0,
+        "null_mean": 4337.472,
+        "null_sd": 40.07259698383709,
+        "null_min": 4182.0,
+        "null_max": 4468.0,
+        "n_at_or_above_real": 1000,
+        "ratio": 0.48830286397237843,
+        "z_score": -55.386278081632774,
+        "p_value": 1.0,
+        "significant": false
+      },
+      "pairs": {
+        "real": 1101.0,
+        "null_mean": 9415.209,
+        "null_sd": 1517.0946171535895,
+        "null_min": 4768.0,
+        "null_max": 13945.0,
+        "n_at_or_above_real": 1000,
+        "ratio": 0.11693845564129271,
+        "z_score": -5.48034968023242,
+        "p_value": 1.0,
+        "significant": false
+      },
+      "flow_brain_to_vnc": {
+        "real": 6202.0,
+        "null_mean": 3359.378,
+        "null_sd": 34.94126511745114,
+        "null_min": 3228.0,
+        "null_max": 3461.0,
+        "n_at_or_above_real": 0,
+        "ratio": 1.846175095508752,
+        "z_score": 81.35429528509758,
+        "p_value": 0.000999000999000999,
+        "significant": true
+      },
+      "flow_vnc_to_brain": {
+        "real": 1543.0,
+        "null_mean": 896.235,
+        "null_sd": 17.75903032708031,
+        "null_min": 842.0,
+        "null_max": 959.0,
+        "n_at_or_above_real": 0,
+        "ratio": 1.721646666331933,
+        "z_score": 36.418936624809064,
+        "p_value": 0.000999000999000999,
+        "significant": true
+      },
+      "random_edges_removed": {
+        "mean": 246921.827,
+        "min": 246369,
+        "max": 247444
+      },
+      "random_cost_ratio": {
+        "min": 0.9999947288541048,
+        "max": 1.000005018207168
+      }
+    },
+    "crossing_count": {
+      "flow": {
+        "real": 963.0,
+        "null_mean": 648.24,
+        "null_sd": 23.67295521916959,
+        "null_min": 582.0,
+        "null_max": 727.0,
+        "n_at_or_above_real": 0,
+        "ratio": 1.4855609033691226,
+        "z_score": 13.296185334103008,
+        "p_value": 0.000999000999000999,
+        "significant": true
+      },
+      "pairs": {
+        "real": 0.0,
+        "null_mean": 636.653,
+        "null_sd": 477.66566244191773,
+        "null_min": 0.0,
+        "null_max": 2202.0,
+        "n_at_or_above_real": 1000,
+        "ratio": 0.0,
+        "z_score": -1.332842299664809,
+        "p_value": 1.0,
+        "significant": false
+      },
+      "flow_brain_to_vnc": {
+        "real": 3759.0,
+        "null_mean": 464.16,
+        "null_sd": 20.357820139711443,
+        "null_min": 403.0,
+        "null_max": 535.0,
+        "n_at_or_above_real": 0,
+        "ratio": 8.098500517063082,
+        "z_score": 161.8464048404105,
+        "p_value": 0.000999000999000999,
+        "significant": true
+      },
+      "flow_vnc_to_brain": {
+        "real": 242.0,
+        "null_mean": 133.75,
+        "null_sd": 11.059286044216769,
+        "null_min": 101.0,
+        "null_max": 166.0,
+        "n_at_or_above_real": 0,
+        "ratio": 1.8093457943925233,
+        "z_score": 9.788154458361909,
+        "p_value": 0.000999000999000999,
+        "significant": true
+      },
+      "random_edges_removed": {
+        "mean": 36943.0,
+        "min": 36943,
+        "max": 36943
+      },
+      "random_cost_ratio": {
+        "min": 0.2386273207472534,
+        "max": 0.24340979671688248
+      }
+    }
+  }
+}

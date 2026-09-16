@@ -1,0 +1,43 @@
+{
+  "preregistration_commit": "e62c6df",
+  "sampled": 500,
+  "without_skeleton": 0,
+  "analysed": 500,
+  "spearman_rho": 0.42798132792531174,
+  "p_value": 5.469055583095723e-24,
+  "significant": true,
+  "by_superclass": {
+    "descending_neuron": {
+      "n": 100,
+      "spearman_rho": 0.050573057305730564,
+      "p_value": 0.6172918034942242,
+      "median_cable_um": 4591.985136598557,
+      "median_soma_to_output_um": 349.4635121568799,
+      "median_ratio": 11.60832588106256
+    },
+    "ascending_neuron": {
+      "n": 100,
+      "spearman_rho": 0.1195319531953195,
+      "p_value": 0.23619787585238547,
+      "median_cable_um": 3898.0806224273315,
+      "median_soma_to_output_um": 272.17372777878376,
+      "median_ratio": 13.619273925457247
+    },
+    "cb_intrinsic": {
+      "n": 150,
+      "spearman_rho": 0.015241566291835195,
+      "p_value": 0.8531353314202286,
+      "median_cable_um": 1428.0664658599953,
+      "median_soma_to_output_um": 110.77703419625492,
+      "median_ratio": 13.857526433006846
+    },
+    "vnc_intrinsic": {
+      "n": 150,
+      "spearman_rho": 0.0175705586914974,
+      "p_value": 0.831006565979057,
+      "median_cable_um": 1712.9669476081547,
+      "median_soma_to_output_um": 98.82861057532435,
+      "median_ratio": 17.957781071924035
+    }
+  }
+}

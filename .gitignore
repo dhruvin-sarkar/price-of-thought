@@ -8,8 +8,7 @@ PROGRESS.md
 .kilo/
 
 # Data cache
-data
-data/*
+/data/
 
 # Python
 __pycache__/

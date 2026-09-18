@@ -1,0 +1,294 @@
+{
+  "n_synthetic": 50,
+  "shifts": {
+    "G": -0.013834249776318419,
+    "G_deg": -0.040769947221398706
+  },
+  "real_edges": 490884,
+  "models": {
+    "G": {
+      "edges": {
+        "mean": 490923.1,
+        "min": 489172,
+        "max": 492206
+      },
+      "properties": {
+        "in_degree_sd": {
+          "real": 5.258765177782206,
+          "synthetic_mean": 5.673713016300342,
+          "synthetic_sd": 0.02192976924154463,
+          "interval_95": [
+            5.632876665444113,
+            5.719210100564263
+          ],
+          "reproduced": false
+        },
+        "in_degree_max": {
+          "real": 60.0,
+          "synthetic_mean": 61.14,
+          "synthetic_sd": 7.225267454974824,
+          "interval_95": [
+            49.225,
+            78.1
+          ],
+          "reproduced": true
+        },
+        "out_degree_sd": {
+          "real": 25.193490249324565,
+          "synthetic_mean": 9.648813705419363,
+          "synthetic_sd": 0.04770435439629121,
+          "interval_95": [
+            9.555443934904048,
+            9.749748929450224
+          ],
+          "reproduced": false
+        },
+        "out_degree_max": {
+          "real": 395.0,
+          "synthetic_mean": 234.64,
+          "synthetic_sd": 14.218068412683738,
+          "interval_95": [
+            212.0,
+            263.775
+          ],
+          "reproduced": false
+        },
+        "total_cost_um": {
+          "real": 93094951.27162534,
+          "synthetic_mean": 92665573.46967117,
+          "synthetic_sd": 165623.94099523913,
+          "interval_95": [
+            92326369.81353672,
+            92945603.92865604
+          ],
+          "reproduced": false
+        },
+        "median_length_um": {
+          "real": 154.33098980505372,
+          "synthetic_mean": 157.59886898643822,
+          "synthetic_sd": 0.20084459840416705,
+          "interval_95": [
+            157.24302764476624,
+            157.91406776536394
+          ],
+          "reproduced": false
+        },
+        "cross_compartment_fraction": {
+          "real": 0.07776990083196846,
+          "synthetic_mean": 0.08132692912164559,
+          "synthetic_sd": 0.000403607565326091,
+          "interval_95": [
+            0.0806225630372131,
+            0.08201936563975894
+          ],
+          "reproduced": false
+        },
+        "reciprocity": {
+          "real": 0.07933849952330897,
+          "synthetic_mean": 0.003788701691382379,
+          "synthetic_sd": 0.00011096011685401626,
+          "interval_95": [
+            0.003596654311283573,
+            0.004004996763276655
+          ],
+          "reproduced": false
+        },
+        "transitivity": {
+          "real": 0.07988935751059123,
+          "synthetic_mean": 0.005084943242462066,
+          "synthetic_sd": 3.926251220235383e-05,
+          "interval_95": [
+            0.00501628984679269,
+            0.005155689940040951
+          ],
+          "reproduced": false
+        },
+        "flow": {
+          "real": 8731.0,
+          "synthetic_mean": 8364.94,
+          "synthetic_sd": 102.57210704113054,
+          "interval_95": [
+            8167.775,
+            8579.65
+          ],
+          "reproduced": false
+        },
+        "pairs": {
+          "real": 269011.0,
+          "synthetic_mean": 275572.96,
+          "synthetic_sd": 120.47168521596895,
+          "interval_95": [
+            275250.0,
+            275617.0
+          ],
+          "reproduced": false
+        },
+        "neck_crossing_edges": {
+          "real": 36943.0,
+          "synthetic_mean": 39241.22,
+          "synthetic_sd": 212.6413373907974,
+          "interval_95": [
+            38931.4,
+            39587.0
+          ],
+          "reproduced": false
+        },
+        "rich_routes": {
+          "real": 7454.0,
+          "synthetic_mean": 6636.24,
+          "synthetic_sd": 594.0840165965672,
+          "interval_95": [
+            5540.175,
+            7599.775
+          ],
+          "reproduced": true
+        }
+      },
+      "fraction_reproduced": 0.15384615384615385,
+      "ks_in_degree_mean": 0.050420838209162246,
+      "ks_out_degree_mean": 0.3513214579811902
+    },
+    "G_deg": {
+      "edges": {
+        "mean": 490847.56,
+        "min": 488996,
+        "max": 492529
+      },
+      "properties": {
+        "in_degree_sd": {
+          "real": 5.258765177782206,
+          "synthetic_mean": 7.866783130915247,
+          "synthetic_sd": 0.029551220936096044,
+          "interval_95": [
+            7.813799909442577,
+            7.915469104802979
+          ],
+          "reproduced": false
+        },
+        "in_degree_max": {
+          "real": 60.0,
+          "synthetic_mean": 70.5,
+          "synthetic_sd": 5.369034420847467,
+          "interval_95": [
+            61.45,
+            81.775
+          ],
+          "reproduced": false
+        },
+        "out_degree_sd": {
+          "real": 25.193490249324565,
+          "synthetic_mean": 29.067990255968134,
+          "synthetic_sd": 0.10236997772943482,
+          "interval_95": [
+            28.85852737059742,
+            29.219909899584298
+          ],
+          "reproduced": false
+        },
+        "out_degree_max": {
+          "real": 395.0,
+          "synthetic_mean": 857.58,
+          "synthetic_sd": 25.753216561534717,
+          "interval_95": [
+            814.45,
+            912.5999999999999
+          ],
+          "reproduced": false
+        },
+        "total_cost_um": {
+          "real": 93094951.27162534,
+          "synthetic_mean": 91418567.45203038,
+          "synthetic_sd": 191775.71226622362,
+          "interval_95": [
+            91121600.92658204,
+            91766220.86844787
+          ],
+          "reproduced": false
+        },
+        "median_length_um": {
+          "real": 154.33098980505372,
+          "synthetic_mean": 153.31016301494685,
+          "synthetic_sd": 0.1950791681969611,
+          "interval_95": [
+            152.9358175468048,
+            153.65352375778735
+          ],
+          "reproduced": false
+        },
+        "cross_compartment_fraction": {
+          "real": 0.07776990083196846,
+          "synthetic_mean": 0.0803021821234057,
+          "synthetic_sd": 0.00033058369644269883,
+          "interval_95": [
+            0.07976291403266735,
+            0.08092988084460793
+          ],
+          "reproduced": false
+        },
+        "reciprocity": {
+          "real": 0.07933849952330897,
+          "synthetic_mean": 0.005068471544944621,
+          "synthetic_sd": 0.00015153345010827715,
+          "interval_95": [
+            0.004802974923710944,
+            0.005411120239972121
+          ],
+          "reproduced": false
+        },
+        "transitivity": {
+          "real": 0.07988935751059123,
+          "synthetic_mean": 0.009703295779935504,
+          "synthetic_sd": 7.020062894580935e-05,
+          "interval_95": [
+            0.009563824078459703,
+            0.009829528208621633
+          ],
+          "reproduced": false
+        },
+        "flow": {
+          "real": 8731.0,
+          "synthetic_mean": 9994.78,
+          "synthetic_sd": 103.3735627198161,
+          "interval_95": [
+            9820.15,
+            10225.05
+          ],
+          "reproduced": false
+        },
+        "pairs": {
+          "real": 269011.0,
+          "synthetic_mean": 267807.44,
+          "synthetic_sd": 1303.3679318267293,
+          "interval_95": [
+            265341.225,
+            270112.0
+          ],
+          "reproduced": true
+        },
+        "neck_crossing_edges": {
+          "real": 36943.0,
+          "synthetic_mean": 39180.74,
+          "synthetic_sd": 185.2836556775165,
+          "interval_95": [
+            38885.35,
+            39550.05
+          ],
+          "reproduced": false
+        },
+        "rich_routes": {
+          "real": 7454.0,
+          "synthetic_mean": 15495.02,
+          "synthetic_sd": 449.07276306920716,
+          "interval_95": [
+            14851.525,
+            16489.25
+          ],
+          "reproduced": false
+        }
+      },
+      "fraction_reproduced": 0.07692307692307693,
+      "ks_in_degree_mean": 0.11337754084861093,
+      "ks_out_degree_mean": 0.03888007627963419
+    }
+  }
+}

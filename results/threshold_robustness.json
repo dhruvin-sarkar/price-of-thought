@@ -1,0 +1,304 @@
+{
+  "preregistration_commit": "73fba33",
+  "n_permutations": 1000,
+  "n_nulls": 1000,
+  "thresholds": [
+    {
+      "fraction": 0.005,
+      "nodes": 23073,
+      "edges": 942400,
+      "layer_edges": {
+        "D_in": 26845,
+        "D_out": 33561,
+        "A_in": 24081,
+        "A_out": 30464
+      },
+      "placement": {
+        "real": 179170394.97107336,
+        "null_mean": 389724426.9870909,
+        "null_sd": 651386.0540089887,
+        "null_min": 387790177.50284487,
+        "null_max": 391631648.10853076,
+        "n_permutations": 1000,
+        "n_at_or_below_real": 0,
+        "z_score": -323.24000601509965,
+        "cost_ratio": 0.45973611753365445,
+        "p_value": 0.000999000999000999,
+        "significant": true
+      },
+      "routes": {
+        "total": {
+          "real": 23106.0,
+          "null_mean": 23050.517,
+          "null_sd": 301.90912014682135,
+          "null_min": 22158.0,
+          "null_max": 23929.0,
+          "n_at_or_above_real": 424,
+          "ratio": 1.0024070175953104,
+          "z_score": 0.18377384549701,
+          "p_value": 0.4245754245754246,
+          "significant": false
+        },
+        "descending": {
+          "real": 8880.0,
+          "null_mean": 8520.314,
+          "null_sd": 159.29014016175876,
+          "null_min": 8043.0,
+          "null_max": 9023.0,
+          "n_at_or_above_real": 8,
+          "ratio": 1.0422151108515485,
+          "z_score": 2.258055643837964,
+          "p_value": 0.008991008991008992,
+          "significant": true
+        },
+        "ascending": {
+          "real": 14226.0,
+          "null_mean": 14530.203,
+          "null_sd": 255.55671978648502,
+          "null_min": 13723.0,
+          "null_max": 15392.0,
+          "n_at_or_above_real": 885,
+          "ratio": 0.9790640915340275,
+          "z_score": -1.1903541423373956,
+          "p_value": 0.8851148851148851,
+          "significant": false
+        }
+      },
+      "hubs": {
+        "degree_threshold": 123.0,
+        "odds_ratio": 3.9880252366870517,
+        "p_value": 1.2639001547787703e-117,
+        "connective_share_high": 0.2721055202735711,
+        "other_share_high": 0.08570341481974698
+      },
+      "holds": {
+        "placement": true,
+        "routes": false,
+        "hubs": true
+      }
+    },
+    {
+      "fraction": 0.01,
+      "nodes": 23073,
+      "edges": 490884,
+      "layer_edges": {
+        "D_in": 13270,
+        "D_out": 17628,
+        "A_in": 12357,
+        "A_out": 16677
+      },
+      "placement": {
+        "real": 93094951.27162534,
+        "null_mean": 203008048.71636757,
+        "null_sd": 394230.2977200951,
+        "null_min": 201771645.07831073,
+        "null_max": 204149897.4673209,
+        "n_permutations": 1000,
+        "n_at_or_below_real": 0,
+        "z_score": -278.8042879514576,
+        "cost_ratio": 0.4585776369965155,
+        "p_value": 0.000999000999000999,
+        "significant": true
+      },
+      "routes": {
+        "total": {
+          "real": 7454.0,
+          "null_mean": 6759.897,
+          "null_sd": 143.26500358514727,
+          "null_min": 6282.0,
+          "null_max": 7215.0,
+          "n_at_or_above_real": 0,
+          "ratio": 1.1026795230755735,
+          "z_score": 4.844888721113744,
+          "p_value": 0.000999000999000999,
+          "significant": true
+        },
+        "descending": {
+          "real": 1911.0,
+          "null_mean": 1941.205,
+          "null_sd": 60.89616833856067,
+          "null_min": 1749.0,
+          "null_max": 2152.0,
+          "n_at_or_above_real": 709,
+          "ratio": 0.9844400771685629,
+          "z_score": -0.49600821897481384,
+          "p_value": 0.7092907092907093,
+          "significant": false
+        },
+        "ascending": {
+          "real": 5543.0,
+          "null_mean": 4818.692,
+          "null_sd": 126.95749423071227,
+          "null_min": 4372.0,
+          "null_max": 5233.0,
+          "n_at_or_above_real": 0,
+          "ratio": 1.1503121593992727,
+          "z_score": 5.705122051981888,
+          "p_value": 0.000999000999000999,
+          "significant": true
+        }
+      },
+      "hubs": {
+        "degree_threshold": 67.0,
+        "odds_ratio": 3.2176160488732255,
+        "p_value": 1.4805781184484832e-79,
+        "connective_share_high": 0.23742061553492916,
+        "other_share_high": 0.08822410349091601
+      },
+      "holds": {
+        "placement": true,
+        "routes": true,
+        "hubs": true
+      }
+    },
+    {
+      "fraction": 0.02,
+      "nodes": 23073,
+      "edges": 216862,
+      "layer_edges": {
+        "D_in": 5268,
+        "D_out": 7578,
+        "A_in": 5447,
+        "A_out": 7738
+      },
+      "placement": {
+        "real": 40766526.431688875,
+        "null_mean": 89686153.38985798,
+        "null_sd": 231376.6876158774,
+        "null_min": 88970012.24165706,
+        "null_max": 90385948.62138319,
+        "n_permutations": 1000,
+        "n_at_or_below_real": 0,
+        "z_score": -211.4285041515659,
+        "cost_ratio": 0.4545464923050083,
+        "p_value": 0.000999000999000999,
+        "significant": true
+      },
+      "routes": {
+        "total": {
+          "real": 2317.0,
+          "null_mean": 1665.136,
+          "null_sd": 59.46858007398542,
+          "null_min": 1458.0,
+          "null_max": 1919.0,
+          "n_at_or_above_real": 0,
+          "ratio": 1.391477933333974,
+          "z_score": 10.961485866805797,
+          "p_value": 0.000999000999000999,
+          "significant": true
+        },
+        "descending": {
+          "real": 299.0,
+          "null_mean": 349.069,
+          "null_sd": 22.341517011661995,
+          "null_min": 289.0,
+          "null_max": 431.0,
+          "n_at_or_above_real": 988,
+          "ratio": 0.8565641749911909,
+          "z_score": -2.2410743180001886,
+          "p_value": 0.988011988011988,
+          "significant": false
+        },
+        "ascending": {
+          "real": 2018.0,
+          "null_mean": 1316.067,
+          "null_sd": 54.637109410406445,
+          "null_min": 1150.0,
+          "null_max": 1557.0,
+          "n_at_or_above_real": 0,
+          "ratio": 1.533356584429212,
+          "z_score": 12.847184039833309,
+          "p_value": 0.000999000999000999,
+          "significant": true
+        }
+      },
+      "hubs": {
+        "degree_threshold": 32.0,
+        "odds_ratio": 2.2212744890442377,
+        "p_value": 4.7667968815540707e-35,
+        "connective_share_high": 0.19149975574010747,
+        "other_share_high": 0.09635689146770665
+      },
+      "holds": {
+        "placement": true,
+        "routes": true,
+        "hubs": true
+      }
+    },
+    {
+      "fraction": 0.05,
+      "nodes": 23073,
+      "edges": 52217,
+      "layer_edges": {
+        "D_in": 957,
+        "D_out": 1502,
+        "A_in": 1368,
+        "A_out": 1871
+      },
+      "placement": {
+        "real": 9485894.6628778,
+        "null_mean": 21591921.323686514,
+        "null_sd": 97063.73060978652,
+        "null_min": 21251643.597340584,
+        "null_max": 21941067.983173225,
+        "n_permutations": 1000,
+        "n_at_or_below_real": 0,
+        "z_score": -124.72245384300236,
+        "cost_ratio": 0.4393261035307542,
+        "p_value": 0.000999000999000999,
+        "significant": true
+      },
+      "routes": {
+        "total": {
+          "real": 308.0,
+          "null_mean": 191.877,
+          "null_sd": 17.10065213093651,
+          "null_min": 139.0,
+          "null_max": 264.0,
+          "n_at_or_above_real": 0,
+          "ratio": 1.6051949947101527,
+          "z_score": 6.790559746544623,
+          "p_value": 0.000999000999000999,
+          "significant": true
+        },
+        "descending": {
+          "real": 73.0,
+          "null_mean": 55.675,
+          "null_sd": 9.494815771068259,
+          "null_min": 30.0,
+          "null_max": 90.0,
+          "n_at_or_above_real": 41,
+          "ratio": 1.311180960933992,
+          "z_score": 1.8246799535375053,
+          "p_value": 0.04195804195804196,
+          "significant": true
+        },
+        "ascending": {
+          "real": 235.0,
+          "null_mean": 136.202,
+          "null_sd": 14.622620046250846,
+          "null_min": 87.0,
+          "null_max": 209.0,
+          "n_at_or_above_real": 0,
+          "ratio": 1.7253784819606173,
+          "z_score": 6.756518304346644,
+          "p_value": 0.000999000999000999,
+          "significant": true
+        }
+      },
+      "hubs": {
+        "degree_threshold": 9.0,
+        "odds_ratio": 1.3332136381776691,
+        "p_value": 1.0301434084635717e-05,
+        "connective_share_high": 0.15095261358085002,
+        "other_share_high": 0.11766384476362599
+      },
+      "holds": {
+        "placement": true,
+        "routes": true,
+        "hubs": true
+      }
+    }
+  ],
+  "h11_supported": false
+}

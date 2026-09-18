@@ -1,0 +1,34 @@
+{
+  "preregistration_commit": "73fba33",
+  "intact": {
+    "flow": 8731,
+    "flow_brain_to_vnc": 6423,
+    "flow_vnc_to_brain": 2228
+  },
+  "tests": {
+    "descending": {
+      "n": 911,
+      "zero_value": 622,
+      "spearman_rho": 0.23144203048922735,
+      "p_value": 7.624220052233845e-13,
+      "partial_rho": 0.04399898089822624,
+      "partial_p_value": 0.09228235516676263,
+      "edge_count_value_rho": 0.22744876460108157,
+      "total_price_um": 11245354.98374898,
+      "total_value": 973
+    },
+    "ascending": {
+      "n": 1010,
+      "zero_value": 899,
+      "spearman_rho": -0.0045199419118684015,
+      "p_value": 0.5570400457431348,
+      "partial_rho": -0.12184355302454261,
+      "partial_p_value": 0.9999481836380233,
+      "edge_count_value_rho": 0.027441641014154656,
+      "total_price_um": 11125801.466439657,
+      "total_value": 240
+    }
+  },
+  "h10_supported": false,
+  "h10b_supported": false
+}

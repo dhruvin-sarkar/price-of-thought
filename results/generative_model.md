@@ -15,3 +15,20 @@
 **Compared properties** (each computed on the real graph and on every synthetic graph): standard deviation and maximum of in-degree and of out-degree; total wiring cost; median edge length; fraction of edges joining the two compartments; reciprocity; global transitivity of the undirected graph; sensory-to-motor flow capacity and reachable pairs (sets as in `results/connective_value.md`); number of neck-crossing edges; and the rich-to-rich route statistic R of `results/connective_richclub.md`. The Kolmogorov-Smirnov distance between real and synthetic in- and out-degree distributions is reported descriptively.
 
 **Criterion.** A property counts as reproduced when the real value lies within the central 95% of the 50 synthetic values (2.5th to 97.5th percentile). The report states the fraction of properties reproduced and lists each one either way. No threshold for a "good" model is set; the model reproducing many or few properties is equally reportable.
+
+## Fit
+
+Protocol committed in `e62c6df` before any model was fitted.
+
+Fitting sample: all 490,884 edges and 2,454,420 uniformly sampled non-edges, out of 531,849,372 non-edge ordered pairs. Intercept correction for the sampling: -5.378.
+
+| model | parameters | McFadden pseudo-R² | AIC | 5-fold CV AUC (range over folds) |
+|---|---|---|---|---|
+| distance only | 3 | 0.1646 | 2,217,311 | 0.7859 (0.7849–0.7869) |
+| distance + compartment | 4 | 0.1650 | 2,216,170 | 0.7868 (0.7858–0.7878) |
+| distance + compartment + class pairing (G) | 404 | 0.2755 | 1,923,558 | 0.8475 (0.8460–0.8482) |
+| G + source out-degree + target in-degree | 406 | 0.3809 | 1,644,045 | 0.8992 (0.8984–0.8999) |
+
+Model G coefficients: -0.248 per 100 µm of distance and -0.705 per unit of log distance; same compartment 0.698. Largest class-pairing coefficients: `descending_neuron->vnc_efferent` 4.88, `descending_neuron->vnc_intrinsic` 4.03, `descending_neuron->vnc_motor` 3.88, `descending_neuron->ascending_neuron` 3.82, `ascending_neuron->cb_motor` 3.61. Smallest: `descending_neuron->ol_intrinsic` -3.26, `vnc_motor->vnc_intrinsic` -4.06, `vnc_intrinsic->cb_intrinsic` -6.07, `cb_intrinsic->vnc_intrinsic` -6.07, `cb_intrinsic->ol_intrinsic` -6.61.
+
+After the intercept correction, model G expects 497,689 edges over all ordered pairs against 490,884 real edges; the shift that matches the count exactly is -0.014 (model G+deg: expected 511,033, shift -0.041).

@@ -1,9 +1,9 @@
 PYTHON ?= python
 export PYTHONUTF8 = 1
 
-.PHONY: reproduce data analyze hero export test
+.PHONY: reproduce data analyze hero export paper test
 
-reproduce: data analyze hero export
+reproduce: data analyze hero export paper
 
 data:
 	$(PYTHON) -m pipeline.schema_discovery
@@ -25,6 +25,10 @@ hero:
 
 export:
 	$(PYTHON) -m export.build_static_json
+
+# Figures are read from ../results, so typst's root is the repository.
+paper:
+	cd paper && pandoc report.md -o report.pdf --pdf-engine=typst --pdf-engine-opt=--root=..
 
 test:
 	$(PYTHON) -m pytest -q

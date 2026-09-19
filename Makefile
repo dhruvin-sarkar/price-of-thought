@@ -5,7 +5,7 @@ CHECKS := schema spatial_graph preregistration spatial_optimality richclub value
 
 .PHONY: reproduce data analyze hero readme export paper test verify
 
-reproduce: data analyze hero readme export paper test verify
+reproduce: data analyze hero readme paper test verify
 
 data:
 	$(PYTHON) -m pipeline.schema_discovery

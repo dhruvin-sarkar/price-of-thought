@@ -322,7 +322,7 @@ Requirements: Python 3.12, GNU Make, and network access to neuPrint and the publ
 ```sh
 python -m venv .venv && . .venv/bin/activate   # .venv\Scripts\activate on Windows
 pip install -r requirements.txt
-make reproduce   # data, analyze, hero, readme, export, paper, test and verify
+make reproduce   # data, analyze, hero, readme, paper, test and verify
 ```
 
 The stages can also be run on their own: `make data` (schema and spatial graph), `make analyze` (every test and null), `make hero` (hero image and its front view), `make readme` (the figures on this page, drawn from `results/` with their text set as outlines in Archivo and Spline Sans Mono, DejaVu where those font files are absent), `make paper`, `make test` (unit tests) and `make verify` (recomputes every statistic from the saved nulls and checks every committed result, report and headline number).

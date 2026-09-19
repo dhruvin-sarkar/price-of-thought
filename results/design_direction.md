@@ -46,7 +46,7 @@ Cream-and-terracotta or near-black-and-neon defaults. A SaaS card kit. ALL-CAPS 
 
 ## Constraints
 
-- A static site with no backend. Every value is precomputed by `export/build_static_json.py` from files in `results/` and `data/`.
+- A static site with no backend. Every value is precomputed by an export step from files in `results/` and `data/`.
 - GitHub Pages, deployed by Actions on push to `main`, the same single path as the other two projects.
 - The 3D view must stay interactive on a mid-range laptop. Meshes are decimated and connections drawn as one line batch, with the payload aimed below 15 MB compressed.
 - Usable at phone width: the 3D view becomes a static render with the overlay switch, and tables scroll within their own box.

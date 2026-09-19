@@ -1,11 +1,11 @@
 PYTHON ?= python
 export PYTHONUTF8 = 1
 CHECKS := schema spatial_graph preregistration spatial_optimality richclub value wiring_economy cable_length price \
-	generative threshold_robustness hero references citations document_numbers
+	generative threshold_robustness hero readme_assets references citations document_numbers
 
-.PHONY: reproduce data analyze hero export paper test verify
+.PHONY: reproduce data analyze hero readme export paper test verify
 
-reproduce: data analyze hero export paper test verify
+reproduce: data analyze hero readme export paper test verify
 
 data:
 	$(PYTHON) -m pipeline.schema_discovery
@@ -24,6 +24,11 @@ analyze:
 
 hero:
 	$(PYTHON) -m pipeline.hero_render
+	$(PYTHON) -m pipeline.front_view
+
+# README plates, figures and methods diagram, drawn from results/ into assets/readme/.
+readme:
+	$(PYTHON) -m pipeline.readme_assets
 
 export:
 	$(PYTHON) -m export.build_static_json

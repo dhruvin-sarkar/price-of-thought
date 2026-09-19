@@ -8,10 +8,17 @@ jobs:
   pytest:
     runs-on: ubuntu-latest
     steps:
+      # Full history, so the pre-registration check can read each hypothesis at its registration commit.
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
       - run: python -m pytest -q
+      # The neuPrint data cache is not in the repository, so checks that need it verify only the committed
+      # results and report SKIP for inputs that are absent.
+      - name: Verify committed results
+        run: make verify PYTHON=python

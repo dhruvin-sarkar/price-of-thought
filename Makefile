@@ -1,9 +1,11 @@
 PYTHON ?= python
 export PYTHONUTF8 = 1
+CHECKS := schema spatial_graph preregistration spatial_optimality richclub value wiring_economy cable_length price \
+	generative threshold_robustness hero references citations document_numbers
 
-.PHONY: reproduce data analyze hero export paper test
+.PHONY: reproduce data analyze hero export paper test verify
 
-reproduce: data analyze hero export paper
+reproduce: data analyze hero export paper test verify
 
 data:
 	$(PYTHON) -m pipeline.schema_discovery
@@ -32,3 +34,8 @@ paper:
 
 test:
 	$(PYTHON) -m pytest -q
+
+# Checks the committed results against their invariants and each other; fails if any check fails.
+# Checks whose inputs are not on disk report SKIP and do not fail.
+verify:
+	@status=0; for c in $(CHECKS); do printf "%-22s" "$$c"; $(PYTHON) -m verify.check_$$c || status=1; done; exit $$status

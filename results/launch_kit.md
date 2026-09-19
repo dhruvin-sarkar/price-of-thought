@@ -76,7 +76,7 @@ The male CNS connectome from HHMI Janelia FlyEM and Google Research (Berg et al.
   - the longest ordinary edges of equal total length: 962
   - brain → nerve cord flow only: 1.83 × the cost-matched loss
 - per cell type, price (wire length) and value (flow lost) correlate only through edge count (partial ρ = 0.044 for DNs, −0.12 for ANs)
-- a generative logistic model (distance + compartment + superclass pairing, pseudo-R² 0.276, AUC 0.848) reproduces 2 of 13 graph properties, including the rich-to-rich route count
+- a generative logistic model (distance + compartment + superclass pairing, pseudo-R² 0.276, AUC 0.847) reproduces 2 of 13 graph properties, including the rich-to-rich route count
 
 **Caveats I would flag first:**
 

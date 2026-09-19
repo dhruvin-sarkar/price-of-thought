@@ -262,7 +262,7 @@ Distance alone explains connections moderately well, with McFadden pseudo-R² 0.
 |---|---|---|
 | distance only | 0.165 | 0.786 |
 | + compartment | 0.165 | 0.787 |
-| + superclass pairing (model G) | 0.276 | 0.848 |
+| + superclass pairing (model G) | 0.276 | 0.847 |
 | + source and target degree (model G+deg) | 0.381 | 0.899 |
 
 : Fit of the nested generative models.

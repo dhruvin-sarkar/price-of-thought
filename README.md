@@ -2,7 +2,7 @@
 
 <p align="center"><b>Economically, but not optimally, and its most expensive wires buy no more than ordinary long ones.</b> The cell types of the male fruit fly's central nervous system are placed so that their connections use 0.459 times the wire of random placements of the same positions, yet simple swaps still cut at least 33.6%. The 7.5% of connections that cross the neck between brain and nerve cord hold 24.0% of all wire and join well-connected cell types, much as the costly hub connections of the human brain do. Cutting them removes less sensory-to-motor routing than random wiring of the same length, and the same as the longest ordinary connections, except in the direction from brain to nerve cord.<br><sub>Dhruvin Sarkar. An independent, pre-registered analysis of public connectome data, not peer reviewed.</sub></p>
 
-<p align="center"><a href="paper/report.pdf">Technical&nbsp;report</a>&emsp;<a href="results/preregistration.md">Pre-registration</a>&emsp;<a href="results/prior_art.md">Prior&nbsp;art&nbsp;and&nbsp;scope</a>&emsp;<a href="#reproduce">Reproduce</a></p>
+<p align="center"><a href="paper/report.pdf">Technical&nbsp;report</a>&emsp;<a href="results/preregistration.md">Pre-registration</a>&emsp;<a href="results/prior_art.md">Prior&nbsp;art&nbsp;and&nbsp;scope</a>&emsp;<a href="#the-poster">Poster</a>&emsp;<a href="#reproduce">Reproduce</a></p>
 
 ## Abstract
 
@@ -298,6 +298,11 @@ Every type's price, value and edge count is in [results/connective_price.csv](re
 
 </details>
 
+## The poster
+
+<p align="center"><a href="assets/readme/price-of-thought-poster.png"><img src="assets/readme/poster-preview.png" width="440" alt="Preview of The Price of Thought poster: a black title band with the nervous system seen from the front and its neck-crossing connections coloured by length, the two headline numbers 0.459 times and 24.0%, a strip of six method steps, three columns of figures and text on a pale ground, the thirteen pre-registered hypotheses with their outcomes, and a footer with a QR code to this repository."></a></p>
+<p align="center">One-page summary, 3508 × 4960 pixels. <a href="assets/readme/price-of-thought-poster.png">Open the full-size poster</a></p>
+
 ## Data and outputs
 
 Every number on this page comes from a file in this repository. These are the ones worth opening directly, with nothing installed and nothing run.
@@ -325,7 +330,7 @@ pip install -r requirements.txt
 make reproduce   # data, analyze, hero, readme, paper, test and verify
 ```
 
-The stages can also be run on their own: `make data` (schema and spatial graph), `make analyze` (every test and null), `make hero` (hero image and its front view), `make readme` (the figures on this page, drawn from `results/` with their text set as outlines in Archivo and Spline Sans Mono, DejaVu where those font files are absent), `make paper`, `make test` (unit tests) and `make verify` (recomputes every statistic from the saved nulls and checks every committed result, report and headline number).
+The stages can also be run on their own: `make data` (schema and spatial graph), `make analyze` (every test and null), `make hero` (hero image and its front view), `make readme` (the figures on this page, drawn from `results/` with their text set as outlines in Archivo and Spline Sans Mono, DejaVu where those font files are absent), `make poster`, `make paper`, `make test` (unit tests) and `make verify` (recomputes every statistic from the saved nulls and checks every committed result, report and headline number).
 
 Raw neuPrint data are cached under `data/` and are not committed. The public dataset can be queried anonymously; set `NEUPRINT_APPLICATION_CREDENTIALS` to use a token. All randomness is seeded from 20260916. The analyses use multiprocessing, with worker counts set in the `Makefile`, and were run on a machine with 16 GB of RAM.
 
@@ -347,6 +352,7 @@ Raw neuPrint data are cached under `data/` and are not committed. The public dat
 | threshold robustness | `pipeline/threshold_robustness.py` | [results/threshold_robustness.md](results/threshold_robustness.md) |
 | hero image and front view | `pipeline/hero_render.py`, `pipeline/front_view.py` | [assets/hero.png](assets/hero.png), [results/front_view.json](results/front_view.json) |
 | README figures | `pipeline/readme_assets.py` | plates, figures and methods diagram as SVG in `assets/readme/` |
+| poster | `pipeline/poster.py`, `pipeline/qr_code.py` | [assets/readme/price-of-thought-poster.png](assets/readme/price-of-thought-poster.png) |
 
 `verify/` holds one check script per result, and `tests/` holds the unit tests. Both run in continuous integration on every push.
 

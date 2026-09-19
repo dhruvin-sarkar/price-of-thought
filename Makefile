@@ -3,7 +3,7 @@ export PYTHONUTF8 = 1
 CHECKS := schema spatial_graph preregistration spatial_optimality richclub value wiring_economy cable_length price \
 	generative threshold_robustness hero readme_assets references citations document_numbers
 
-.PHONY: reproduce data analyze hero readme export paper test verify
+.PHONY: reproduce data analyze hero readme poster export paper test verify clean
 
 reproduce: data analyze hero readme paper test verify
 
@@ -37,6 +37,10 @@ export:
 paper:
 	cd paper && pandoc report.md -o report.pdf --pdf-engine=typst --pdf-engine-opt=--root=..
 
+# One-page summary at print size, and the preview shown in the README.
+poster:
+	$(PYTHON) -m pipeline.poster
+
 test:
 	$(PYTHON) -m pytest -q
 
@@ -44,3 +48,6 @@ test:
 # Checks whose inputs are not on disk report SKIP and do not fail.
 verify:
 	@status=0; for c in $(CHECKS); do printf "%-22s" "$$c"; $(PYTHON) -m verify.check_$$c || status=1; done; exit $$status
+
+clean:
+	rm -f paper/report.pdf

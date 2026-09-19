@@ -8,6 +8,7 @@ from verify.common import run
 
 LINK = re.compile(r"!?\[[^\]]*\]\(([^)\s#]+)(?:#[^)]*)?\)")
 CODE_PATH = re.compile(r"`((?:results|pipeline|export|verify|tests|assets|paper)/[^`\s]+)`")
+HTML_PATH = re.compile(r'(?:src|srcset|href)="([^"#]+)"')
 
 
 def documents() -> list[Path]:
@@ -18,7 +19,8 @@ def check() -> str:
     broken, checked = [], 0
     for doc in documents():
         text = doc.read_text(encoding="utf-8")
-        targets = [doc.parent / m for m in LINK.findall(text) if not re.match(r"^[a-z]+:", m)]
+        links = LINK.findall(text) + HTML_PATH.findall(text)
+        targets = [doc.parent / m for m in links if not re.match(r"^[a-z]+:", m)]
         targets += [ROOT / m.rstrip(".,;:") for m in CODE_PATH.findall(text)]
         for target in targets:
             checked += 1

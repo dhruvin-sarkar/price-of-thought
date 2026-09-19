@@ -178,11 +178,15 @@ The search had not converged (the last 100,000 proposals still saved 0.33%), so 
 
 The cable-length check supports node positions as a between-class measure only. Across the 500 sampled neurons, skeleton cable length correlates with soma-to-output distance (ρ = 0.428, p = 5.5 × 10^−24^): descending and ascending neurons have more cable (medians 4,592 and 3,898 µm) than intrinsic neurons (1,428 and 1,713 µm). Within each superclass, however, |ρ| is below 0.12.
 
+![Skeleton cable length against soma-to-output distance for 500 sampled neurons, by superclass.](../results/cable_length.png)
+
 ## The connective is expensive, and its partners are well connected
 
 Neck-crossing edges are 7.5% of all edges and 24.0% of total wiring cost, with a mean length of 606 µm against 189.6 µm for all edges. Counting every edge incident on a connective node, the connective carries 20.4% of edges and 38.7% of cost.
 
 Edges incident on high-degree nodes (total degree at least 67, the 90th percentile) are longer than other edges: mean 211 against 175 µm (one-sided Mann-Whitney p < 10^−300^). The high-cost backbone reported in human and *C. elegans* connectomes is therefore present here. Long edges also carry somewhat more traffic: edge length correlates with directed edge betweenness at ρ = 0.121, and at ρ = 0.084 among edges within one compartment.
+
+![Wiring economy of the cell-type graph: connection probability against distance, cost saved by greedy swaps, the share of edges and of wiring cost by edge group, and edge length against edge betweenness.](../results/wiring_economy_extensions.png)
 
 Descending and ascending nodes are over-represented among the most connected nodes of the whole graph. At or above the 90th percentile of total degree lie 24.4% of descending nodes, 23.2% of ascending nodes and 8.8% of other nodes (odds ratio 3.22, Fisher p = 1.5 × 10^−79^). This is the expectation of Lin et al. (2024).
 

@@ -19,11 +19,13 @@ N_WIRES = 3000
 SAMPLE_SEED_OFFSET = 950_000
 
 
-def silhouette(points: np.ndarray, grid: float = GRID_UM, close_cells: int = 3) -> list[np.ndarray]:
+def silhouette(points: np.ndarray, grid: float = GRID_UM, close_cells: int = 3,
+               smooth_cells: float = 1.5) -> list[np.ndarray]:
     """Outer outlines of a dense 2D point cloud, traced on an occupancy grid.
 
     Parameters: ``points`` is an (n, 2) array of screen coordinates in µm; ``grid`` the cell size in µm;
-    ``close_cells`` the radius, in cells, of the morphological closing that bridges gaps between points.
+    ``close_cells`` the radius, in cells, of the morphological closing that bridges gaps between points;
+    ``smooth_cells`` the Gaussian blur, in cells, applied before tracing so the outline follows curves, not cells.
     Returns each closed outline as an (m, 2) array in the same coordinates, largest first.
     """
     lo = points.min(axis=0) - (close_cells + 2) * grid
@@ -33,7 +35,7 @@ def silhouette(points: np.ndarray, grid: float = GRID_UM, close_cells: int = 3) 
     occupied[index[:, 1], index[:, 0]] = True
     structure = ndimage.generate_binary_structure(2, 1)
     filled = ndimage.binary_fill_holes(ndimage.binary_closing(occupied, structure, iterations=close_cells))
-    lines = contourpy.contour_generator(z=filled.astype(float)).lines(0.5)
+    lines = contourpy.contour_generator(z=ndimage.gaussian_filter(filled.astype(float), smooth_cells)).lines(0.5)
     outlines = [line * grid + lo for line in lines if len(line) > 8]
     return sorted(outlines, key=lambda o: -np.ptp(o[:, 0]) * np.ptp(o[:, 1]))
 

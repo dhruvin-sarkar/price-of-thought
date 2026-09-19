@@ -1,8 +1,10 @@
 """Render the male CNS neuropils with every neck-crossing connection of the cell-type graph drawn through them."""
 
+import hashlib
 import json
 import textwrap
 import urllib.parse
+from pathlib import Path
 
 import numpy as np
 import requests
@@ -42,11 +44,16 @@ def mesh_names(source: str) -> list[str]:
     return list(info["properties"][0]["values"])
 
 
+def mesh_cache_path(source: str, name: str) -> Path:
+    """Cache file for one neuropil mesh, unique even on case-insensitive filesystems (AL(R) and aL(R) both exist)."""
+    digest = hashlib.sha1(name.encode("utf-8")).hexdigest()[:8]
+    return MESH_CACHE / source / f"{name}.{digest}.ngmesh"
+
+
 def load_mesh(source: str, name: str) -> tuple[np.ndarray, np.ndarray] | None:
     """Vertices (nm) and triangles of one neuropil, cached on disk; None when no mesh is published."""
-    cache = MESH_CACHE / source
-    cache.mkdir(parents=True, exist_ok=True)
-    path = cache / f"{name}.ngmesh"
+    path = mesh_cache_path(source, name)
+    path.parent.mkdir(parents=True, exist_ok=True)
     if not path.exists():
         response = requests.get(f"{MESH_SOURCES[source]}/mesh/{urllib.parse.quote(name)}.ngmesh", timeout=600)
         if response.status_code == 404:

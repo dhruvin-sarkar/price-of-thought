@@ -2,11 +2,11 @@
 
 <p align="center"><b>Economically, but not optimally, and its most expensive wires buy no more than ordinary long ones.</b> The cell types of the male fruit fly's central nervous system are placed so that their connections use 0.459 times the wire of random placements of the same positions, yet simple swaps still cut at least 33.6%. The 7.5% of connections that cross the neck between brain and nerve cord hold 24.0% of all wire and join well-connected cell types, much as the costly hub connections of the human brain do. Cutting them removes less sensory-to-motor routing than random wiring of the same length, and the same as the longest ordinary connections, except in the direction from brain to nerve cord.<br><sub>Dhruvin Sarkar. An independent, pre-registered analysis of public connectome data, not peer reviewed.</sub></p>
 
-<p align="center"><a href="https://dhruvin-sarkar.github.io/price-of-thought/">Illustrated&nbsp;findings</a>&emsp;<a href="https://dhruvin-sarkar.github.io/price-of-thought/#connective">The&nbsp;connective</a>&emsp;<a href="https://dhruvin-sarkar.github.io/price-of-thought/#lookup">Any&nbsp;cell&nbsp;type</a>&emsp;<a href="paper/report.pdf">Technical&nbsp;report</a>&emsp;<a href="results/preregistration.md">Pre-registration</a>&emsp;<a href="results/prior_art.md">Prior&nbsp;art&nbsp;and&nbsp;scope</a>&emsp;<a href="#the-poster">Poster</a></p>
+<p align="center"><a href="https://dhruvin-sarkar.github.io/price-of-thought/">Illustrated&nbsp;findings</a>&emsp;<a href="https://dhruvin-sarkar.github.io/price-of-thought/#budget">The&nbsp;budget</a>&emsp;<a href="https://dhruvin-sarkar.github.io/price-of-thought/#connective">The&nbsp;connective</a>&emsp;<a href="https://dhruvin-sarkar.github.io/price-of-thought/#lookup">Any&nbsp;cell&nbsp;type</a>&emsp;<a href="paper/report.pdf">Technical&nbsp;report</a>&emsp;<a href="results/preregistration.md">Pre-registration</a>&emsp;<a href="results/prior_art.md">Prior&nbsp;art&nbsp;and&nbsp;scope</a>&emsp;<a href="#the-poster">Poster</a></p>
 
 ## Abstract
 
-HHMI Janelia and Google Research have released a complete wiring diagram of an adult male fruit fly's central nervous system, brain and nerve cord together.[^berg] We asked whether it is wired economically, in the sense that its components are placed so as to keep connections short,[^cherniak] and what its most expensive wiring, the neck connective of descending and ascending neurons, buys in return. In the human connectome the most connected regions are joined by long, costly connections that carry a large share of communication;[^heuvel2012] the fly's connective is the obvious candidate for the same role. The connectome was represented as a graph of 23,073 cell types resolved by side, with 490,884 connections, each type placed at the centroid of its neurons' cell bodies. The real placement costs 0.459 times the wire of 1000 random reassignments of the same positions (z = −278.8), and 0.728 times when positions move only within brain or nerve cord; it is not a local optimum. The connective's cell types are over-represented among hubs (odds ratio 3.22), and routes through it join well-connected types on the two sides 1.103 times as often as rewiring predicts, though that excess vanishes when weaker connections are counted. Cutting it removes 0.36 times the sensory-to-motor flow capacity that random wiring of equal length removes, and 1.83 times from brain to nerve cord. Attributed to the neuropils, only 6.6% of the wire stays inside one region, and all 48 regions large enough to test are wired internally more cheaply than permutations of their own cell types; over connections the budget is uneven (Gini 0.404) but its upper tail is fitted better by a lognormal than by a power law.
+HHMI Janelia and Google Research have released a complete wiring diagram of an adult male fruit fly's central nervous system, brain and nerve cord together.[^berg] We asked whether it is wired economically, in the sense that its components are placed so as to keep connections short,[^cherniak] and what its most expensive wiring, the neck connective of descending and ascending neurons, buys in return. In the human connectome the most connected regions are joined by long, costly connections that carry a large share of communication;[^heuvel2012] the fly's connective is the obvious candidate for the same role. The connectome was represented as a graph of 23,073 cell types resolved by side, with 490,884 connections, each type placed at the centroid of its neurons' cell bodies. The real placement costs 0.459 times the wire of 1000 random reassignments of the same positions (z = −278.8), and 0.728 times when positions move only within brain or nerve cord; it is not a local optimum. The connective's cell types are over-represented among hubs (odds ratio 3.22), and routes through it join well-connected types on the two sides 1.103 times as often as rewiring predicts, though that excess vanishes when weaker connections are counted. Cutting it removes 0.36 times the sensory-to-motor flow capacity that random wiring of equal length removes, and 1.83 times from brain to nerve cord. Attributed to the neuropils, only 6.6% of the wire stays inside one region, and all 48 regions large enough to test are wired internally more cheaply than permutations of their own cell types; over connections the budget is uneven (Gini 0.404) but its upper tail is fitted better by a lognormal than by a power law. Of thirteen hypotheses registered before the statistics were computed, nine are supported and four are not.
 
 ## Results
 
@@ -15,16 +15,23 @@ HHMI Janelia and Google Research have released a complete wiring diagram of an a
 > [!IMPORTANT]
 > These are structural results on a static wiring diagram aggregated to cell types. Wiring cost is the straight-line distance between cell-type positions, not the length of real neuronal processes, and flow capacity counts disjoint paths, not information transmitted or behaviour. Nothing here simulates neural activity or says how the nervous system develops.
 
-**Pre-specified checks**
+**The thirteen pre-specified checks**
 
-- [x] Real placement is cheaper than 1000 permutations of the same positions (0 of 1000 as cheap; also within brain or nerve cord alone)
-- [x] The placement is not a local optimum: cost-reducing swaps exist and cut more than 1%
-- [x] Connection probability falls with distance, and edges of high-degree types are longer (mean 211 against 175 µm)
-- [x] Rich-to-rich routes through the connective exceed layer-preserving rewirings (1.103, p = 0.001)
-- [x] Connective partners are enriched for high degree (1.40 times a uniform redraw), and connective types are over-represented among hubs (odds ratio 3.22)
-- [ ] Cutting the neck costs more flow than random wiring of equal length (not supported: 0.36 times; see [where it falls short](#where-it-falls-short))
-- [ ] A connective type's wire length predicts the flow it carries, at a given number of connections (not supported: partial ρ = 0.044)
-- [ ] The placement, route and hub results hold at edge thresholds of 0.5%, 2% and 5% (not supported: routes vanish at 0.5%)
+Every hypothesis was committed, with its direction, statistic and null, before the statistic was computed. Nine hold and four do not; the four that do not are set out under [where it falls short](#where-it-falls-short) and are given the same space here as the nine.
+
+- [x] The real placement is cheaper than 1000 permutations of the same positions (0.459 of the permuted mean, 0 of 1000 as cheap; also within brain or nerve cord alone)
+- [x] Rich-to-rich routes through the connective exceed layer-preserving rewirings (1.103 times the rewired mean, p = 0.001)
+- [x] Rich partners are over-represented among the connective's partners (1.40 times a uniform redraw)
+- [x] Descending and ascending cell types are over-represented among hubs (odds ratio 3.22)
+- [ ] Cutting the neck costs more flow than random wiring of equal length (**not supported**: 0.36 times as much)
+- [x] Connection probability falls with distance (ρ = −0.993 over all pairs; not within one compartment alone)
+- [x] The placement is not a local optimum: cost-reducing swaps exist and cut more than 1% (at least 33.6%)
+- [x] Connections of high-degree cell types are longer (mean 211 against 175 µm)
+- [x] Connection length correlates with edge betweenness (ρ = 0.121, weak)
+- [x] Skeleton cable length correlates with soma-to-output distance (ρ = 0.428, between classes rather than within them)
+- [ ] A connective type's wire length predicts the flow it carries (**not supported**: ρ = 0.231 descending, −0.005 ascending)
+- [ ] That correlation survives control for the number of connections (**not supported**: partial ρ = 0.044)
+- [ ] Placement, routes and hubs hold at edge thresholds of 0.5%, 2% and 5% (**not supported**: routes vanish at 0.5%)
 
 <details>
 <summary>All headline values</summary>
@@ -33,6 +40,7 @@ HHMI Janelia and Google Research have released a complete wiring diagram of an a
 |---|---|
 | cell types by side / connections | 23,073 / 490,884 |
 | typed neurons | 164,506 |
+| pre-registered hypotheses, supported / not supported | 9 / 4 of 13 |
 | neck-crossing connections | 36,943, 7.5% of connections and 24.0% of wire |
 | placement cost against random, all positions / within compartment | 0.459 (z = −278.8) / 0.728 |
 | further saving from cost-reducing swaps, a lower bound | 33.6% |
@@ -45,6 +53,7 @@ HHMI Janelia and Google Research have released a complete wiring diagram of an a
 | price against value, descending types, given edge count | partial ρ = 0.044 |
 | wire staying inside one neuropil | 6.6%, 6,154 mm over 86,881 connections |
 | neuropils tested for internal placement, and those below their permuted mean | 48 / 48 |
+| neuropils cheaper than at least 95% of their own permutations | 45 of 48 |
 | concentration of the budget, Gini / share held by the longest tenth | 0.404 / 30.7% |
 | properties reproduced by the distance, compartment and cell-class model | 2 of 13 |
 
@@ -78,19 +87,19 @@ The real placement costs 93,095 mm of wire. Of 2,000,000 proposed swaps, 50,050 
 
 <p><a href="https://dhruvin-sarkar.github.io/price-of-thought/#placement"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/fig-distance-dark.svg"><img src="assets/readme/fig-distance-light.svg" width="880" alt="Figure 2. Line chart, logarithmic vertical axis, of connection probability against distance from 0 to 1000 µm. All pairs together fall steadily, length constant 76 µm over the first 600 µm. Brain pairs fall to a minimum at 340 µm and nerve-cord pairs at 500 µm, then rise again; pairs across the neck start lower and fall with a length constant of 208 µm."></picture></a></p>
 
-**Figure 2. Nearby cell types connect far more often, except at the longest distances.** Connection probability falls with distance across all pairs (Spearman ρ = −0.993 over 51 bins of 20 µm), with a length constant of 76 µm over the first 600 µm. Inside the brain and inside the nerve cord the fall is not monotonic: probability reaches a minimum at 340 µm and 500 µm, then rises again, because most of the longest connections join a cell type on one side of the body to one on the other. Pairs across the neck start less likely to connect and fall more slowly.
+**Figure 2. Nearby cell types connect far more often, except at the longest distances.** Connection probability falls with distance across all pairs (Spearman ρ = −0.993 over 51 bins of 20 µm), with a length constant of 76 µm over the first 600 µm. Inside the brain and inside the nerve cord the fall is not monotonic and the rank correlation is not significant (ρ = −0.154 and −0.159, p = 0.14 each): probability reaches a minimum at 340 µm and 500 µm, then rises again, because most of the longest connections join a cell type on one side of the body to one on the other. The hypothesis is therefore supported over all pairs and not within a compartment taken alone. Pairs across the neck start less likely to connect and fall more slowly.
 
 <details>
 <summary>Values behind Figure 2</summary>
 
-| pairs | length constant, 0 to 600 µm | probability minimum |
-|---|---:|---:|
-| all pairs | 76 µm | |
-| brain to brain | 63 µm | 340 µm |
-| nerve cord to nerve cord | 128 µm | 500 µm |
-| across the neck | 208 µm | |
+| pairs | edges | Spearman ρ | p | length constant, 0 to 600 µm | probability minimum |
+|---|---:|---:|---:|---:|---:|
+| all pairs | 490,884 | −0.993 | 9.4 × 10⁻⁴⁸ | 76 µm | |
+| brain to brain | 319,431 | −0.154 | 0.14 | 63 µm | 340 µm |
+| nerve cord to nerve cord | 133,277 | −0.159 | 0.14 | 128 µm | 500 µm |
+| across the neck | 38,176 | −0.988 | 9.2 × 10⁻⁴² | 208 µm | |
 
-Per-bin pair and edge counts are in [results/distance_dependence.csv](results/distance_dependence.csv).
+The last row counts every connection joining a brain cell type to a nerve-cord one, which is a slightly wider set than the 36,943 that a descending or ascending type owns. Beyond 600 µm there are 2,015 brain and 1,176 nerve-cord connections; 61% and 57% of them join opposite sides of the body, which is why the curves turn up again. Per-bin pair and edge counts are in [results/distance_dependence.csv](results/distance_dependence.csv).
 
 <sub>Source: <a href="results/wiring_economy_extensions.md">results/wiring_economy_extensions.md</a></sub>
 
@@ -98,7 +107,7 @@ Per-bin pair and edge counts are in [results/distance_dependence.csv](results/di
 
 ## Where the wire goes
 
-<p><a href="https://dhruvin-sarkar.github.io/price-of-thought/"><img src="assets/hero.png" width="880" alt="The male fly central nervous system seen from the front, brain above and nerve cord below, with every connection that crosses the neck drawn as a line coloured by its length, from pale orange for short to dark red for the longest, about a millimetre."></a></p>
+<p><a href="https://dhruvin-sarkar.github.io/price-of-thought/"><img src="assets/hero.png" width="880" alt="The male fly central nervous system seen from the front, brain above and nerve cord below, with every connection that crosses the neck drawn as a line coloured by its length, from pale orange for short to dark red for the longest, about a millimetre."></a><br><sub>All 36,943 neck-crossing connections at once, drawn between the cell-type positions they join and coloured by length. The same connections can be turned in the browser on <a href="https://dhruvin-sarkar.github.io/price-of-thought/">the site</a>.</sub></p>
 
 <p><a href="https://dhruvin-sarkar.github.io/price-of-thought/#connective"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/fig-cost-dark.svg"><img src="assets/readme/fig-cost-light.svg" width="880" alt="Figure 3. Paired bar chart of the share of connections and the share of total wiring length. Neck-crossing connections: 7.5% of connections, 24.0% of wire, mean 606 µm. Any descending or ascending edge: 20.4% of connections, 38.7% of wire. Touching a hub (degree at least 67): 41.8% of connections, 46.4% of wire. None of these: 49.2% of connections, 37.3% of wire."></picture></a></p>
 
@@ -114,15 +123,17 @@ Per-bin pair and edge counts are in [results/distance_dependence.csv](results/di
 | touching a hub (degree at least 67) | 41.8% | 46.4% | 211 µm |
 | none of these | 49.2% | 37.3% | 144 µm |
 
-The first three groups overlap. As a check on positions as a stand-in for cable, skeleton cable length of 500 sampled neurons correlates with soma-to-output distance (ρ = 0.428), through differences between classes: within each class |ρ| is below 0.12 ([cable_length.md](results/cable_length.md)).
+The first three groups overlap.
 
 <sub>Source: <a href="results/wiring_economy_extensions.md">results/wiring_economy_extensions.md</a></sub>
 
 </details>
 
-<p><a href="https://dhruvin-sarkar.github.io/price-of-thought/#placement"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/fig-atlas-dark.svg"><img src="assets/readme/fig-atlas-light.svg" width="880" alt="Figure 4. Twelve rows, one per neuropil. Bars of the share of all wire that ends in each: GNG 10.1%, ANm 5.8%, AVLP(R) 4.1%, LegNp(T2)(R) 4.0%, LegNp(T3)(R) 3.9%, LegNp(T2)(L) 3.9%, AVLP(L) 3.8%, LegNp(T1)(L) 3.4%, LegNp(T3)(L) 3.3%, SAD 3.3%, LegNp(T1)(R) 3.1%, PB 2.9%. Beside each, a dot for the summed length of its internal connections divided by the mean of 1000 permutations of its own cell types: GNG 0.809, ANm 0.729, AVLP(R) 0.863, LegNp(T2)(R) 0.885, LegNp(T3)(R) 0.894, LegNp(T2)(L) 0.895, AVLP(L) 0.879, LegNp(T1)(L) 0.891, LegNp(T3)(L) 0.922, SAD 0.682, LegNp(T1)(R) 0.885, PB 0.767. 89 of 105 neuropil surfaces hold cell types and 6.6% of the wire stays inside one of them. All 48 neuropils large enough to test sit below their permuted mean, 41 of them below every permutation, and AL(L) comes closest at 0.974."></picture></a></p>
+## The budget across the regions
 
-**Figure 4. The wire ends unevenly across the neuropils, and every region large enough to test is packed cheaply.** Each connection lends half its length to the neuropil nearest each of its ends, so every region is charged for the wire that ends in it. 89 of the 105 published neuropil surfaces hold cell types, and only 6.6% of the wire stays inside one of them; the rest runs between regions. The gnathal ganglia hold 10.1% of the budget, more than any other region, and the heaviest route between two regions, from there to the abdominal neuromere, carries 1,586 mm over 2,101 connections. Repeating the placement test inside a region, over that region's own cell types and its own positions, puts all 48 regions large enough to test below their permuted mean, 41 of them below every one of the 1000 permutations. The antennal lobes are the exception: AL(L) sits at 0.974 of its permuted mean, with 171 of the 1000 permutations as cheap.
+<p><a href="https://dhruvin-sarkar.github.io/price-of-thought/#budget"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/fig-atlas-dark.svg"><img src="assets/readme/fig-atlas-light.svg" width="880" alt="Figure 4. Twelve rows, one per neuropil. Bars of the share of all wire that ends in each: GNG 10.1%, ANm 5.8%, AVLP(R) 4.1%, LegNp(T2)(R) 4.0%, LegNp(T3)(R) 3.9%, LegNp(T2)(L) 3.9%, AVLP(L) 3.8%, LegNp(T1)(L) 3.4%, LegNp(T3)(L) 3.3%, SAD 3.3%, LegNp(T1)(R) 3.1%, PB 2.9%. Beside each, a dot for the summed length of its internal connections divided by the mean of 1000 permutations of its own cell types: GNG 0.809, ANm 0.729, AVLP(R) 0.863, LegNp(T2)(R) 0.885, LegNp(T3)(R) 0.894, LegNp(T2)(L) 0.895, AVLP(L) 0.879, LegNp(T1)(L) 0.891, LegNp(T3)(L) 0.922, SAD 0.682, LegNp(T1)(R) 0.885, PB 0.767. 89 of 105 neuropil surfaces hold cell types and 6.6% of the wire stays inside one of them. All 48 neuropils large enough to test sit below their permuted mean, 41 of them below every permutation, and AL(L) comes closest at 0.974."></picture></a></p>
+
+**Figure 4. The wire ends unevenly across the neuropils, and almost every region large enough to test is packed cheaply.** Each connection lends half its length to the neuropil nearest each of its ends, so every region is charged for the wire that ends in it. 89 of the 105 published neuropil surfaces hold cell types, and only 6.6% of the wire stays inside one of them; the rest runs between regions. The gnathal ganglia hold 10.1% of the budget, more than any other region, and the heaviest route between two regions, from there to the abdominal neuromere, carries 1,586 mm over 2,101 connections. Repeating the placement test inside a region, over that region's own cell types and its own positions, puts all 48 regions large enough to test below their permuted mean, 41 of them below every one of the 1000 permutations. Three regions are not reliably cheaper than their own reshuffles: AL(L) sits at 0.974 of its permuted mean with 171 of the 1000 permutations as cheap, AL(R) at 0.960 with 53, and AME(R) at 0.939 with 231. The antennal lobes, whose glomeruli are a textbook case of orderly wiring, are on this measure no cheaper than chance: their order is not an order that shortens wire.
 
 <details>
 <summary>Values behind Figure 4</summary>
@@ -134,16 +145,17 @@ The first three groups overlap. As a check on positions as a stand-in for cable,
 | AVLP(R) | 4.1% | 5,881 | 0.863 | 0 of 1000 |
 | SAD | 3.3% | 1,842 | 0.682 | 0 of 1000 |
 | gL(L), the most economical | 0.9% | 233 | 0.428 | 0 of 1000 |
+| AME(R) | 0.2% | 84 | 0.939 | 231 of 1000 |
 | AL(R) | 2.3% | 2,904 | 0.960 | 53 of 1000 |
 | AL(L), the closest to chance | 2.4% | 3,139 | 0.974 | 171 of 1000 |
 
-Every neuropil, the wire it holds and the wire running between each pair is in [results/wire_atlas.md](results/wire_atlas.md).
+The fourteen regions with the largest shares hold 56.4% of the budget between them. Every neuropil, the wire it holds and the wire running between each pair is in [results/wire_atlas.md](results/wire_atlas.md).
 
 <sub>Source: <a href="results/wire_atlas.md">results/wire_atlas.md</a>, <a href="results/wire_atlas.json">results/wire_atlas.json</a></sub>
 
 </details>
 
-<p><a href="https://dhruvin-sarkar.github.io/price-of-thought/#connective"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/fig-concentration-dark.svg"><img src="assets/readme/fig-concentration-light.svg" width="880" alt="Figure 5. Left: Lorenz curves of the share of wire against the share of connections, longest first, with Gini coefficients all connections 0.40, within the brain 0.34, within the nerve cord 0.33, across the neck 0.15. The longest 1% of connections hold 4.6% of the wire and the longest 10% hold 30.7%. Right: bars of the share of the wire owned by each class of cell type, counting a connection for the class at each end: central brain intrinsic 55.7% at a mean 173 µm, nerve cord intrinsic 32.0% at a mean 211 µm, ascending 22.5% at a mean 363 µm, descending 20.4% at a mean 383 µm, visual projection 5.2% at a mean 157 µm, nerve cord sensory 2.9% at a mean 146 µm, optic lobe intrinsic 2.5% at a mean 134 µm, central brain sensory 1.7% at a mean 118 µm. A power law fitted above 161 µm has exponent 2.99; it beats an exponential but loses to a lognormal and to a truncated power law."></picture></a></p>
+<p><a href="https://dhruvin-sarkar.github.io/price-of-thought/#budget"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/fig-concentration-dark.svg"><img src="assets/readme/fig-concentration-light.svg" width="880" alt="Figure 5. Left: Lorenz curves of the share of wire against the share of connections, longest first, with Gini coefficients all connections 0.40, within the brain 0.34, within the nerve cord 0.33, across the neck 0.15. The longest 1% of connections hold 4.6% of the wire and the longest 10% hold 30.7%. Right: bars of the share of the wire owned by each class of cell type, counting a connection for the class at each end: central brain intrinsic 55.7% at a mean 173 µm, nerve cord intrinsic 32.0% at a mean 211 µm, ascending 22.5% at a mean 363 µm, descending 20.4% at a mean 383 µm, visual projection 5.2% at a mean 157 µm, nerve cord sensory 2.9% at a mean 146 µm, optic lobe intrinsic 2.5% at a mean 134 µm, central brain sensory 1.7% at a mean 118 µm. A power law fitted above 161 µm has exponent 2.99; it beats an exponential but loses to a lognormal and to a truncated power law."></picture></a></p>
 
 **Figure 5. A tenth of the connections holds nearly a third of the wire, and the tail is not a power law.** Sorted longest first, the longest 1% of connections hold 4.6% of the wiring budget and the longest 10% hold 30.7%, a Gini coefficient of 0.404. Inside the brain and inside the nerve cord the spread is narrower (0.343 and 0.334), and the neck-crossing connections are the most uniform of all (0.151): they are long, a median of 597.6 µm against 146.3 µm inside the brain, and nearly all of a length. A power law fitted to the upper tail above 161 µm has exponent 2.99 and beats an exponential, but a lognormal and a truncated power law both fit it better, which is what a distribution bounded by the size of the nervous system looks like. Counting a connection for the class of cell type at each of its ends, central brain intrinsic types hold 55.7% of the budget and nerve cord intrinsic types 32.0%, while ascending and descending types hold 22.5% and 20.4% of it on the longest connections of any class, means of 363 and 383 µm.
 
@@ -203,7 +215,7 @@ p = (1 + k) / 1001, where k is the number of rewirings with at least as many rou
 
 <p><a href="https://dhruvin-sarkar.github.io/price-of-thought/#connective"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/fig-value-dark.svg"><img src="assets/readme/fig-value-light.svg" width="880" alt="Figure 7. Three rows of histograms of sensory-to-motor flow lost under random removals, with the loss from cutting the neck marked. All flow: the cut removes 963, length-matched random sets 2689 on average (ratio 0.36), count-matched sets 648, the longest ordinary edges 962. Brain to nerve cord: ratio 1.83, the cut beyond every random set. Nerve cord to brain: ratio 0.44."></picture></a></p>
 
-**Figure 7. Per unit of wire, the neck carries less routing than ordinary wiring, except from brain to nerve cord.** Flow capacity is the number of edge-disjoint paths from sensory to motor cell types, the measure of Fault Lines.[^faultlines] The intact graph supports 8,731. Cutting the 36,943 neck-crossing connections removes 963; 1000 random sets of ordinary connections of the same total length, about 153,000 shorter connections each, remove 2,689 on average. Per connection the neck carries more (1.49 times an equal number of random connections), and against the longest ordinary connections of the same total length it carries the same: those remove 962. Its distinctive contribution is directional. Cutting the neck removes 59% of the flow from brain sensory to nerve-cord motor types, 1.83 times the random loss, and 11% of the reverse.
+**Figure 7. Per unit of wire, the neck carries less routing than ordinary wiring, except from brain to nerve cord.** Flow capacity is the number of edge-disjoint paths from sensory to motor cell types, the measure of Fault Lines.[^faultlines] The intact graph supports 8,731. Cutting the 36,943 neck-crossing connections removes 963; 1000 random sets of ordinary connections of the same total length, about 153,000 shorter connections each, remove 2,689 on average. The pre-registered hypothesis was that the neck would cost more, and it costs less: the ratio is 0.36. Per connection the neck carries more (1.49 times an equal number of random connections), and against the longest ordinary connections of the same total length it carries the same: those remove 962. Its distinctive contribution is directional. Cutting the neck removes 59% of the flow from brain sensory to nerve-cord motor types, 1.83 times the random loss, and 11% of the reverse.
 
 <details>
 <summary>Values behind Figure 7</summary>
@@ -224,7 +236,7 @@ No sensory-motor pair is disconnected by the cut. Silencing every connection of 
 
 <p><a href="https://dhruvin-sarkar.github.io/price-of-thought/#connective"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/fig-price-dark.svg"><img src="assets/readme/fig-price-light.svg" width="880" alt="Figure 8. Two scatter plots, descending and ascending cell types, of neck-crossing wire length (logarithmic) against the flow lost when that wire alone is removed. Most dots lie on zero: 622 of 911 descending and 899 of 1,010 ascending types lose no flow. Rank correlation 0.231 for descending types, 0.044 once the number of connections is controlled for; −0.005 for ascending types."></picture></a></p>
 
-**Figure 8. More wire does not buy a cell type more flow.** For each descending or ascending cell type on one side, its price is the total length of its neck-crossing connections and its value the flow lost in its own direction when they alone are removed. Most types can be removed at no cost to flow. Among descending types price and value are correlated (ρ = 0.231), but at a given number of connections longer wiring buys nothing more (partial ρ = 0.044, p = 0.09); among ascending types they are unrelated. The most expensive ascending type, `AN07B004`, has 146 mm of wire and carries 2 units, while `DNge002` carries 14 with 5.5 mm.
+**Figure 8. More wire does not buy a cell type more flow.** For each descending or ascending cell type on one side, its price is the total length of its neck-crossing connections and its value the flow lost in its own direction when they alone are removed. Most types can be removed at no cost to flow. Among descending types price and value are correlated (ρ = 0.231), but at a given number of connections longer wiring buys nothing more (partial ρ = 0.044, p = 0.09); among ascending types they are unrelated. Both parts of the pre-registered hypothesis therefore fail, in both directions. The most expensive ascending type, `AN07B004`, has 146 mm of wire and carries 2 units, while `DNge002` carries 14 with 5.5 mm.
 
 <details>
 <summary>Values behind Figure 8</summary>
@@ -244,7 +256,7 @@ Every type's price, value and edge count is in [results/connective_price.csv](re
 
 <p><a href="https://dhruvin-sarkar.github.io/price-of-thought/#model"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/fig-generative-dark.svg"><img src="assets/readme/fig-generative-light.svg" width="880" alt="Figure 9. For thirteen graph properties, the real value relative to the mean of 50 synthetic graphs from two logistic models, with the synthetic 95% range. Model G reproduces 2 properties, including rich-to-rich routes (real 7454, synthetic mean 6636); model G+deg reproduces 1. The real graph has 21 times model G's reciprocity and 16 times its transitivity."></picture></a></p>
 
-**Figure 9. Distance, compartment and cell class reproduce the rich-to-rich routes, and little else.** Model G predicts each connection from the distance between two cell types, whether they share a compartment, and their pair of cell classes; it knows nothing of the real degrees. Earlier generative models of the fly brain combined distance with degree.[^salova] Graphs drawn from model G reproduce 2 of 13 properties of the real graph, and one of them is the number of rich-to-rich routes through the connective: 6,636 on average against 7,454 real. The route excess over degree-preserving rewiring therefore lies within what distance and cell class produce on their own. Neither model reproduces reciprocity or clustering, as expected when every pair is drawn independently.
+**Figure 9. Distance, compartment and cell class reproduce the rich-to-rich routes, and little else.** Model G predicts each connection from the distance between two cell types, whether they share a compartment, and their pair of cell classes; it knows nothing of the real degrees. Earlier generative models of the fly brain combined distance with degree.[^salova] Graphs drawn from model G reproduce 2 of 13 properties of the real graph, and one of them is the number of rich-to-rich routes through the connective: 6,636 on average against 7,454 real. The route excess over degree-preserving rewiring therefore lies within what distance and cell class produce on their own. Neither model reproduces reciprocity or clustering, as expected when every pair is drawn independently. The model was registered as a protocol without a hypothesis: which properties it reproduced was to be reported either way.
 
 <details>
 <summary>Values behind Figure 9</summary>
@@ -275,10 +287,31 @@ Every type's price, value and edge count is in [results/connective_price.csv](re
 
 </details>
 
+## Further results
+
+**Positions stand in for cable between classes, not within them.** Cell-type positions are only worth using if they track the cable a neuron actually grows. Skeletons were pulled for a stratified sample of 500 neurons, and their total cable length does correlate with the straight-line distance from soma to the centroid of their output synapses (Spearman ρ = 0.428, one-sided p = 5.5 × 10⁻²⁴). The correlation is carried by the differences between classes: within each of the four classes sampled, |ρ| is below 0.12 and none is significant. Positions therefore capture that descending and ascending neurons grow more cable than local interneurons, and say nothing about which individual neuron of a class grows more ([cable_length.md](results/cable_length.md)).
+
+**Longer connections carry slightly more traffic.** Connection length and edge betweenness are positively but weakly related (ρ = 0.121 over all 490,884 connections, 0.084 over the 452,708 that stay within one compartment). Length buys some centrality, not much ([wiring_economy_extensions.md](results/wiring_economy_extensions.md)).
+
+**Two of the three headline tests survive every edge threshold.** The graph was rebuilt at 0.5%, 2% and 5% of a target's input synapses, holding positions and compartments fixed, and three tests were repeated with the original procedures and seeds. Placement holds everywhere (0.439 to 0.460 of the permuted mean, 0 of 1000 permutations as cheap at every threshold) and so does hub over-representation (odds ratio 3.99, 3.22, 2.22 and 1.33, each with p below 10⁻⁴). Rich-to-rich routing does not: the ratio rises with the threshold, from 1.002 at 0.5% to 1.605 at 5%, so the excess is carried by the strongest connections and is absent once weak ones are admitted ([threshold_robustness.md](results/threshold_robustness.md)).
+
+**What was already known, and what was not.** Component placement optimality, rich-club organization and distance-dependent wiring have all been tested before, in *C. elegans*, in the mammalian cortex and in the FlyWire brain. Every claim here was checked against that literature before it was made, and the references, what each one establishes and what it leaves open for a complete CNS connectome are set out in [prior_art.md](results/prior_art.md).
+
 ## Where it falls short
 
 > [!CAUTION]
-> Four pre-registered hypotheses are not supported, and they are reported as they stand. Cutting the neck costs less flow than random wiring of equal length, not more. Wire length does not predict a connective type's flow once its number of connections is known, in either direction. And the rich-to-rich route result does not survive a lower edge threshold, so the robustness hypothesis fails.
+> Four of the thirteen pre-registered hypotheses are not supported, and they are reported as they stand. They are listed first, before the general limitations, because a study that pre-registers its predictions owes its failures the same prominence as its successes.
+
+| hypothesis, as registered | what the result says | figure |
+|---|---|---|
+| Cutting the neck costs more flow than random wiring of equal length | It costs less. The cut removes 963 units of sensory-to-motor flow against 2,689 for length-matched random wiring, a ratio of 0.36. Only the direction from brain to nerve cord goes the registered way, at 1.83. | [Figure 7](#what-the-connective-buys) |
+| A connective type's wire length predicts the flow it carries, in both directions | Only one direction correlates at all: ρ = 0.231 among 911 descending types, −0.005 among 1,010 ascending types. | [Figure 8](#what-the-connective-buys) |
+| That correlation survives control for the number of connections | It does not, in either direction: partial ρ = 0.044 (p = 0.09) descending and −0.122 ascending. What a type carries follows from how many connections it has, not how long they are. | [Figure 8](#what-the-connective-buys) |
+| Placement, routes and hubs keep their direction and significance at edge thresholds of 0.5%, 2% and 5% | Placement and hubs do. Rich-to-rich routing falls to 1.002 (p = 0.42) at 0.5%, so the hypothesis fails on one of its three tests. | [Figure 6](#the-connective-as-a-hub-backbone) |
+
+A fifth hypothesis holds only in part: connection probability falls with distance over all pairs (ρ = −0.993), but within the brain alone and within the nerve cord alone the rank correlation is not significant (p = 0.14 each), because the longest connections in each compartment mostly join the two sides of the body.
+
+The limits of what the design can show at all:
 
 - **Resolution:** the graph is aggregated to cell types by side, each placed at the centroid of its cell bodies. Within a class, soma-to-output distance does not predict a neuron's cable length, so positions capture differences between classes, not the cable of individual neurons.
 - **Cost measure:** straight-line distance between centroids stands in for real processes, which follow neuropil tracts.
@@ -292,6 +325,18 @@ Every type's price, value and edge count is in [results/connective_price.csv](re
 - **One animal:** a single male fly and one static reconstruction.
 - **Review:** none of this has been peer reviewed.
 
+## Explore the site
+
+[The site](https://dhruvin-sarkar.github.io/price-of-thought/) is an illustrated version of everything above, with every figure drawn live from the same result files and the neck connective rotatable in three dimensions.
+
+- **[The opening](https://dhruvin-sarkar.github.io/price-of-thought/):** the nervous system seen from the front, with all 36,943 neck-crossing connections coloured by length and turnable in the browser.
+- **[Placement](https://dhruvin-sarkar.github.io/price-of-thought/#placement):** the permutation tests and the swap search, and connection probability against distance.
+- **[The budget](https://dhruvin-sarkar.github.io/price-of-thought/#budget):** where the wire ends, region by region, each region's own internal placement test, and how unevenly the budget is spread over connections and over classes of cell type.
+- **[The connective](https://dhruvin-sarkar.github.io/price-of-thought/#connective):** what the neck costs, whom it joins, what cutting it removes, and what an individual cell type's wire buys.
+- **[Any cell type](https://dhruvin-sarkar.github.io/price-of-thought/#lookup):** all 1,921 descending and ascending cell types in a sortable table, each with its number of neck-crossing connections, the wire they hold and the flow lost when they alone are removed.
+- **[A wiring model](https://dhruvin-sarkar.github.io/price-of-thought/#model):** the thirteen properties, and which of them distance, compartment and cell class reproduce.
+- **[Methods and what they cannot show](https://dhruvin-sarkar.github.io/price-of-thought/#methods):** the thirteen pre-registered hypotheses with their outcomes, how every number was computed, the settings, the software and the references.
+
 ## Methods
 
 <p><a href="https://dhruvin-sarkar.github.io/price-of-thought/#methods"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/methods-pipeline-dark.svg"><img src="assets/readme/methods-pipeline-light.svg" width="880" alt="The analysis pipeline in eight steps: 1 data, 164,506 typed neurons from neuPrint male-cns:v1.0; 2 spatial graph, 23,073 cell types by side and 490,884 connections; 3 pre-registration in commits 39892c5, e62c6df, 73fba33 before any result; 4 placement, 1000 permutations and a swap search; 5 rich club, 1000 layer-preserving rewirings; 6 value, 1000 cost-matched removals; 7 generative model, four logistic fits and 100 synthetic graphs; 8 checks, three more edge thresholds and a verification suite that recomputes every statistic."></picture></a></p>
@@ -304,7 +349,7 @@ Every type's price, value and edge count is in [results/connective_price.csv](re
    ```
 
    Pooled across sides, the same rule gives exactly the 11,751-type graph of ConnectomeLens and Fault Lines.
-3. **Pre-registration.** Every hypothesis, with its direction, statistic, null and threshold, was committed before it was computed, in `39892c5`, `e62c6df` and `73fba33`. Each results file keeps that section unchanged and the scripts append beneath it ([index](results/preregistration.md)).
+3. **Pre-registration.** All thirteen hypotheses, each with its direction, statistic, null and threshold, were committed before they were computed, in `39892c5`, `e62c6df` and `73fba33`. Each results file keeps that section unchanged and the scripts append beneath it; `make verify` checks that the section has not moved since its registration commit and that the commit predates the results it governs ([index](results/preregistration.md)).
 4. **Wiring cost and placement.** The cost of an edge set is $C = \sum_{(u,v)} \lVert x_u - x_v \rVert$. The real $C$ is compared with 1000 permutations $\pi$ of the positions over the nodes, with the one-sided empirical p-value
 
    ```math
@@ -335,6 +380,7 @@ Every type's price, value and edge count is in [results/connective_price.csv](re
 | empirical p | (1 + null values at least as extreme) / (1 + N), one-sided, α = 0.05 |
 | neuropil attribution | nearest of 105 published surfaces, each connection charged half its length at each end |
 | within-neuropil null | 1000 permutations of a region's own cell types over its own positions, for the 48 regions with at least 12 types and 50 internal connections |
+| cable-length sample | 500 neurons, stratified: 100 descending, 100 ascending, 150 central brain intrinsic, 150 nerve cord intrinsic |
 | tail fit | `powerlaw`, lengths rounded to the micrometer, weighed against lognormal, exponential and truncated power law |
 | seeds | base 20260916 plus a fixed offset per analysis, set in each module |
 
@@ -378,6 +424,7 @@ Every number on this page comes from a file in this repository. These are the on
 | [results/generative_model.md](results/generative_model.md) | the logistic wiring models and their synthetic graphs |
 | [results/wire_atlas.md](results/wire_atlas.md) | the wire each neuropil holds, and its internal placement test |
 | [results/wire_concentration.md](results/wire_concentration.md) | how unevenly the budget is spread, and which classes own it |
+| [results/cable_length.md](results/cable_length.md) | whether positions stand in for the cable a neuron grows |
 | [results/threshold_robustness.md](results/threshold_robustness.md) | the headline tests at three other edge thresholds |
 | [results/prior_art.md](results/prior_art.md) | the prior work checked before any claim was made |
 | [paper/report.md](paper/report.md) | the technical report, also as [PDF](paper/report.pdf) |
@@ -397,7 +444,7 @@ npm --prefix web ci && npm --prefix web run build   # web/dist
 
 The stages can also be run on their own: `make data` (schema and spatial graph), `make analyze` (every test and null), `make hero` (hero image and its front view), `make readme` (the figures on this page, drawn from `results/` with their text set as outlines in Archivo and Spline Sans Mono, DejaVu where those font files are absent), `make poster`, `make paper`, `make export` (the site's copy of the results, written to `web/public/data/`), `make test` (unit tests) and `make verify` (recomputes every statistic from the saved nulls and checks every committed result, report and headline number).
 
-Raw neuPrint data are cached under `data/` and are not committed. The public dataset can be queried anonymously; set `NEUPRINT_APPLICATION_CREDENTIALS` to use a token. All randomness is seeded from 20260916. The analyses use multiprocessing, with worker counts set in the `Makefile`, and were run on a machine with 16 GB of RAM.
+Raw neuPrint data are cached under `data/` and are not committed. The public dataset can be queried anonymously; set `NEUPRINT_APPLICATION_CREDENTIALS` to use a token. All randomness is seeded from 20260916. The analyses use multiprocessing, with worker counts set in the `Makefile`, and were run on a machine with 16 GB of RAM. The slow steps are the permutation and rewiring nulls, each of which repeats its statistic 1000 times, and the edge-threshold repeat, which runs three of them again on three more graphs.
 
 <details open>
 <summary>Pipeline modules and outputs</summary>
@@ -428,11 +475,13 @@ Raw neuPrint data are cached under `data/` and are not committed. The public dat
 
 ## A three-part study
 
-This is the third of three analyses of the same connectome:
+This is the third of three analyses of the same connectome, built to the same standard and sharing a graph construction:
 
 1. [ConnectomeLens](https://github.com/dhruvin-sarkar/ConnectomeLens) asks whether the male wiring alone identifies the cell types annotated as sexually dimorphic.
 2. [Fault Lines](https://github.com/dhruvin-sarkar/fault-lines) asks how much of the nervous system can be removed before sensory input no longer reaches motor output.
 3. The Price of Thought asks what the wiring costs, and what its most expensive part buys.
+
+The 1% input threshold and the type graph are the same in all three; pooled across sides, this study's graph is exactly the 11,751-type graph of the other two. Where a measure recurs it is the same code: the flow capacity used here is the Fault Lines implementation, unchanged.
 
 ## Credits and citation
 

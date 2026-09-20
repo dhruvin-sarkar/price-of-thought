@@ -1,0 +1,630 @@
+{
+ "pairs": [
+  {
+   "neuropil": "AVLP",
+   "compartment": "brain",
+   "types_left": 1075,
+   "types_right": 1135,
+   "wire_left_um": 3571779.1,
+   "wire_right_um": 3772115.1,
+   "wire_share_left": 0.038367,
+   "wire_share_right": 0.040519,
+   "log_ratio": -0.0546,
+   "cost_ratio_left": 0.879,
+   "cost_ratio_right": 0.8632,
+   "cost_ratio_difference": 0.0158
+  },
+  {
+   "neuropil": "LegNp(T2)",
+   "compartment": "vnc",
+   "types_left": 799,
+   "types_right": 803,
+   "wire_left_um": 3654372.6,
+   "wire_right_um": 3681527.0,
+   "wire_share_left": 0.039254,
+   "wire_share_right": 0.039546,
+   "log_ratio": -0.0074,
+   "cost_ratio_left": 0.8947,
+   "cost_ratio_right": 0.8854,
+   "cost_ratio_difference": 0.0093
+  },
+  {
+   "neuropil": "LegNp(T3)",
+   "compartment": "vnc",
+   "types_left": 636,
+   "types_right": 759,
+   "wire_left_um": 3082269.8,
+   "wire_right_um": 3672529.2,
+   "wire_share_left": 0.033109,
+   "wire_share_right": 0.039449,
+   "log_ratio": -0.1752,
+   "cost_ratio_left": 0.9221,
+   "cost_ratio_right": 0.8942,
+   "cost_ratio_difference": 0.0279
+  },
+  {
+   "neuropil": "LegNp(T1)",
+   "compartment": "vnc",
+   "types_left": 667,
+   "types_right": 590,
+   "wire_left_um": 3191968.1,
+   "wire_right_um": 2845393.5,
+   "wire_share_left": 0.034287,
+   "wire_share_right": 0.030564,
+   "log_ratio": 0.1149,
+   "cost_ratio_left": 0.8906,
+   "cost_ratio_right": 0.8852,
+   "cost_ratio_difference": 0.0054
+  },
+  {
+   "neuropil": "AL",
+   "compartment": "brain",
+   "types_left": 551,
+   "types_right": 570,
+   "wire_left_um": 2218767.7,
+   "wire_right_um": 2165311.5,
+   "wire_share_left": 0.023833,
+   "wire_share_right": 0.023259,
+   "log_ratio": 0.0244,
+   "cost_ratio_left": 0.974,
+   "cost_ratio_right": 0.9603,
+   "cost_ratio_difference": 0.0137
+  },
+  {
+   "neuropil": "LH",
+   "compartment": "brain",
+   "types_left": 668,
+   "types_right": 620,
+   "wire_left_um": 1971313.5,
+   "wire_right_um": 1834853.3,
+   "wire_share_left": 0.021175,
+   "wire_share_right": 0.019709,
+   "log_ratio": 0.0717,
+   "cost_ratio_left": 0.8898,
+   "cost_ratio_right": 0.862,
+   "cost_ratio_difference": 0.0278
+  },
+  {
+   "neuropil": "SMP",
+   "compartment": "brain",
+   "types_left": 549,
+   "types_right": 500,
+   "wire_left_um": 1894853.7,
+   "wire_right_um": 1625481.6,
+   "wire_share_left": 0.020354,
+   "wire_share_right": 0.01746,
+   "log_ratio": 0.1533,
+   "cost_ratio_left": 0.8196,
+   "cost_ratio_right": 0.8441,
+   "cost_ratio_difference": -0.0245
+  },
+  {
+   "neuropil": "PLP",
+   "compartment": "brain",
+   "types_left": 438,
+   "types_right": 485,
+   "wire_left_um": 1514165.3,
+   "wire_right_um": 1667719.5,
+   "wire_share_left": 0.016265,
+   "wire_share_right": 0.017914,
+   "log_ratio": -0.0966,
+   "cost_ratio_left": 0.8313,
+   "cost_ratio_right": 0.8344,
+   "cost_ratio_difference": -0.0031
+  },
+  {
+   "neuropil": "Ov",
+   "compartment": "vnc",
+   "types_left": 301,
+   "types_right": 341,
+   "wire_left_um": 1409114.3,
+   "wire_right_um": 1597230.6,
+   "wire_share_left": 0.015136,
+   "wire_share_right": 0.017157,
+   "log_ratio": -0.1253,
+   "cost_ratio_left": 0.8002,
+   "cost_ratio_right": 0.8296,
+   "cost_ratio_difference": -0.0294
+  },
+  {
+   "neuropil": "SLP",
+   "compartment": "brain",
+   "types_left": 533,
+   "types_right": 455,
+   "wire_left_um": 1390206.8,
+   "wire_right_um": 1229844.5,
+   "wire_share_left": 0.014933,
+   "wire_share_right": 0.013211,
+   "log_ratio": 0.1226,
+   "cost_ratio_left": 0.7964,
+   "cost_ratio_right": 0.7812,
+   "cost_ratio_difference": 0.0152
+  },
+  {
+   "neuropil": "SPS",
+   "compartment": "brain",
+   "types_left": 299,
+   "types_right": 311,
+   "wire_left_um": 1314154.7,
+   "wire_right_um": 1283418.0,
+   "wire_share_left": 0.014116,
+   "wire_share_right": 0.013786,
+   "log_ratio": 0.0237,
+   "cost_ratio_left": 0.7634,
+   "cost_ratio_right": 0.8202,
+   "cost_ratio_difference": -0.0568
+  },
+  {
+   "neuropil": "WTct(UTct-T2)",
+   "compartment": "vnc",
+   "types_left": 305,
+   "types_right": 257,
+   "wire_left_um": 1390407.8,
+   "wire_right_um": 1137664.7,
+   "wire_share_left": 0.014935,
+   "wire_share_right": 0.01222,
+   "log_ratio": 0.2006,
+   "cost_ratio_left": 0.8733,
+   "cost_ratio_right": 0.8809,
+   "cost_ratio_difference": -0.0076
+  },
+  {
+   "neuropil": "ME",
+   "compartment": "brain",
+   "types_left": 278,
+   "types_right": 448,
+   "wire_left_um": 829585.5,
+   "wire_right_um": 1369071.7,
+   "wire_share_left": 0.008911,
+   "wire_share_right": 0.014706,
+   "log_ratio": -0.501,
+   "cost_ratio_left": 0.6806,
+   "cost_ratio_right": 0.7593,
+   "cost_ratio_difference": -0.0787
+  },
+  {
+   "neuropil": "LO",
+   "compartment": "brain",
+   "types_left": 248,
+   "types_right": 228,
+   "wire_left_um": 1024972.2,
+   "wire_right_um": 887601.8,
+   "wire_share_left": 0.01101,
+   "wire_share_right": 0.009534,
+   "log_ratio": 0.1439,
+   "cost_ratio_left": 0.7491,
+   "cost_ratio_right": 0.7404,
+   "cost_ratio_difference": 0.0087
+  },
+  {
+   "neuropil": "AOTU",
+   "compartment": "brain",
+   "types_left": 360,
+   "types_right": 247,
+   "wire_left_um": 1078284.5,
+   "wire_right_um": 787093.8,
+   "wire_share_left": 0.011583,
+   "wire_share_right": 0.008455,
+   "log_ratio": 0.3148,
+   "cost_ratio_left": 0.536,
+   "cost_ratio_right": 0.5163,
+   "cost_ratio_difference": 0.0197
+  },
+  {
+   "neuropil": "gL",
+   "compartment": "brain",
+   "types_left": 219,
+   "types_right": 214,
+   "wire_left_um": 873591.1,
+   "wire_right_um": 848253.0,
+   "wire_share_left": 0.009384,
+   "wire_share_right": 0.009112,
+   "log_ratio": 0.0294,
+   "cost_ratio_left": 0.4282,
+   "cost_ratio_right": 0.5661,
+   "cost_ratio_difference": -0.1379
+  },
+  {
+   "neuropil": "CA",
+   "compartment": "brain",
+   "types_left": 200,
+   "types_right": 227,
+   "wire_left_um": 829797.7,
+   "wire_right_um": 890666.7,
+   "wire_share_left": 0.008913,
+   "wire_share_right": 0.009567,
+   "log_ratio": -0.0708,
+   "cost_ratio_left": 0.6482,
+   "cost_ratio_right": 0.667,
+   "cost_ratio_difference": -0.0188
+  },
+  {
+   "neuropil": "WED",
+   "compartment": "brain",
+   "types_left": 120,
+   "types_right": 106,
+   "wire_left_um": 474849.0,
+   "wire_right_um": 462619.4,
+   "wire_share_left": 0.005101,
+   "wire_share_right": 0.004969,
+   "log_ratio": 0.0261,
+   "cost_ratio_left": 0.7372,
+   "cost_ratio_right": 0.5768,
+   "cost_ratio_difference": 0.1604
+  },
+  {
+   "neuropil": "HTct(UTct-T3)",
+   "compartment": "vnc",
+   "types_left": 90,
+   "types_right": 126,
+   "wire_left_um": 385807.3,
+   "wire_right_um": 516315.4,
+   "wire_share_left": 0.004144,
+   "wire_share_right": 0.005546,
+   "log_ratio": -0.2914,
+   "cost_ratio_left": 0.7799,
+   "cost_ratio_right": 0.8858,
+   "cost_ratio_difference": -0.1059
+  },
+  {
+   "neuropil": "CRE",
+   "compartment": "brain",
+   "types_left": 68,
+   "types_right": 90,
+   "wire_left_um": 317698.4,
+   "wire_right_um": 449547.0,
+   "wire_share_left": 0.003413,
+   "wire_share_right": 0.004829,
+   "log_ratio": -0.3471
+  },
+  {
+   "neuropil": "IPS",
+   "compartment": "brain",
+   "types_left": 94,
+   "types_right": 85,
+   "wire_left_um": 350327.3,
+   "wire_right_um": 349091.6,
+   "wire_share_left": 0.003763,
+   "wire_share_right": 0.00375,
+   "log_ratio": 0.0035
+  },
+  {
+   "neuropil": "SIP",
+   "compartment": "brain",
+   "types_left": 71,
+   "types_right": 79,
+   "wire_left_um": 280141.3,
+   "wire_right_um": 257283.6,
+   "wire_share_left": 0.003009,
+   "wire_share_right": 0.002764,
+   "log_ratio": 0.0851
+  },
+  {
+   "neuropil": "NTct(UTct-T1)",
+   "compartment": "vnc",
+   "types_left": 20,
+   "types_right": 32,
+   "wire_left_um": 228053.1,
+   "wire_right_um": 308075.8,
+   "wire_share_left": 0.00245,
+   "wire_share_right": 0.003309,
+   "log_ratio": -0.3008
+  },
+  {
+   "neuropil": "mVAC(T2)",
+   "compartment": "vnc",
+   "types_left": 44,
+   "types_right": 34,
+   "wire_left_um": 277247.8,
+   "wire_right_um": 252148.3,
+   "wire_share_left": 0.002978,
+   "wire_share_right": 0.002709,
+   "log_ratio": 0.0949
+  },
+  {
+   "neuropil": "mVAC(T3)",
+   "compartment": "vnc",
+   "types_left": 47,
+   "types_right": 39,
+   "wire_left_um": 321266.2,
+   "wire_right_um": 196978.5,
+   "wire_share_left": 0.003451,
+   "wire_share_right": 0.002116,
+   "log_ratio": 0.4892
+  },
+  {
+   "neuropil": "ICL",
+   "compartment": "brain",
+   "types_left": 47,
+   "types_right": 47,
+   "wire_left_um": 196216.1,
+   "wire_right_um": 256334.2,
+   "wire_share_left": 0.002108,
+   "wire_share_right": 0.002753,
+   "log_ratio": -0.2673
+  },
+  {
+   "neuropil": "ATL",
+   "compartment": "brain",
+   "types_left": 52,
+   "types_right": 51,
+   "wire_left_um": 229995.4,
+   "wire_right_um": 221141.9,
+   "wire_share_left": 0.002471,
+   "wire_share_right": 0.002375,
+   "log_ratio": 0.0393
+  },
+  {
+   "neuropil": "LOP",
+   "compartment": "brain",
+   "types_left": 47,
+   "types_right": 51,
+   "wire_left_um": 146853.8,
+   "wire_right_um": 162594.9,
+   "wire_share_left": 0.001577,
+   "wire_share_right": 0.001747,
+   "log_ratio": -0.1018,
+   "cost_ratio_left": 0.8546,
+   "cost_ratio_right": 0.8431,
+   "cost_ratio_difference": 0.0115
+  },
+  {
+   "neuropil": "PVLP",
+   "compartment": "brain",
+   "types_left": 51,
+   "types_right": 38,
+   "wire_left_um": 148290.7,
+   "wire_right_um": 113867.6,
+   "wire_share_left": 0.001593,
+   "wire_share_right": 0.001223,
+   "log_ratio": 0.2641
+  },
+  {
+   "neuropil": "AME",
+   "compartment": "brain",
+   "types_left": 30,
+   "types_right": 56,
+   "wire_left_um": 79289.1,
+   "wire_right_um": 162749.3,
+   "wire_share_left": 0.000852,
+   "wire_share_right": 0.001748,
+   "log_ratio": -0.7191
+  },
+  {
+   "neuropil": "LAL",
+   "compartment": "brain",
+   "types_left": 26,
+   "types_right": 33,
+   "wire_left_um": 111627.5,
+   "wire_right_um": 121220.6,
+   "wire_share_left": 0.001199,
+   "wire_share_right": 0.001302,
+   "log_ratio": -0.0824
+  },
+  {
+   "neuropil": "mVAC(T1)",
+   "compartment": "vnc",
+   "types_left": 15,
+   "types_right": 15,
+   "wire_left_um": 83806.7,
+   "wire_right_um": 69414.9,
+   "wire_share_left": 0.0009,
+   "wire_share_right": 0.000746,
+   "log_ratio": 0.1884
+  },
+  {
+   "neuropil": "aL",
+   "compartment": "brain",
+   "types_left": 9,
+   "types_right": 10,
+   "wire_left_um": 24747.1,
+   "wire_right_um": 23591.1,
+   "wire_share_left": 0.000266,
+   "wire_share_right": 0.000253,
+   "log_ratio": 0.0478
+  },
+  {
+   "neuropil": "a'L",
+   "compartment": "brain",
+   "types_left": 6,
+   "types_right": 3,
+   "wire_left_um": 15534.3,
+   "wire_right_um": 22259.5,
+   "wire_share_left": 0.000167,
+   "wire_share_right": 0.000239,
+   "log_ratio": -0.3597
+  },
+  {
+   "neuropil": "FLA",
+   "compartment": "brain",
+   "types_left": 3,
+   "types_right": 6,
+   "wire_left_um": 6022.1,
+   "wire_right_um": 13576.5,
+   "wire_share_left": 6.5e-05,
+   "wire_share_right": 0.000146,
+   "log_ratio": -0.8129
+  },
+  {
+   "neuropil": "LA",
+   "compartment": "brain",
+   "types_left": 1,
+   "types_right": 4,
+   "wire_left_um": 503.4,
+   "wire_right_um": 6798.6,
+   "wire_share_left": 5e-06,
+   "wire_share_right": 7.3e-05,
+   "log_ratio": -2.6031
+  }
+ ],
+ "midline": [
+  {
+   "neuropil": "GNG",
+   "compartment": "brain",
+   "types": 1918,
+   "wire_um": 9445105.9,
+   "wire_share": 0.101457
+  },
+  {
+   "neuropil": "ANm",
+   "compartment": "vnc",
+   "types": 1108,
+   "wire_um": 5420444.2,
+   "wire_share": 0.058225
+  },
+  {
+   "neuropil": "SAD",
+   "compartment": "brain",
+   "types": 677,
+   "wire_um": 3030044.6,
+   "wire_share": 0.032548
+  },
+  {
+   "neuropil": "PB",
+   "compartment": "brain",
+   "types": 820,
+   "wire_um": 2718639.5,
+   "wire_share": 0.029203
+  },
+  {
+   "neuropil": "IB",
+   "compartment": "brain",
+   "types": 195,
+   "wire_um": 904675.5,
+   "wire_share": 0.009718
+  },
+  {
+   "neuropil": "PRW",
+   "compartment": "brain",
+   "types": 106,
+   "wire_um": 432575.6,
+   "wire_share": 0.004647
+  },
+  {
+   "neuropil": "IntTct",
+   "compartment": "vnc",
+   "types": 86,
+   "wire_um": 373675.9,
+   "wire_share": 0.004014
+  },
+  {
+   "neuropil": "LTct",
+   "compartment": "vnc",
+   "types": 49,
+   "wire_um": 297901.3,
+   "wire_share": 0.0032
+  },
+  {
+   "neuropil": "CV-anterior",
+   "compartment": "brain",
+   "types": 28,
+   "wire_um": 153415.0,
+   "wire_share": 0.001648
+  },
+  {
+   "neuropil": "CRN",
+   "compartment": "brain",
+   "types": 10,
+   "wire_um": 88370.7,
+   "wire_share": 0.000949
+  },
+  {
+   "neuropil": "FB",
+   "compartment": "brain",
+   "types": 5,
+   "wire_um": 17960.2,
+   "wire_share": 0.000193
+  },
+  {
+   "neuropil": "EB",
+   "compartment": "brain",
+   "types": 2,
+   "wire_um": 3672.3,
+   "wire_share": 3.9e-05
+  }
+ ],
+ "unpaired_sides": [
+  {
+   "neuropil": "bL(R)",
+   "compartment": "brain",
+   "types": 2,
+   "wire_um": 9401.4,
+   "wire_share": 0.000101
+  },
+  {
+   "neuropil": "AB(L)",
+   "compartment": "brain",
+   "types": 1,
+   "wire_um": 9350.3,
+   "wire_share": 0.0001
+  },
+  {
+   "neuropil": "SCL(R)",
+   "compartment": "brain",
+   "types": 2,
+   "wire_um": 5171.4,
+   "wire_share": 5.6e-05
+  },
+  {
+   "neuropil": "VES(R)",
+   "compartment": "brain",
+   "types": 1,
+   "wire_um": 2956.0,
+   "wire_share": 3.2e-05
+  },
+  {
+   "neuropil": "b'L(L)",
+   "compartment": "brain",
+   "types": 1,
+   "wire_um": 2326.8,
+   "wire_share": 2.5e-05
+  }
+ ],
+ "wire_asymmetry": {
+  "pairs": 36,
+  "mean": -0.1244,
+  "mean_absolute": 0.2598,
+  "median_absolute": 0.124,
+  "max_absolute": 2.6031,
+  "null_sd": 0.0836,
+  "z_score": -1.49,
+  "p_value": 0.108891,
+  "permutations": 1000,
+  "repaired_null_mean": 1.8687,
+  "repaired_null_sd": 0.1785,
+  "repaired_n_at_or_below_observed": 0,
+  "repaired_p_value": 0.000999
+ },
+ "cost_ratio_asymmetry": {
+  "pairs": 20,
+  "mean": -0.0074,
+  "mean_absolute": 0.0389,
+  "median_absolute": 0.0192,
+  "max_absolute": 0.1604,
+  "null_sd": 0.0132,
+  "z_score": -0.56,
+  "p_value": 0.607393,
+  "permutations": 1000
+ },
+ "totals": {
+  "neuropils": 89,
+  "paired": {
+   "neuropils": 72,
+   "wire_um": 70179265.2,
+   "wire_share": 0.7538
+  },
+  "midline": {
+   "neuropils": 12,
+   "wire_um": 22886480.7,
+   "wire_share": 0.2458
+  },
+  "unpaired_sides": {
+   "neuropils": 5,
+   "wire_um": 29205.9,
+   "wire_share": 0.0003
+  },
+  "total_wire_um": 93094951.3,
+  "permutations": 1000,
+  "seed": 20410916
+ }
+}

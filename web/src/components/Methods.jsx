@@ -26,6 +26,7 @@ const SOFTWARE = [
   ["NumPy / SciPy / pandas", "2.5.3 / 1.18.1 / 3.0.5"],
   ["scikit-learn", "1.9.1"],
   ["navis", "1.12.0"],
+  ["powerlaw", "2.0.0"],
   ["trimesh", "5.1.0"],
   ["matplotlib / fontTools", "3.11.2 / 4.65.0"],
   ["pandoc / typst", "3.11 / 0.15.1"],
@@ -40,6 +41,8 @@ const FILES = [
   ["results/connective_price.csv", "price and value of every descending and ascending cell type"],
   ["results/generative_model.md", "the logistic wiring models and their synthetic graphs"],
   ["results/threshold_robustness.md", "the headline tests at three other edge thresholds"],
+  ["results/wire_atlas.md", "the wire held by each neuropil and how economically each is wired inside"],
+  ["results/wire_concentration.md", "how unevenly the budget is spread over connections and over cell classes"],
   ["results/prior_art.md", "the prior work checked before any claim was made"],
   ["paper/report.md", "the technical report"],
 ];
@@ -132,7 +135,9 @@ export default function Methods({ data }) {
                 <caption>
                   Registered in commits {data.preregistration_commits.join(", ")} before any result was computed. The
                   full index, with each hypothesis as it was written, is in{" "}
-                  <a href={blobUrl("results/preregistration.md")}>results/preregistration.md</a>.
+                  <a href={blobUrl("results/preregistration.md")}>results/preregistration.md</a>. The wire atlas and
+                  the concentration of the budget carry no registered hypothesis: both were run after these tests
+                  and are reported as description.
                 </caption>
                 <thead>
                   <tr>

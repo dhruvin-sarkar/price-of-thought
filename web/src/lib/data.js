@@ -39,6 +39,5 @@ export const blobUrl = (path) => `${repoUrl}/blob/main/${path}`;
 export const reportUrl = `${base}report.pdf`;
 
 /** The still of the connective view, shown until the scene is ready and to anyone without WebGL. */
-export const posterUrl = `${base}hero.png`;
 
 export const sceneUrl = `${base}data/scene.json`;

@@ -5,7 +5,7 @@ import Model from "./components/Model.jsx";
 import Nav from "./components/Nav.jsx";
 import Placement from "./components/Placement.jsx";
 import SectionBoundary from "./components/SectionBoundary.jsx";
-import { posterUrl, useData } from "./lib/data.js";
+import { useData } from "./lib/data.js";
 
 export default function App() {
   const { data, error } = useData("site.json");
@@ -68,9 +68,7 @@ function HeroSkeleton() {
           <p className="hero-answer">Loading the wiring economy of the male Drosophila central nervous system.</p>
         </div>
         <div className="hero-stage">
-          <div className="scene">
-            <img className="scene-poster" src={posterUrl} alt="" width="1920" height="1080" />
-          </div>
+          <div className="scene" />
         </div>
       </div>
     </section>

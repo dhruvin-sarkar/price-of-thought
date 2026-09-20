@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { posterUrl, sceneUrl } from "../lib/data.js";
+import { sceneUrl } from "../lib/data.js";
 import { count, micron, millimetre } from "../lib/format.js";
 import { useMedia, useNear, useReducedMotion } from "../lib/hooks.js";
+import FrontView from "./FrontView.jsx";
 import { Segmented } from "./ui.jsx";
 
 const OVERLAYS = [
@@ -61,7 +62,7 @@ async function fetchScene(onProgress) {
  * stands in until the scene has arrived, and stays for a reader without WebGL. On a small screen the scene is
  * loaded only when it is asked for, so a phone is not made to download it.
  */
-export default function Scene({ nodes, neck }) {
+export default function Scene({ nodes, neck, front }) {
   const holder = useRef(null);
   const viewer = useRef(null);
   const near = useNear(holder);
@@ -130,7 +131,9 @@ export default function Scene({ nodes, neck }) {
   return (
     <div className="hero-stage">
       <div className={`scene${live ? " is-live" : ""}`} ref={holder} role="img" aria-label={label}>
-        <img className="scene-poster" src={posterUrl} alt="" width="1920" height="1080" />
+        <div className="scene-poster">
+          <FrontView front={front} />
+        </div>
         {shouldLoad && !live && !failed && (
           <p className="scene-status">
             <span className="scene-progress" aria-hidden="true">
@@ -144,8 +147,9 @@ export default function Scene({ nodes, neck }) {
 
       <div className="scene-controls">
         <div className="scene-row">
-          <Segmented label="Colour the connections by" options={OVERLAYS} value={mode} onChange={setMode} />
-          {mode === "length" && (
+          {/* The still is coloured by length and cannot answer the other two, so the switch waits for the view. */}
+          {live && <Segmented label="Colour the connections by" options={OVERLAYS} value={mode} onChange={setMode} />}
+          {(!live || mode === "length") && (
             <div className="ramp-scale">
               <span className="ramp-bar" aria-hidden="true" />
               <span className="ramp-ticks" aria-hidden="true">

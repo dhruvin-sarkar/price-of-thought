@@ -2,13 +2,12 @@
 
 import base64
 import json
-import shutil
 
 import numpy as np
 import pandas as pd
 
 from pipeline.build_spatial_graph import load_spatial_graph
-from pipeline.common import ASSETS, RESULTS, ROOT
+from pipeline.common import RESULTS, ROOT
 from pipeline.connective_richclub import TOP_FRACTION, node_sets, partner_richness, rich_mask
 from pipeline.connective_value import neck_crossing_mask
 from pipeline.hero_render import load_all_meshes, simplify
@@ -103,6 +102,15 @@ def scene(graph, price: pd.DataFrame) -> dict:
     return header
 
 
+def front_view(front: dict) -> dict:
+    """The front view with its coordinates rounded to a tenth of a micrometre, which the site draws at."""
+    return {
+        **{k: front[k] for k in ("bounds", "length_range_um", "crossing_edges", "sample")},
+        "outlines": [[[round(x, 1), round(y, 1)] for x, y in outline] for outline in front["outlines"]],
+        "wires": [[round(v, 1) for v in wire] for wire in front["wires"]],
+    }
+
+
 def site_data(price: pd.DataFrame) -> dict:
     """Every number and chart series the page text and charts use."""
     spatial = read_json("spatial_optimality.json")
@@ -160,6 +168,8 @@ def site_data(price: pd.DataFrame) -> dict:
         "cable": {**cable, "points": cable_points[["superclass", "cable_um", "soma_to_output_um"]]
                   .round(1).to_dict(orient="records")},
         "generative": {"fit": model, "comparison": comparison},
+        # The front view the title plate draws, so the hero can show the same still while the scene loads.
+        "front": front_view(read_json("front_view.json")),
         # The same list the poster prints, so the site cannot drift from it or from the pre-registration index.
         "hypotheses": [{"label": label, "statement": statement, "supported": bool(supported)}
                        for label, statement, supported in hypotheses(load_results())],
@@ -172,7 +182,6 @@ def site_data(price: pd.DataFrame) -> dict:
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(ASSETS / "hero.png", OUT.parent / "hero.png")
     price = pd.read_csv(RESULTS / "connective_price.csv")
     data = site_data(price)
     (OUT / "site.json").write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")

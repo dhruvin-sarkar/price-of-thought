@@ -41,7 +41,7 @@ export default function Hero({ data }) {
             </a>
           </p>
         </div>
-        <Scene nodes={data.price.nodes} neck={h.neck} />
+        <Scene nodes={data.price.nodes} neck={h.neck} front={data.front} />
       </div>
     </section>
   );

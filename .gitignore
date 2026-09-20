@@ -6,6 +6,7 @@ PROGRESS.md
 .env
 .remember/
 .kilo/
+.impeccable/
 
 # Data cache
 /data/

@@ -1,0 +1,91 @@
+/*
+ * The palette of the committed figures, in both of their themes: paper is the reading surface, field is the
+ * black band the title and the connective view sit on. The wire ramp encodes connection length and nothing else;
+ * blue is the second series colour, used for null distributions and for the nerve cord.
+ * pipeline/readme_assets.py holds the same values, and tests/test_web_tokens.py keeps the two in step.
+ */
+:root {
+  color-scheme: light;
+
+  --paper: #f4f5f3;
+  --paper-raised: #fbfbfa;
+  --wash: #e6e6e1;
+  --rule: #d9d8d3;
+  --rule-strong: #a9a8a2;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --ink-3: #6a6964;
+  --axis: #85847e;
+  --wire: #d4541f;
+  --wire-ink: #8f2e0c;
+  --null: #2a78d6;
+  --null-ink: #1a63b8;
+  --ramp-0: #f3c7a4;
+  --ramp-1: #eb6834;
+  --ramp-2: #b23a10;
+  --ramp-3: #3d1204;
+  /* Boundary of text inputs and selects: at least 3:1 against both paper and wash. */
+  --control-border: #7b7a74;
+  --shadow: 0 8px 22px rgb(11 11 11 / 0.1);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #0b0b0b;
+  --paper-raised: #121311;
+  --wash: #1d1e1b;
+  --rule: #2a2b28;
+  --rule-strong: #57574f;
+  --ink: #eeeeea;
+  --ink-2: #a8a7a0;
+  --ink-3: #8f8e88;
+  --axis: #8f8e88;
+  --wire: #f07a45;
+  --wire-ink: #ff9a6b;
+  --null: #5b9cf0;
+  --null-ink: #7ab0f5;
+  --ramp-0: #4a1a08;
+  --ramp-1: #b23a10;
+  --ramp-2: #eb6834;
+  --ramp-3: #f7cfae;
+  --control-border: #77766f;
+  --shadow: 0 10px 26px rgb(0 0 0 / 0.6);
+}
+
+/* The field is the same black in both themes: the nav band, the hero and the connective view. */
+:root {
+  --field: #0b0b0b;
+  --field-raised: #121311;
+  --field-rule: #2a2b28;
+  --field-ink: #eeeeea;
+  --field-ink-2: #a8a7a0;
+  --field-ink-3: #8f8e88;
+  --field-wire: #f07a45;
+  --field-wire-ink: #ff9a6b;
+  --field-null: #5b9cf0;
+
+  --sans: "Archivo Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "Spline Sans Mono Variable", ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+
+  --step--2: 0.75rem;
+  --step--1: 0.875rem;
+  --step-0: 1rem;
+  --step-1: 1.125rem;
+  --step-2: 1.4375rem;
+  --step-3: 2rem;
+  --step-4: clamp(2.1rem, 1.55rem + 2.2vw, 3.1rem);
+  --step-5: clamp(2.5rem, 1.9rem + 2.2vw, 3.6rem);
+  --step-hero: clamp(2.9rem, 1.2rem + 6.4vw, 7rem);
+
+  --measure: 38rem;
+  --page: 76rem;
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+  --section: clamp(4.5rem, 2.8rem + 5.6vw, 8rem);
+  --nav-height: 3.5rem;
+  --radius: 6px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --z-sticky: 50;
+  --z-tooltip: 60;
+}

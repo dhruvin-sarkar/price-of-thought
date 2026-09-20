@@ -1,0 +1,415 @@
+/* Figures are numbered as they are in the README, so a reader can move between the two. */
+main {
+  counter-reset: figure;
+}
+
+.figure {
+  margin: 3.25rem 0 0;
+  min-width: 0;
+  counter-increment: figure;
+}
+
+.figure-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  margin-bottom: 1.5rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--ink);
+}
+
+.figure-title {
+  max-width: 46rem;
+  text-wrap: balance;
+  font-size: var(--step-2);
+  font-weight: 550;
+  line-height: 1.22;
+  letter-spacing: -0.014em;
+}
+
+.figure-number {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ink-3);
+}
+
+.figure-number:empty::before {
+  content: "Figure " counter(figure);
+}
+
+.figure-controls {
+  flex: none;
+  max-width: 100%;
+}
+
+.figure-body {
+  position: relative;
+  min-width: 0;
+}
+
+.figure-caption {
+  max-width: 46rem;
+  margin-top: 1.25rem;
+  font-size: var(--step--1);
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+/* A figure set on the black field, for anatomy and for the connective view. */
+.figure-field,
+.field {
+  padding: clamp(1rem, 0.6rem + 1.8vw, 2rem);
+  border-radius: 10px;
+  background: var(--field);
+  color: var(--field-ink);
+}
+
+.figure-field .figure-head {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.figure-field .figure-number {
+  color: var(--field-ink-3);
+}
+
+.figure-field .figure-caption,
+:is(.field, .hero) .caption,
+:is(.field, .hero) .label,
+:is(.field, .hero) .legend {
+  color: var(--field-ink-2);
+}
+
+.figure-field :focus-visible,
+:is(.field, .hero) :focus-visible {
+  outline-color: var(--field-ink);
+}
+
+:is(.field, .hero) .segmented {
+  background: var(--field-raised);
+  box-shadow: 0 0 0 1px var(--field-rule);
+}
+
+:is(.field, .hero) .segmented button {
+  color: var(--field-ink-2);
+}
+
+:is(.field, .hero) .segmented button:hover {
+  color: var(--field-ink);
+}
+
+:is(.field, .hero) .segmented button.on {
+  background: #1c1d1a;
+  color: var(--field-ink);
+  box-shadow: none;
+}
+
+:is(.field, .hero) .btn {
+  border-color: var(--field-rule);
+  color: var(--field-ink);
+}
+
+:is(.field, .hero) .btn:hover {
+  background: var(--field-raised);
+  border-color: var(--field-ink-3);
+}
+
+:is(.field, .hero) .input {
+  background: var(--field-raised);
+  border-color: #6e6d66;
+  color: var(--field-ink);
+}
+
+:is(.field, .hero) .input::placeholder {
+  color: var(--field-ink-3);
+}
+
+:is(.field, .hero) input[type="range"] {
+  accent-color: var(--field-wire);
+}
+
+/* Charts */
+.chart {
+  position: relative;
+  width: 100%;
+}
+
+.chart svg {
+  display: block;
+  overflow: visible;
+}
+
+.chart text,
+.figure svg text {
+  font-family: var(--sans);
+  font-size: 11px;
+  fill: var(--ink-3);
+}
+
+.chart .value,
+.figure svg text.value {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart .tick line {
+  stroke: var(--rule);
+  shape-rendering: crispEdges;
+}
+
+.chart .axis-line {
+  stroke: var(--axis);
+  shape-rendering: crispEdges;
+}
+
+.chart .axis-title {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--ink-2);
+}
+
+.chart .direct-label {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--ink-2);
+}
+
+/* The name of one row of a horizontal chart, set beside it, and the name of a group of rows above them. */
+.chart .row-label {
+  font-size: 12px;
+  fill: var(--ink-2);
+}
+
+.chart .group-label {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.chart .mark-label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  fill: var(--ink-2);
+}
+
+:is(.field, .hero) .chart text {
+  fill: var(--field-ink-3);
+}
+
+:is(.field, .hero) .chart .tick line {
+  stroke: var(--field-rule);
+}
+
+:is(.field, .hero) .chart .axis-line {
+  stroke: var(--field-ink-3);
+}
+
+:is(.field, .hero) .chart .axis-title,
+:is(.field, .hero) .chart .direct-label,
+:is(.field, .hero) .chart .row-label,
+:is(.field, .hero) .chart .group-label,
+:is(.field, .hero) .chart .mark-label {
+  fill: var(--field-ink-2);
+}
+
+/* Readout anchored to a mark; hidden from assistive technology, so its values are reachable in the table view. */
+.tooltip {
+  position: absolute;
+  z-index: var(--z-tooltip);
+  display: grid;
+  gap: 0.15rem;
+  width: max-content;
+  min-width: 9rem;
+  max-width: 18rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  color: var(--ink);
+  box-shadow: 0 0 0 1px var(--rule), var(--shadow);
+  font-size: var(--step--1);
+  line-height: 1.35;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 12px));
+  white-space: nowrap;
+}
+
+.tooltip.is-below {
+  transform: translate(-50%, 12px);
+}
+
+.tooltip strong {
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.tooltip .tip-title {
+  font-family: var(--sans);
+  font-weight: 600;
+}
+
+.tooltip .row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+:is(.field, .hero) .tooltip {
+  background: #161714;
+  color: var(--field-ink);
+  box-shadow: 0 0 0 1px var(--field-rule), 0 10px 26px rgb(0 0 0 / 0.6);
+}
+
+/* Tables */
+.table-wrap {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+table.data {
+  width: 100%;
+  /* Past this a row is too wide to follow across, the same reason prose is held to a measure. */
+  max-width: 62rem;
+  border-collapse: collapse;
+  font-size: var(--step--1);
+}
+
+table.data caption {
+  margin-bottom: 0.75rem;
+  text-align: left;
+  font-size: var(--step--1);
+  color: var(--ink-2);
+}
+
+table.data thead th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink-2);
+  padding: 0 0.75rem 0.6rem 0;
+  border-bottom: 1px solid var(--ink);
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+table.data td,
+table.data tbody th {
+  padding: 0.5rem 0.75rem 0.5rem 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+/* A row header names its row; it is not a column heading and does not carry the heading rule. */
+table.data tbody th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+table.data tbody tr:last-child td,
+table.data tbody tr:last-child th {
+  border-bottom: 0;
+}
+
+table.data th.num-col,
+table.data td.num-col {
+  text-align: right;
+  font-family: var(--mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+table.data thead th.num-col {
+  font-family: var(--sans);
+  font-weight: 600;
+}
+
+table.data tbody tr:hover td,
+table.data tbody tr:hover th {
+  background: var(--wash);
+}
+
+details.more {
+  margin-top: 1.25rem;
+}
+
+details.more summary {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: max-content;
+  max-width: 100%;
+  min-height: 2.5rem;
+  list-style: none;
+  cursor: pointer;
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+details.more summary::-webkit-details-marker {
+  display: none;
+}
+
+details.more summary::before {
+  content: "";
+  flex: none;
+  width: 0.42em;
+  height: 0.42em;
+  margin-inline: 0.1em 0.05em;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 140ms var(--ease);
+}
+
+details.more[open] summary::before {
+  transform: rotate(45deg);
+}
+
+details.more summary:hover {
+  color: var(--ink);
+}
+
+details.more[open] summary {
+  margin-bottom: 0.75rem;
+}
+
+.outcome {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.outcome svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+}
+
+.outcome.is-supported {
+  color: var(--ink-2);
+}
+
+.outcome.is-unsupported {
+  color: var(--wire-ink);
+}
+
+/* Small multiples: panels that share an axis definition and are read as one figure. */
+.panels {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.panels.is-two {
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 1.5rem clamp(1.5rem, 3vw, 2.5rem);
+}

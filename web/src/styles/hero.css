@@ -1,0 +1,426 @@
+/* The bar and the hero share the black field of the title plate and the poster's title band. */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: var(--field);
+  color: var(--field-ink);
+  border-bottom: 1px solid var(--field-rule);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  height: var(--nav-height);
+}
+
+.wordmark {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.5rem;
+  font-size: var(--step-1);
+  font-weight: 550;
+  font-stretch: 94%;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  color: var(--field-ink);
+}
+
+.nav-links {
+  display: flex;
+  flex: 1;
+  align-self: stretch;
+  min-width: 0;
+  gap: 0.15rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav-links::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-links a {
+  display: flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0 0.7rem;
+  font-size: var(--step--1);
+  color: var(--field-ink-2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 120ms;
+}
+
+.nav-links a:hover {
+  color: var(--field-ink);
+}
+
+.nav-links a.is-current {
+  color: var(--field-ink);
+  box-shadow: inset 0 -2px 0 var(--field-wire);
+}
+
+.nav-links .nav-external {
+  margin-left: auto;
+}
+
+.nav :focus-visible {
+  outline-color: var(--field-ink);
+  outline-offset: -2px;
+}
+
+.theme-toggle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--field-rule);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--field-ink-2);
+  cursor: pointer;
+  transition: color 120ms, border-color 120ms;
+}
+
+.theme-toggle:hover {
+  color: var(--field-ink);
+  border-color: var(--field-ink-3);
+}
+
+.theme-toggle svg {
+  width: 15px;
+  height: 15px;
+}
+
+@media (max-width: 760px) {
+  .nav-inner {
+    gap: 0.75rem;
+  }
+  .nav-links {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 1.5rem), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 1.5rem), transparent);
+  }
+  .nav-links .nav-external {
+    margin-left: 0;
+  }
+}
+
+/* Hero */
+.hero {
+  background: var(--field);
+  color: var(--field-ink);
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  column-gap: clamp(1.5rem, 4vw, 4rem);
+  min-height: calc(100svh - var(--nav-height));
+  align-items: center;
+}
+
+.hero-copy {
+  display: grid;
+  align-content: center;
+  gap: 1.35rem;
+  max-width: 36rem;
+  padding-block: 3rem 3.5rem;
+}
+
+.hero-title {
+  font-size: var(--step-hero);
+  font-weight: 480;
+  font-stretch: 92%;
+  line-height: 0.92;
+  letter-spacing: -0.038em;
+  color: var(--field-ink);
+}
+
+.hero-deck {
+  max-width: 30ch;
+  font-size: clamp(1.15rem, 1rem + 0.6vw, 1.45rem);
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--field-ink);
+}
+
+.hero-answer {
+  max-width: 34rem;
+  font-size: var(--step-0);
+  line-height: 1.6;
+  color: var(--field-ink-2);
+}
+
+.hero-answer strong {
+  font-weight: 600;
+  color: var(--field-ink);
+}
+
+/* The two numbers the whole study turns on, set as an instrument readout. */
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem 2.5rem;
+  margin: 0;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--field-rule);
+}
+
+.hero-stats div {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.hero-stats dd {
+  order: 1;
+  margin: 0;
+  font-size: clamp(1.9rem, 1.5rem + 1.5vw, 2.7rem);
+  font-weight: 500;
+  font-stretch: 94%;
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.028em;
+  color: var(--field-ink);
+}
+
+.hero-stats dt {
+  order: 2;
+  max-width: 17ch;
+  font-size: var(--step--1);
+  line-height: 1.4;
+  color: var(--field-ink-2);
+}
+
+.hero-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.hero .btn.is-strong {
+  background: var(--field-ink);
+  border-color: var(--field-ink);
+  color: var(--field);
+}
+
+.hero .btn.is-strong:hover {
+  background: #fff;
+}
+
+/* Stage */
+.hero-stage {
+  position: relative;
+  align-self: stretch;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 1rem;
+  padding-block: 1.5rem 2.5rem;
+  margin-inline-end: calc(-1 * var(--gutter));
+}
+
+.scene {
+  position: relative;
+  min-height: clamp(20rem, 62svh, 44rem);
+  touch-action: pan-y;
+}
+
+.scene canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 600ms var(--ease);
+}
+
+.scene.is-live canvas {
+  opacity: 1;
+}
+
+.scene-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transition: opacity 600ms var(--ease);
+}
+
+.scene.is-live .scene-poster {
+  opacity: 0;
+}
+
+.scene-status {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--mono);
+  font-size: var(--step--2);
+  color: var(--field-ink-3);
+}
+
+.scene-progress {
+  width: 6rem;
+  height: 2px;
+  background: var(--field-rule);
+  overflow: hidden;
+}
+
+.scene-progress span {
+  display: block;
+  height: 100%;
+  background: var(--field-wire);
+  transform-origin: left;
+  transition: transform 200ms linear;
+}
+
+.scene-controls {
+  display: grid;
+  gap: 0.9rem;
+  padding-inline-end: var(--gutter);
+}
+
+.scene-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.scene-pick {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 32rem;
+}
+
+.scene-pick .input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 2.5rem;
+  font-size: var(--step--1);
+}
+
+.scene-pick .btn {
+  flex: none;
+}
+
+.scene-readout {
+  min-height: 1.4em;
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--field-ink-2);
+}
+
+.scene-readout .num {
+  color: var(--field-ink);
+}
+
+/* Length scale: the ramp the wires are coloured by. */
+.ramp-scale {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 11rem;
+}
+
+.ramp-bar {
+  height: 8px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--ramp-0), var(--ramp-1), var(--ramp-2), var(--ramp-3));
+}
+
+.hero .ramp-bar,
+.field .ramp-bar {
+  background: linear-gradient(to right, #4a1a08, #b23a10, #eb6834, #f7cfae);
+}
+
+.ramp-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: var(--step--2);
+  color: var(--field-ink-3);
+}
+
+.ramp-title {
+  font-size: var(--step--2);
+  color: var(--field-ink-3);
+}
+
+@media (max-width: 1000px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .hero-copy {
+    padding-block: 2.5rem 0.5rem;
+  }
+  .hero-stage {
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
+  }
+  .scene {
+    min-height: 0;
+    aspect-ratio: 5 / 4;
+  }
+  .scene-controls {
+    padding-inline-end: 0;
+  }
+}
+
+/* Footer */
+.footer {
+  margin-top: 6rem;
+  padding: 3rem 0 2.5rem;
+  background: var(--wash);
+  border-top: 1px solid var(--rule);
+  font-size: var(--step--1);
+  color: var(--ink-2);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 2rem 3rem;
+}
+
+.footer-title {
+  margin-bottom: 0.5rem;
+  font-size: var(--step-1);
+  font-weight: 550;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.footer-heading {
+  margin-bottom: 0.45rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.footer ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer-note {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+  max-width: 46rem;
+  font-size: var(--step--2);
+  color: var(--ink-2);
+}

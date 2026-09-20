@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Price of Thought: wiring economy of the Drosophila male CNS connectome</title>
+    <meta
+      name="description"
+      content="Cell types in the Drosophila male central nervous system are placed so that their connections use 0.459 times the wire of random placement. The 7.5% of connections that cross the neck hold 24.0% of it."
+    />
+    <meta name="author" content="Dhruvin Sarkar" />
+    <link rel="preload" as="fetch" crossorigin href="data/site.json" />
+    <link rel="canonical" href="https://dhruvin-sarkar.github.io/price-of-thought/" />
+    <meta name="theme-color" content="#0b0b0b" />
+    <meta name="color-scheme" content="light dark" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="The Price of Thought" />
+    <meta property="og:title" content="The Price of Thought: wiring economy of the Drosophila male CNS connectome" />
+    <meta
+      property="og:description"
+      content="Cell types in the Drosophila male central nervous system are placed so that their connections use 0.459 times the wire of random placement. The 7.5% of connections that cross the neck hold 24.0% of it."
+    />
+    <meta property="og:url" content="https://dhruvin-sarkar.github.io/price-of-thought/" />
+    <meta property="og:image" content="https://dhruvin-sarkar.github.io/price-of-thought/hero.png" />
+    <meta property="og:image:width" content="1920" />
+    <meta property="og:image:height" content="1080" />
+    <meta
+      property="og:image:alt"
+      content="The male fly central nervous system seen from the front, brain above and nerve cord below, with every connection that crosses the neck drawn as a line coloured by its length."
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="The Price of Thought: wiring economy of the Drosophila male CNS connectome" />
+    <meta
+      name="twitter:description"
+      content="Cell types in the Drosophila male central nervous system are placed so that their connections use 0.459 times the wire of random placement. The 7.5% of connections that cross the neck hold 24.0% of it."
+    />
+    <meta name="twitter:image" content="https://dhruvin-sarkar.github.io/price-of-thought/hero.png" />
+    <meta
+      name="twitter:image:alt"
+      content="The male fly central nervous system seen from the front, brain above and nerve cord below, with every connection that crosses the neck drawn as a line coloured by its length."
+    />
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Crect width='18' height='18' rx='3.5' fill='%230b0b0b'/%3E%3Cg fill='none' stroke='%23eeeeea' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 5.2h10'/%3E%3Cpath d='M6.5 13.4h5'/%3E%3C/g%3E%3Cpath d='M9 5.2v8.2' fill='none' stroke='%23f07a45' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <link rel="apple-touch-icon" sizes="180x180" href="%BASE_URL%apple-touch-icon.png" />
+
+    <script>
+      // Applied before first paint so a chosen theme does not flash the other one.
+      try {
+        var stored = localStorage.getItem("price-of-thought:theme");
+        var system = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = stored === "light" || stored === "dark" ? stored : system;
+      } catch (error) {
+        document.documentElement.dataset.theme = "light";
+      }
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <p style="max-width: 60ch; margin: 48px auto; padding: 0 16px; font-family: system-ui, sans-serif; line-height: 1.6">
+        This site needs JavaScript to draw its figures and the connective view. The full report, with every result,
+        figure and method, is available as <a href="%BASE_URL%report.pdf">a PDF</a>, and the code and result files are
+        in the <a href="https://github.com/dhruvin-sarkar/price-of-thought">repository</a>.
+      </p>
+    </noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -80,18 +80,20 @@ function Panel({ title, points, test }) {
               format={(t) => millimetre(t)}
               title="Total neck-crossing wire"
             />
-            {points.map((point) =>
-              point.price_um > 0 ? (
-                <circle
-                  key={point.node}
-                  cx={x(point.price_um)}
-                  cy={y(point.value)}
-                  r={hover?.node === point.node ? 5 : 3}
-                  fill={point.value > 0 ? "var(--wire)" : "var(--ink-3)"}
-                  fillOpacity={hover?.node === point.node ? 1 : 0.42}
-                />
-              ) : null,
-            )}
+            <g data-mark="fade">
+              {points.map((point) =>
+                point.price_um > 0 ? (
+                  <circle
+                    key={point.node}
+                    cx={x(point.price_um)}
+                    cy={y(point.value)}
+                    r={hover?.node === point.node ? 5 : 3}
+                    fill={point.value > 0 ? "var(--wire)" : "var(--ink-3)"}
+                    fillOpacity={hover?.node === point.node ? 1 : 0.42}
+                  />
+                ) : null,
+              )}
+            </g>
             {/* Set beside the panel title rather than in the plot, where the zero row of points already sits. */}
             <text className="mark-label" x={width} y={-24} textAnchor="end">
               {count(test.zero_value)} of {count(test.n)} lose no flow

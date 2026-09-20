@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 
 const KEY = "price-of-thought:theme";
 const DARK = "(prefers-color-scheme: dark)";
+const REVEAL_MS = 620;
 
 function stored() {
   try {
@@ -12,9 +14,15 @@ function stored() {
   }
 }
 
+/** Distance from a point to the farthest corner of the viewport: how far the reveal has to travel. */
+function reach(x, y) {
+  return Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+}
+
 /**
  * The theme in force and a toggle for it. The inline script in index.html has already put the resolved theme on
  * the root element before first paint; this keeps it in step with the system setting until the reader chooses.
+ * The toggle takes the event that caused it, so the new theme can be wiped in from the control that was pressed.
  */
 export function useTheme() {
   const [theme, setTheme] = useState(() => document.documentElement.dataset.theme ?? "light");
@@ -33,17 +41,43 @@ export function useTheme() {
     return () => query.removeEventListener("change", follow);
   }, [chosen]);
 
-  const toggle = useCallback(() => {
-    setTheme((current) => {
-      const next = current === "dark" ? "light" : "dark";
-      try {
-        localStorage.setItem(KEY, next);
-      } catch (error) {
-        /* storage blocked: the choice lasts for this page only */
-      }
-      setChosen(next);
-      return next;
-    });
+  const toggle = useCallback((event) => {
+    const next = (document.documentElement.dataset.theme ?? "light") === "dark" ? "light" : "dark";
+    try {
+      localStorage.setItem(KEY, next);
+    } catch (error) {
+      /* storage blocked: the choice lasts for this page only */
+    }
+    const apply = () => {
+      document.documentElement.dataset.theme = next;
+      flushSync(() => {
+        setChosen(next);
+        setTheme(next);
+      });
+    };
+
+    const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (still || !document.startViewTransition) {
+      apply();
+      return;
+    }
+
+    // The new theme is wiped in as a circle opening from the control, so the change has a direction.
+    const box = event?.currentTarget?.getBoundingClientRect?.();
+    const x = box ? box.left + box.width / 2 : innerWidth - 48;
+    const y = box ? box.top + box.height / 2 : 48;
+    document.documentElement.dataset.themeChanging = "";
+    const transition = document.startViewTransition(apply);
+    transition.ready
+      .then(() =>
+        document.documentElement.animate(
+          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${reach(x, y)}px at ${x}px ${y}px)`] },
+          { duration: REVEAL_MS, easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+            pseudoElement: "::view-transition-new(root)" },
+        ).finished,
+      )
+      .catch(() => {})
+      .finally(() => delete document.documentElement.dataset.themeChanging);
   }, []);
 
   return [theme, toggle];

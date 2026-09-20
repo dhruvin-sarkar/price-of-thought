@@ -80,7 +80,7 @@ export default function CostShare({ data }) {
                     const y = top + 26 + m * (BAR + 2);
                     return (
                       <g key={measure.key}>
-                        <path d={barPath(0, y, x(row[measure.key]), BAR)} fill={measure.color} />
+                        <path data-mark="bar" d={barPath(0, y, x(row[measure.key]), BAR)} fill={measure.color} />
                         <text className="mark-label" x={x(row[measure.key]) + 8} y={y + BAR - 4}>
                           {percent(row[measure.key])}
                         </text>

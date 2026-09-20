@@ -69,11 +69,12 @@ function RatioRows({ rows, title, label }) {
               return (
                 <g key={row.key}>
                   {/* The band the rewirings occupy; a point outside it is the result. */}
-                  <path d={barPath(x(clamp(lo)), y - 5, x(clamp(hi)) - x(clamp(lo)), 10, 2)} fill="var(--wash)" />
+                  <path data-mark="bar" d={barPath(x(clamp(lo)), y - 5, x(clamp(hi)) - x(clamp(lo)), 10, 2)} fill="var(--wash)" />
                   <text className="row-label" x={-12} y={y} dy="0.32em" textAnchor="end">
                     {row.label}
                   </text>
                   <circle
+                    data-mark="fade"
                     cx={x(clamp(row.ratio))}
                     cy={y}
                     r="5.5"

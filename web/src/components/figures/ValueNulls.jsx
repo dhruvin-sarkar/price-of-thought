@@ -79,6 +79,7 @@ function Histogram({ metric, result, intact, cut, marks }) {
               return (
                 <rect
                   key={edges[i]}
+                  data-mark="column"
                   x={left}
                   y={y(value)}
                   width={Math.max(1, right - left - 2)}

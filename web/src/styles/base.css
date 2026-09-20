@@ -506,3 +506,18 @@ input[type="search"]::placeholder {
     scroll-behavior: auto !important;
   }
 }
+
+/* Theme change: the new theme is wiped over the old one, which stays put underneath. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+}

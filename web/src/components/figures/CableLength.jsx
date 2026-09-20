@@ -71,16 +71,18 @@ function Panel({ superclass, points, test, domainX, domainY }) {
               format={(t) => (t >= 1000 ? `${t / 1000}k` : String(t))}
               title="Soma to output (µm)"
             />
-            {points.map((point, index) => (
-              <circle
-                key={`${point.soma_to_output_um}-${point.cable_um}-${index}`}
-                cx={x(point.soma_to_output_um)}
-                cy={y(point.cable_um)}
-                r={hover?.index === index ? 5 : 3}
-                fill={color}
-                fillOpacity={hover?.index === index ? 1 : 0.45}
-              />
-            ))}
+            <g data-mark="fade">
+              {points.map((point, index) => (
+                <circle
+                  key={`${point.soma_to_output_um}-${point.cable_um}-${index}`}
+                  cx={x(point.soma_to_output_um)}
+                  cy={y(point.cable_um)}
+                  r={hover?.index === index ? 5 : 3}
+                  fill={color}
+                  fillOpacity={hover?.index === index ? 1 : 0.45}
+                />
+              ))}
+            </g>
           </g>
         );
       }}

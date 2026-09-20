@@ -88,8 +88,9 @@ export default function Generative({ data, model }) {
                   <text className="row-label" x={-12} y={y} dy="0.32em" textAnchor="end">
                     {row.label}
                   </text>
-                  <path d={barPath(x(lo), y - 4.5, Math.max(3, x(hi) - x(lo)), 9, 2)} fill="var(--wash)" />
+                  <path data-mark="bar" d={barPath(x(lo), y - 4.5, Math.max(3, x(hi) - x(lo)), 9, 2)} fill="var(--wash)" />
                   <circle
+                    data-mark="fade"
                     cx={x(at)}
                     cy={y}
                     r="5"

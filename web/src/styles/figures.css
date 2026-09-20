@@ -425,3 +425,77 @@ details.more[open] summary {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/*
+ * Marks are drawn once, when their chart first comes near the viewport. Every rule below adds an animation to
+ * the settled state rather than animating towards it, so a chart whose animation never runs, in a background
+ * tab or under a headless renderer, is still drawn in full.
+ */
+.chart [data-mark] {
+  transform-box: fill-box;
+}
+
+.chart.is-drawn [data-mark="bar"] {
+  transform-origin: left center;
+  animation: mark-bar 560ms var(--ease) both;
+}
+
+.chart.is-drawn [data-mark="column"] {
+  transform-origin: center bottom;
+  animation: mark-column 560ms var(--ease) both;
+}
+
+.chart.is-drawn [data-mark="line"] {
+  animation: mark-line 900ms var(--ease) both;
+}
+
+.chart.is-drawn [data-mark="fade"] {
+  animation: mark-fade 420ms var(--ease) 240ms both;
+}
+
+.chart.is-drawn [data-mark="rise"] {
+  animation: mark-rise 420ms var(--ease) 180ms both;
+}
+
+@keyframes mark-bar {
+  from {
+    transform: scaleX(0.002);
+  }
+}
+
+@keyframes mark-column {
+  from {
+    transform: scaleY(0.002);
+  }
+}
+
+/* The path carries pathLength="1", so one unit of dash covers it whatever its real length. */
+@keyframes mark-line {
+  from {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes mark-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes mark-rise {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+}
+
+/* A control that switches which series is shown moves the marks rather than replacing them. */
+.chart.is-drawn circle,
+.chart.is-drawn [data-mark="bar"] {
+  transition: cx 460ms var(--ease), cy 460ms var(--ease), x 460ms var(--ease), width 460ms var(--ease);
+}

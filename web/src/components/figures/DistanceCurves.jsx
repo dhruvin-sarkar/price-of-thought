@@ -99,6 +99,8 @@ export default function DistanceCurves({ data }) {
             {curves.map((curve) => (
               <path
                 key={curve.key}
+                data-mark="line"
+                pathLength="1"
                 d={line(curve.points.map(([d, p]) => [x(d), y(p)]))}
                 fill="none"
                 stroke={curve.color}

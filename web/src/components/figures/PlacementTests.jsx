@@ -98,6 +98,7 @@ export default function PlacementTests({ data }) {
                     </text>
                   )}
                   <path
+                    data-mark="bar"
                     d={barPath(0, barTop, x(test.result.cost_ratio), 18)}
                     fill={test.kind === "primary" ? "var(--wire)" : "var(--ink-3)"}
                     opacity={active ? 1 : 0.9}

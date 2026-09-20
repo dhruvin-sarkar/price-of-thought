@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNear, useWidth } from "../lib/hooks.js";
 
 export const MARGIN = { top: 28, right: 20, bottom: 46, left: 56 };
@@ -22,6 +22,15 @@ export function ChartFrame({
   const [ref, width] = useWidth();
   const near = useNear(ref);
   const svgRef = useRef(null);
+  // Marks are drawn at rest and then released, so a chart that never animates is still complete and correct.
+  const [drawn, setDrawn] = useState(false);
+  const ready = Boolean(width) && near;
+
+  useEffect(() => {
+    if (!ready || drawn) return undefined;
+    const frame = requestAnimationFrame(() => setDrawn(true));
+    return () => cancelAnimationFrame(frame);
+  }, [ready, drawn]);
   const inner = {
     width: Math.max(10, width - margin.left - margin.right),
     height: Math.max(10, height - margin.top - margin.bottom),
@@ -33,10 +42,10 @@ export function ChartFrame({
     onPointer(event.clientX - rect.left - margin.left, event.clientY - rect.top - margin.top, inner);
   }
 
-  if (!width || !near) return <div className="chart" ref={ref} style={{ height }} />;
+  if (!ready) return <div className="chart" ref={ref} style={{ height }} />;
 
   return (
-    <div className="chart" ref={ref}>
+    <div className={`chart${drawn ? " is-drawn" : ""}`} ref={ref}>
       <svg
         ref={svgRef}
         width={width}

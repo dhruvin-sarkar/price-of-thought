@@ -528,7 +528,7 @@ def headline(data: dict) -> dict:
 # Plates.
 
 def front_layer(svg: Svg, front: dict, x0: float, y0: float, size: float, theme: str, width: float = 1.3,
-                opacity: float = 0.6) -> None:
+                opacity: float = 0.6, fill: str = "track", stroke: str = "rule_strong") -> None:
     """Draw the CNS silhouette and the sampled neck-crossing wires, shortest first, into a square box."""
     lo, hi = np.array(front["bounds"]["min"]), np.array(front["bounds"]["max"])
     scale = size / float((hi - lo).max())
@@ -541,8 +541,8 @@ def front_layer(svg: Svg, front: dict, x0: float, y0: float, size: float, theme:
     for outline in front["outlines"]:
         points = [to_canvas(x, y) for x, y in outline]
         xs, ys = [p[0] for p in points], [p[1] for p in points]
-        svg.polygon(xs, ys, "track")
-        svg.polyline(xs + xs[:1], ys + ys[:1], "rule_strong", 2)
+        svg.polygon(xs, ys, fill)
+        svg.polyline(xs + xs[:1], ys + ys[:1], stroke, 2)
     a, b = front["length_range_um"]
     stops = THEMES[theme]["ramp"]
     runs: list[tuple[str, list[str]]] = []
@@ -557,37 +557,70 @@ def front_layer(svg: Svg, front: dict, x0: float, y0: float, size: float, theme:
                 f'stroke-opacity="{opacity}" fill="none" stroke-linecap="round"/>')
 
 
+def length_legend(svg: Svg, length_range: Sequence[float], x1: float, y: float, bar: float = 192) -> None:
+    """Key for the wire colours: the length ramp between its two labelled endpoints, right-aligned at ``x1``."""
+    lo, hi = length_range
+    stops = THEMES["dark"]["ramp"]
+    x = x1 - svg.text(x1, y, f"{count(hi)} µm", 20, "#8f8e88", anchor="end", mono=True) - 14 - bar
+    steps = 48
+    for k in range(steps):
+        svg.rect(x + k * bar / steps, y - 15, bar / steps + 0.6, 11, ramp_color(stops, k / (steps - 1)))
+    svg.text(x - 14, y, count(lo), 20, "#8f8e88", anchor="end", mono=True)
+
+
 def title_plate(data: dict) -> tuple[str, str, str]:
-    """Title plate on the black field: the name, the question and the neck-crossing wires in the front view."""
+    """Title plate on the black field: the name, the question, the neck's share of the budget and the front view."""
     svg = Svg(900, "dark", field=True)
     h = headline(data)
-    svg.text(MARGIN + 4, 200, "The Price", 128, "#eeeeea", 600)
-    svg.text(MARGIN + 4, 336, "of Thought", 128, "#eeeeea", 600)
+    front = data["front"]
+    wire_mm = data["concentration"]["total_wire_um"] / 1000
+    short, long = front["length_range_um"]
+    left, right, column = 72, WIDTH - MARGIN, 800
+
+    svg.text(left - 6, 180, "The Price", 128, "#eeeeea", 600)
+    svg.text(left - 6, 308, "of Thought", 128, "#eeeeea", 600)
     question = ["Is a fly's nervous system wired to keep", "its connections short, and what do its",
                 "longest wires buy?"]
     for i, line in enumerate(question):
-        svg.text(MARGIN + 10, 430 + i * 46, line, 36, "#eeeeea")
-    facts = [
-        f"{count(h['nodes'])} cell types, by side, of the adult male Drosophila CNS",
-        f"{count(h['edges'])} connections, {count(h['neck_edges'])} of them crossing the neck",
-    ]
-    for i, line in enumerate(facts):
-        svg.text(MARGIN + 10, 614 + i * 42, line, 28, "#a8a7a0")
-    svg.text(MARGIN + 10, 744, f"The neck holds {pct(h['neck_cost_share'])} of the wire in "
-                               f"{pct(h['neck_edge_share'])} of the connections.", 28, "#eeeeea", 500)
-    svg.text(MARGIN + 10, 786, f"Placement costs {h['ratio']:.3f} times random placement.", 28, "#a8a7a0")
+        svg.text(left, 380 + i * 46, line, 36, "#eeeeea")
 
-    front = data["front"]
-    front_layer(svg, front, 960, 30, 790, "dark", width=1.4, opacity=0.62)
-    svg.text(WIDTH - MARGIN, 872, f"{count(front['sample']['n'])} of the {count(front['crossing_edges'])} "
-                                  "neck-crossing connections, coloured by length", 20, "#8f8e88", anchor="end")
+    front_layer(svg, front, 1008, 72, 688, "dark", width=0.9, opacity=0.28, fill="#0f100d", stroke="#43443d")
+
+    svg.line(left, 518, left + column, 518, "#2a2b28", 2)
+    x = left
+    x += svg.text(x, 566, f"{count(h['nodes'])} cell types sit where they cost ", 26, "#eeeeea")
+    x += svg.text(x, 566, f"{h['ratio']:.3f}", 26, "#eeeeea", 600)
+    svg.text(x, 566, " times random placement.", 26, "#eeeeea")
+
+    # Both shares run on one track length, so the wire bar can be read against the connection bar above it.
+    rows = [
+        (h["neck_edge_share"], f"of {count(h['edges'])} connections cross the neck"),
+        (h["neck_cost_share"], f"of {count(wire_mm)} mm of wire runs through it"),
+    ]
+    gutter = max(text_width(pct(share), 52, weight=600) for share, _ in rows) + 32
+    for i, (share, label) in enumerate(rows):
+        y = 640 + i * 90
+        svg.text(left, y, pct(share), 52, "#eeeeea", 600)
+        svg.text(left + gutter, y, label, 27, "#a8a7a0")
+        svg.rect(left, y + 18, column, 10, "#262724", rx=5)
+        svg.rect(left, y + 18, column * share, 10, "#f07a45", rx=5)
+
+    svg.line(left, 794, right, 794, "#2a2b28", 2)
+    svg.text(left, 834, "Dhruvin Sarkar", 26, "#eeeeea", 500)
+    svg.text(left, 868, "Adult male Drosophila CNS connectome, male-cns:v1.0", 22, "#8f8e88")
+    svg.text(right, 834, f"{count(front['sample']['n'])} of the {count(front['crossing_edges'])} "
+                         "connections that cross the neck", 22, "#8f8e88", anchor="end")
+    length_legend(svg, front["length_range_um"], right, 868)
+
     desc = (
         "The Price of Thought. Is a fly's nervous system wired to keep its connections short, and what do its "
         "longest wires buy? The male fruit fly central nervous system seen from the front on a black field, brain "
         f"above and nerve cord below, with {count(front['sample']['n'])} of its {count(front['crossing_edges'])} "
-        "neck-crossing connections drawn as lines from dark red for the shortest to pale orange for the longest, "
-        f"about a millimetre. The neck holds {pct(h['neck_cost_share'])} of the wire in {pct(h['neck_edge_share'])} "
-        f"of the connections; the placement of cell types costs {h['ratio']:.3f} times random placement."
+        "neck-crossing connections drawn as lines coloured by length, from dark red at "
+        f"{count(short)} micrometres to pale orange at {count(long)}. {count(h['nodes'])} cell types sit where "
+        f"they cost {h['ratio']:.3f} times random placement, and two bars on one scale show that "
+        f"{pct(h['neck_edge_share'])} of {count(h['edges'])} connections cross the neck while "
+        f"{pct(h['neck_cost_share'])} of the {count(wire_mm)} mm of wire runs through it."
     )
     return svg.render("The Price of Thought", desc), desc, "plate-title.svg"
 

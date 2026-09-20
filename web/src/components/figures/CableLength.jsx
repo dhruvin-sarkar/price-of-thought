@@ -106,7 +106,7 @@ export default function CableLength({ data }) {
   ];
 
   return (
-    <div className="panels is-two">
+    <div className="panels is-four">
       {ORDER.map((superclass) => (
         <Panel
           key={superclass}

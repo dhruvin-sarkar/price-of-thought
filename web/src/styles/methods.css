@@ -131,6 +131,12 @@
   color: var(--ink-2);
 }
 
+/* A note closing a list reads as its last item unless it is set apart from one. */
+.refs + .caption,
+.limits + .caption {
+  margin-top: 1.5rem;
+}
+
 pre.cmd {
   margin: 0;
   padding: 0.9rem 1rem;

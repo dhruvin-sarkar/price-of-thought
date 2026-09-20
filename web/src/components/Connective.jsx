@@ -19,10 +19,10 @@ export default function Connective({ data }) {
       <div className="wrap">
         <HeadingLevel level={3}>
           <div className="section-head">
-            <h2 id="connective-title">The neck holds a quarter of the wire</h2>
+            <h2 id="connective-title">The connective is the expensive part</h2>
             <p className="lede">
-              A few thousand connections run the length of the animal, between the brain and the nerve cord. They are
-              the most expensive wiring in the nervous system. This is what they cost, and what they carry.
+              A few thousand connections run the length of the animal, between the brain and the nerve cord. Here is
+              what they cost, and what the nervous system gets for them.
             </p>
           </div>
 

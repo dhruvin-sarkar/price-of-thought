@@ -265,9 +265,9 @@ export default function Methods({ data }) {
             caption={
               <>
                 Skeleton cable length against soma-to-output distance for {count(data.cable.analysed)} neurons
-                sampled from four classes, both axes logarithmic. Pooled across classes the two are correlated (ρ ={" "}
-                {fixed(data.cable.spearman_rho, 3)}); within each class the correlation is near zero. This is the
-                check behind the first limitation below.
+                sampled from four classes, both axes logarithmic; the two connective classes are drawn in the wire
+                colour. Pooled across classes the two are correlated (ρ = {fixed(data.cable.spearman_rho, 3)});
+                within each class the correlation is near zero. This is the check behind the first limitation below.
               </>
             }
           >

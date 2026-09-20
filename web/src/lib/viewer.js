@@ -29,7 +29,16 @@ const OTHER = new Color("#6d6c66");
 const LIT = new Color("#ffffff");
 const PITCH_DEG = 18;
 const FOV_DEG = 28;
-const MARGIN = 1.08;
+const MARGIN = 1.03;
+/**
+ * How far the idle view swings either side of the front, and how long a full swing takes. Kept small: the nerve
+ * cord sits behind the brain as well as below it, so turning the specimen shears the two apart on screen and a
+ * wide swing stops reading as one animal.
+ */
+const SWAY_RAD = 0.11;
+const SWAY_MS = 19000;
+/** What the anatomy outside the region under the pointer falls to. */
+const RECEDE = 0.32;
 const TYPED = { float32: Float32Array, uint32: Uint32Array, uint16: Uint16Array, uint8: Uint8Array };
 
 const stops = RAMP.map((hex) => new Color(hex));
@@ -96,7 +105,8 @@ export function createViewer(container, header, nodes, { reducedMotion = false, 
   const pitch = (-PITCH_DEG * Math.PI) / 180;
   const forward = new Vector3(0, Math.sin(pitch), Math.cos(pitch));
   const up = new Vector3(0, Math.cos(pitch), -Math.sin(pitch));
-  camera.up.set(0, 1, 0);
+  // Screen-up is the specimen's own head-to-tail axis, so swinging the view about that axis never rolls it.
+  camera.up.copy(up);
 
   // Kept deliberately contrasty: the neuropils are packed against each other, and it is the shading that tells
   // one lobe from the next when neighbours hold a similar share of the wire and take a similar colour.
@@ -122,6 +132,19 @@ export function createViewer(container, header, nodes, { reducedMotion = false, 
   // from nothing to a tenth, so a linear ramp would leave every region but a handful at the dark end.
   const topShare = Math.max(1e-9, ...regions.map((r) => r.wire_share ?? 0));
   const regionColor = regions.map((r) => rampColor(Math.sqrt((r.wire_share ?? 0) / topShare)));
+
+  // Each mesh contributed its vertices in one unbroken run, so a region is a slice of the colour buffer and
+  // lighting one costs two array copies rather than a pass over every vertex.
+  const span = regions.map(() => [Infinity, -1]);
+  for (let v = 0; v < shellGroup.length; v += 1) {
+    const range = span[shellGroup[v]];
+    if (range) {
+      if (v < range[0]) range[0] = v;
+      if (v > range[1]) range[1] = v;
+    }
+  }
+  const settled = new Float32Array(shellColors.length);
+  const receded = new Float32Array(shellColors.length);
 
   const shellMaterial = new MeshPhongMaterial({
     vertexColors: true,
@@ -167,13 +190,29 @@ export function createViewer(container, header, nodes, { reducedMotion = false, 
     shellMaterial.depthWrite = atlas;
     shell.renderOrder = atlas ? 0 : 2;
     for (let v = 0; v < shellGroup.length; v += 1) {
-      const region = shellGroup[v];
-      let color = atlas ? regionColor[region] ?? OTHER : QUIET_TISSUE;
-      if (region === lit) color = color.clone().lerp(LIT, atlas ? 0.32 : 0.6);
-      else if (atlas && lit >= 0) color = color.clone().multiplyScalar(0.38);
-      shellColors[v * 3] = color.r;
-      shellColors[v * 3 + 1] = color.g;
-      shellColors[v * 3 + 2] = color.b;
+      const color = atlas ? regionColor[shellGroup[v]] ?? OTHER : QUIET_TISSUE;
+      settled[v * 3] = color.r;
+      settled[v * 3 + 1] = color.g;
+      settled[v * 3 + 2] = color.b;
+      receded[v * 3] = color.r * RECEDE;
+      receded[v * 3 + 1] = color.g * RECEDE;
+      receded[v * 3 + 2] = color.b * RECEDE;
+    }
+    lightRegion(lit);
+  }
+
+  /**
+   * Show one region against the rest, by letting the rest recede rather than by brightening the one. The scale
+   * runs dark to pale, so lifting a region towards white would read as a region that holds a great deal of wire.
+   */
+  function lightRegion(region) {
+    const range = region >= 0 ? span[region] : null;
+    if (!range || range[1] < 0) {
+      shellColors.set(settled);
+    } else {
+      shellColors.set(receded);
+      const from = range[0] * 3;
+      shellColors.set(settled.subarray(from, (range[1] + 1) * 3), from);
     }
     shellGeometry.attributes.color.needsUpdate = true;
   }
@@ -220,13 +259,11 @@ export function createViewer(container, header, nodes, { reducedMotion = false, 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.enablePan = false;
-  // The view turns slowly until the reader takes hold of it, and never turns for a reader who asked for less motion.
-  controls.autoRotate = !reducedMotion;
-  controls.autoRotateSpeed = 0.55;
-  let touched = false;
+  // The specimen is flat front to back and only reads from the front, so the idle view swings a little either
+  // side of it for parallax instead of turning all the way round and spending half its time edge on.
+  let touched = reducedMotion;
   controls.addEventListener("start", () => {
     touched = true;
-    controls.autoRotate = false;
   });
 
   // Every vertex reduced to what framing needs: how far along the view it lies, and how far off the axis it sits
@@ -234,9 +271,12 @@ export function createViewer(container, header, nodes, { reducedMotion = false, 
   const axial = (() => {
     const total = (shellPositions.length + wirePositions.length) / 3;
     const out = { depth: new Float32Array(total), side: new Float32Array(total), rise: new Float32Array(total) };
+    // The frame is centred on the anatomy alone. Cell bodies sit in a rind outside the neuropils and reach
+    // further up than down, so centring on them too would hang the specimen high and leave a gap beneath it.
     const span = { x: [Infinity, -Infinity], y: [Infinity, -Infinity] };
     let n = 0;
     for (const points of [shellPositions, wirePositions]) {
+      const anatomy = points === shellPositions;
       for (let i = 0; i < points.length; i += 3) {
         const x = points[i];
         const y = up.y * points[i + 1] + up.z * points[i + 2];
@@ -244,6 +284,7 @@ export function createViewer(container, header, nodes, { reducedMotion = false, 
         out.side[n] = x;
         out.rise[n] = y;
         n += 1;
+        if (!anatomy) continue;
         if (x < span.x[0]) span.x[0] = x;
         if (x > span.x[1]) span.x[1] = x;
         if (y < span.y[0]) span.y[0] = y;
@@ -257,16 +298,24 @@ export function createViewer(container, header, nodes, { reducedMotion = false, 
   target.x = axial.centre[0];
   const targetDepth = forward.y * target.y + forward.z * target.z;
 
-  /** Back the camera off until every vertex sits inside the frame, with a margin around the outline. */
+  /**
+   * Back the camera off until every vertex sits inside the frame, with a margin around the outline. The solve is
+   * repeated at both ends of the idle swing, because turning the specimen widens the outline it presents.
+   */
   function frameView() {
     const tanV = Math.tan(((FOV_DEG / 2) * Math.PI) / 180);
     const tanH = tanV * Math.max(camera.aspect, 0.2);
     let distance = 0;
-    for (let i = 0; i < axial.count; i += 1) {
-      const depth = axial.depth[i] - targetDepth;
-      const need = depth + Math.max(Math.abs(axial.rise[i] - axial.centre[1]) / tanV,
-                                    Math.abs(axial.side[i] - axial.centre[0]) / tanH);
-      if (need > distance) distance = need;
+    for (const turn of [-SWAY_RAD, 0, SWAY_RAD]) {
+      const cos = Math.cos(turn);
+      const sin = Math.sin(turn);
+      for (let i = 0; i < axial.count; i += 1) {
+        // Swinging about the vertical mixes depth into the sideways offset and leaves the rise untouched.
+        const depth = (axial.depth[i] - targetDepth) * cos - (axial.side[i] - axial.centre[0]) * sin;
+        const side = (axial.depth[i] - targetDepth) * sin + (axial.side[i] - axial.centre[0]) * cos;
+        const need = depth + Math.max(Math.abs(axial.rise[i] - axial.centre[1]) / tanV, Math.abs(side) / tanH);
+        if (need > distance) distance = need;
+      }
     }
     distance *= MARGIN;
     camera.position.copy(target).addScaledVector(forward, distance);
@@ -274,7 +323,13 @@ export function createViewer(container, header, nodes, { reducedMotion = false, 
     controls.minDistance = distance * 0.3;
     controls.maxDistance = distance * 2.4;
     controls.update();
+    return camera.position.clone().sub(target);
   }
+
+  // The camera's offset from the target at the framed front view, and the axis the idle swing turns it about.
+  let home = new Vector3();
+  let framedAspect = 0;
+  const swung = new Vector3();
 
   function resize() {
     const { clientWidth, clientHeight } = container;
@@ -282,8 +337,11 @@ export function createViewer(container, header, nodes, { reducedMotion = false, 
     renderer.setSize(clientWidth, clientHeight, false);
     camera.aspect = clientWidth / clientHeight;
     camera.updateProjectionMatrix();
-    // Reframing would fight a reader who has already moved the view, so it stops once they take hold.
-    if (!touched) frameView();
+    // Reframing would fight a reader who has already moved the view, so it stops once they take hold, and it
+    // ignores the sub-pixel height changes a line of text below the canvas can cause.
+    if (touched || Math.abs(camera.aspect - framedAspect) < framedAspect * 0.01) return;
+    framedAspect = camera.aspect;
+    home = frameView();
   }
 
   // Pointing at the specimen names the neuropil under the cursor and lights it. Only the anatomy is picked, and
@@ -300,7 +358,7 @@ export function createViewer(container, header, nodes, { reducedMotion = false, 
   function settle(next) {
     if (next === lit) return;
     lit = next;
-    paintShell();
+    lightRegion(lit);
     onHover?.(next >= 0 ? regions[next] : null);
   }
 
@@ -324,15 +382,21 @@ export function createViewer(container, header, nodes, { reducedMotion = false, 
   const observer = new ResizeObserver(resize);
   observer.observe(container);
   resize();
-  frameView();
+  home = frameView();
   paint();
 
   let frame = 0;
   let running = true;
+  const opened = performance.now();
   function tick() {
     if (!running) return;
     frame = requestAnimationFrame(tick);
     resolvePointer();
+    if (!touched) {
+      // OrbitControls reads the camera position back each update, so turning the offset here composes with it.
+      const turn = SWAY_RAD * Math.sin(((performance.now() - opened) / SWAY_MS) * 2 * Math.PI);
+      camera.position.copy(swung.copy(home).applyAxisAngle(up, turn).add(controls.target));
+    }
     controls.update();
     renderer.render(scene, camera);
   }

@@ -320,7 +320,9 @@
 }
 
 .scene-readout {
-  min-height: 1.4em;
+  /* Two lines held open whatever the readout says: the scene takes the rest of the row, and a line appearing
+     or leaving here would resize the canvas and move the camera under the reader. */
+  min-height: 3em;
   font-size: var(--step--1);
   line-height: 1.5;
   color: var(--field-ink-2);

@@ -247,7 +247,7 @@ function Readout({ selected, region, live, mode, neck, atlas }) {
     return (
       <>
         <span className="id">{region.name}</span>, {region.compartment === "vnc" ? "nerve cord" : "brain"}:{" "}
-        <span className="num">{count(region.types)}</span> cell types holding{" "}
+        <span className="num">{count(region.types)}</span> cell type{region.types === 1 ? "" : "s"} holding{" "}
         <span className="num">{region.wire_share >= 0.001 ? percent(region.wire_share) : "under 0.1%"}</span> of the
         wire
         {region.cost_ratio != null && (

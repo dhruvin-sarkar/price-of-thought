@@ -20,3 +20,15 @@ def test_every_reference_the_site_cites_is_one_verified_in_the_prior_art_review(
     for reference in site_references():
         doi = re.search(r"doi:(\S+)", reference).group(1)
         assert doi in reviewed, doi
+
+
+INDEX = ROOT / "web" / "index.html"
+SITE = "https://dhruvin-sarkar.github.io/price-of-thought/"
+# Paths the build produces rather than copies: the page itself, and the report the Vite plugin publishes.
+BUILT = {"": ROOT / "web" / "index.html", "report.pdf": ROOT / "paper" / "report.pdf"}
+
+
+def test_every_asset_the_page_metadata_points_at_is_published():
+    for url in set(re.findall(rf'content="{re.escape(SITE)}([^"]*)"', INDEX.read_text(encoding="utf-8"))):
+        path = BUILT.get(url, ROOT / "web" / "public" / url)
+        assert path.exists(), url

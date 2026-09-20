@@ -2,12 +2,13 @@
 
 import base64
 import json
+import shutil
 
 import numpy as np
 import pandas as pd
 
 from pipeline.build_spatial_graph import load_spatial_graph
-from pipeline.common import RESULTS, ROOT
+from pipeline.common import ASSETS, RESULTS, ROOT
 from pipeline.connective_richclub import TOP_FRACTION, node_sets, partner_richness, rich_mask
 from pipeline.connective_value import neck_crossing_mask
 from pipeline.hero_render import load_all_meshes, simplify
@@ -182,6 +183,8 @@ def site_data(price: pd.DataFrame) -> dict:
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
+    # The card link previews use. The page itself draws its own still from the exported front view.
+    shutil.copyfile(ASSETS / "hero.png", OUT.parent / "hero.png")
     price = pd.read_csv(RESULTS / "connective_price.csv")
     data = site_data(price)
     (OUT / "site.json").write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")

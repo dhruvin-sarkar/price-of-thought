@@ -26,6 +26,8 @@ Second, the neck connective of descending and ascending neurons. Its neck-crossi
 
 Third, value. Cutting the connective removes 0.36 times the sensory-to-motor flow capacity lost with random wiring of equal total length, but 1.83 times in the brain-to-nerve-cord direction. Across cell types, wire length does not predict flow once the number of connections is controlled for.
 
+Two descriptive analyses accompany these tests. Attributed to the neuropils, only 6.6% of the wiring budget stays inside one region, and all 48 regions large enough to test are wired internally more cheaply than permutations of their own cell types, the antennal lobes least clearly. Over connections the budget is unevenly but not extremely spread: the longest tenth hold 30.7% of it, and a lognormal fits the upper tail better than a power law.
+
 The fly concentrates its most expensive wiring on well-connected cell types. That wiring carries no more flow per unit length than ordinary long wiring, except from brain to nerve cord.
 
 # Introduction
@@ -102,6 +104,20 @@ The primary test compared the real total unweighted cost with 1000 uniform rando
 
 Distance from a local optimum was estimated with 2,000,000 proposed swaps of position between two soma-placed nodes of the same compartment, each accepted if it lowered the total cost, following Kaiser and Hilgetag (2006) and Gushchin and Tang (2015). Connection probability was measured in 20 µm distance bins, and an exponential P(d) = a·exp(−d/λ) was fitted over 0–600 µm.
 
+## Wire by neuropil
+
+The 105 published neuropil surfaces were simplified onto a 3 µm grid and pooled into one search tree. Each cell type takes the neuropil whose surface lies nearest its position, and each connection lends half its length to the neuropil at each of its ends, so the wire attributed to the regions sums to the total. A neuropil's internal connections are those with both endpoints assigned to it.
+
+Placement inside a region was tested with the statistic of the primary placement test restricted to that region: the summed length of its internal connections against 1000 permutations of which of its own cell types sits at which of its own positions. It is reported for neuropils with at least 12 cell types and 50 internal connections.
+
+## Concentration of the wiring budget
+
+Connections were sorted longest first and the cumulative share of wire taken against the cumulative share of connections; the Gini coefficient is one minus twice the area under the same curve taken shortest first. It was computed over all connections and over those within the brain, within the nerve cord and across the neck.
+
+The upper tail of the length distribution was fitted with the `powerlaw` package, which selects the lower bound minimizing the Kolmogorov-Smirnov distance above it and then fits the exponent by maximum likelihood. Lengths were rounded to the micrometer first, which cuts the candidate lower bounds from half a million to about a thousand without moving the fit by more than the rounding. The fit was weighed against a lognormal, an exponential and a truncated power law by normalized log-likelihood ratio, a positive ratio favouring the power law.
+
+Wire was also attributed to cell classes, each connection counted for the majority superclass at each of its two ends. That majority is taken within a node, and differs a little from the connective set above, which takes it over the cell type pooled across sides: 1,089 nodes have `ascending_neuron` as their majority superclass, against the 1,096 ascending nodes of the connective set.
+
 ## Rich-club tests
 
 A partner's richness is its total degree in the subgraph of non-connective nodes, so no connective edge contributes to it. Rich brain and rich nerve-cord partners are those at or above the 90th percentile of richness within B and within V. A route is a two-edge path through one connective node, b → DN → v or v → AN → b. The statistic R is the number of rich-to-rich routes: the sum over connective nodes of their rich inputs times their rich outputs on the opposite side.
@@ -147,7 +163,7 @@ Fifty synthetic graphs per model were drawn as independent Bernoulli trials, wit
 
 ## Robustness, pre-registration and software
 
-The placement, route and hub tests were repeated at edge thresholds of 0.5%, 2% and 5%. Every hypothesis, with its direction, statistic, null and threshold, was committed before the statistic was computed (commits `39892c5`, `e62c6df` and `73fba33`); each results file keeps that section unchanged and the scripts only append beneath it. Empirical one-sided p-values are (1 + null values at least as extreme) / (1 + N), so the smallest attainable with 1000 draws is 0.0010. Software: Python 3.12, igraph 1.0.0, NumPy 2.5.3, SciPy 1.18.1, pandas 3.0.5, scikit-learn 1.9.1, navis 1.12.0 and neuprint-python 0.6.3, pinned in `requirements.txt`; `make reproduce` rebuilds every result from neuPrint.
+The placement, route and hub tests were repeated at edge thresholds of 0.5%, 2% and 5%. Every hypothesis, with its direction, statistic, null and threshold, was committed before the statistic was computed (commits `39892c5`, `e62c6df` and `73fba33`); each results file keeps that section unchanged and the scripts only append beneath it. The wire atlas and the concentration of the budget carry no registered hypothesis: both were run after the registered tests and are reported as description. Empirical one-sided p-values are (1 + null values at least as extreme) / (1 + N), so the smallest attainable with 1000 draws is 0.0010. Software: Python 3.12, igraph 1.0.0, NumPy 2.5.3, SciPy 1.18.1, pandas 3.0.5, scikit-learn 1.9.1, navis 1.12.0, powerlaw 2.0.0 and neuprint-python 0.6.3, pinned in `requirements.txt`; `make reproduce` rebuilds every result from neuPrint.
 
 # Results
 
@@ -179,6 +195,69 @@ The search had not converged (the last 100,000 proposals still saved 0.33%), so 
 The cable-length check supports node positions as a between-class measure only. Across the 500 sampled neurons, skeleton cable length correlates with soma-to-output distance (ρ = 0.428, p = 5.5 × 10^−24^): descending and ascending neurons have more cable (medians 4,592 and 3,898 µm) than intrinsic neurons (1,428 and 1,713 µm). Within each superclass, however, |ρ| is below 0.12.
 
 ![Skeleton cable length against soma-to-output distance for 500 sampled neurons, by superclass.](../results/cable_length.png)
+
+## Inside the neuropils, placement is economical too
+
+Each cell type was assigned to the nearest of the 105 published neuropil surfaces. Cell types fall in 89 of them, at a median distance of 9.02 µm from the surface they are assigned to, and each connection lends half its length to the neuropil at each of its ends. Only 6.6% of the wire, 6,154 mm over 86,881 connections, stays inside one neuropil; the rest runs between them. The heaviest route between two regions joins the gnathal ganglia (GNG) to the abdominal neuromere (ANm), 1,586 mm over 2,101 connections.
+
+The budget is not spread evenly over the regions. GNG holds 10.1% of all wire, the largest share of any neuropil, ahead of ANm at 5.8%; the six leg neuropils of the nerve cord hold between 3.1% and 4.0% each.
+
+| neuropil | compartment | cell types | wire (mm) | share of wire | internal connections | internal / permuted | z |
+|---|---|---|---|---|---|---|---|
+| GNG | brain | 1,918 | 9,445 | 10.1% | 15,310 | 0.809 | −33.39 |
+| ANm | nerve cord | 1,108 | 5,420 | 5.8% | 11,979 | 0.729 | −23.94 |
+| AVLP(R) | brain | 1,135 | 3,772 | 4.1% | 5,881 | 0.863 | −15.62 |
+| LegNp(T2)(R) | nerve cord | 803 | 3,682 | 4.0% | 3,764 | 0.885 | −9.19 |
+| LegNp(T3)(R) | nerve cord | 759 | 3,673 | 3.9% | 2,603 | 0.894 | −8.75 |
+| LegNp(T2)(L) | nerve cord | 799 | 3,654 | 3.9% | 3,791 | 0.895 | −10.44 |
+| AVLP(L) | brain | 1,075 | 3,572 | 3.8% | 5,096 | 0.879 | −11.18 |
+| LegNp(T1)(L) | nerve cord | 667 | 3,192 | 3.4% | 1,751 | 0.891 | −7.72 |
+| LegNp(T3)(L) | nerve cord | 636 | 3,082 | 3.3% | 1,740 | 0.922 | −5.72 |
+| SAD | brain | 677 | 3,030 | 3.3% | 1,842 | 0.682 | −18.80 |
+| LegNp(T1)(R) | nerve cord | 590 | 2,845 | 3.1% | 1,493 | 0.885 | −7.40 |
+| PB | brain | 820 | 2,719 | 2.9% | 2,277 | 0.767 | −13.35 |
+
+: Wire by neuropil. The twelve neuropils holding most wire, of the 89 that hold cell types. `internal / permuted` is the summed length of a neuropil's internal connections against the mean of 1000 permutations of which of its own cell types sits at which of its own positions.
+
+Of the 89 neuropils, 48 hold enough cell types and internal connections to take that permutation test. All 48 come out below their permuted mean, and in 41 of them no permutation of the region's own cell types over its own positions was as short. The most economical are the mushroom body lobe gL(L) at 0.428 of its permuted mean (z = −10.40) and the two anterior optic tubercles, AOTU(R) at 0.516 and AOTU(L) at 0.536. The economy of the layout is therefore not only the separation of brain from nerve cord, nor of one neuropil from the next: it holds again inside nearly every region, over the positions that region already has.
+
+Three regions are the exception, and not for want of data. The antennal lobes come closest to chance: AL(L) is at 0.974 of its permuted mean with 171 of 1000 permutations as short or shorter (z = −1.00), and AL(R) at 0.960 with 53 (z = −1.62). The accessory medulla AME(R) is at 0.939 with 231 (z = −0.75). AL(L) holds 551 cell types and 3,139 internal connections, more than all but a few of the regions tested, and the two hemispheres agree. Inside the antennal lobes, the arrangement of cell types over their own positions saves little or no wire.
+
+![The wire held by the twelve neuropils that hold most of it, and how economically each is wired internally.](../results/wire_atlas.png)
+
+## The wiring budget is concentrated, and its upper tail is not a power law
+
+The 490,884 connections hold 93,095 mm of wire between them, and they hold it unequally. Sorted longest first, the longest 1% hold 4.6% of the budget, the longest 10% hold 30.7% and the longest quarter 52.2%; the Gini coefficient of the length distribution is 0.404. That is uneven, but a long way from the concentration the rich-club literature deals with, where an eleven-neuron club holds 48% of the wiring cost of *C. elegans* (Towlson et al. 2013).
+
+| group | connections | wire (mm) | mean (µm) | median (µm) | 99th percentile (µm) | Gini | longest 10% |
+|---|---|---|---|---|---|---|---|
+| all | 490,884 | 93,095 | 189.7 | 154.3 | 808.8 | 0.404 | 30.7% |
+| within the brain | 319,431 | 49,540 | 155.1 | 146.3 | 544.7 | 0.343 | 23.6% |
+| within the nerve cord | 133,277 | 21,855 | 164.0 | 145.2 | 570.5 | 0.334 | 24.0% |
+| across the neck | 36,943 | 22,371 | 605.6 | 597.6 | 941.4 | 0.151 | 14.6% |
+
+: Length and concentration by where a connection runs. The groups are views of the same 490,884 connections, not a partition: a connection between a brain type and a nerve-cord type that is neither descending nor ascending falls in none of the last three.
+
+Neck-crossing connections are the longest and also the most uniform. Their median length, 597.6 µm, is four times the 146.3 µm within the brain, while their Gini, 0.151, is less than half the 0.343 within it. Crossing the neck costs about the same whichever pair of cell types does it.
+
+The upper tail is heavier than an exponential, but a power law is not the best description of it. Fitted above 161 µm, over 231,054 connections, the exponent is 2.99. By normalized log-likelihood ratio the power law beats an exponential (46.81) and loses to both a lognormal (−45.52) and a truncated power law (−62.52), each comparison with p < 0.0001. The longest connection in the graph is 1,003.9 µm, against the 995 µm the somata span along their longest axis: the distribution is cut off by the extent of the nervous system itself, which is what the truncated fit picks up and the plain power law cannot.
+
+| class | cell types | connections | wire (mm) | share of wire | mean length (µm) | median (µm) |
+|---|---|---|---|---|---|---|
+| central brain intrinsic | 13,027 | 300,466 | 51,887 | 55.7% | 172.7 | 152.0 |
+| nerve cord intrinsic | 5,393 | 141,088 | 29,829 | 32.0% | 211.4 | 158.1 |
+| ascending | 1,089 | 57,516 | 20,906 | 22.5% | 363.5 | 306.7 |
+| descending | 951 | 49,647 | 19,013 | 20.4% | 383.0 | 332.9 |
+| visual projection | 681 | 31,050 | 4,866 | 5.2% | 156.7 | 149.8 |
+| nerve cord sensory | 328 | 18,765 | 2,730 | 2.9% | 145.5 | 123.9 |
+| optic lobe intrinsic | 529 | 17,415 | 2,338 | 2.5% | 134.2 | 127.0 |
+| central brain sensory | 342 | 13,299 | 1,574 | 1.7% | 118.4 | 97.1 |
+
+: Wire by cell class, for the eight classes that own most of it. A connection is counted for the class at each of its two ends, so the shares add to more than one.
+
+Central brain intrinsic types, 13,027 of the 23,073 nodes, touch connections holding 55.7% of the wire, and nerve cord intrinsic types 32.0%. The 1,089 ascending and 951 descending types touch 22.5% and 20.4% of it, and their connections are the longest of any class with more than a thousand connections: mean 363.5 and 383.0 µm against 172.7 µm for central brain intrinsic types. What that expense buys is the subject of the sections that follow.
+
+![The Lorenz curve of the wiring budget, and the length of the connections behind it.](../results/wire_concentration.png)
 
 ## The connective is expensive, and its partners are well connected
 
@@ -287,6 +366,10 @@ The fly's CNS is laid out economically in the weaker sense later work settled on
 
 Like the *C. elegans* layout, the fly's is far from the cheapest possible arrangement: greedy swaps remove at least a third of its wire, a margin close to Gushchin and Tang's for worm interneurons. Wiring cost is one pressure among several. The long connections that keep the layout from its optimum are the kind Kaiser and Hilgetag (2006) argued shorten processing paths.
 
+The economy is also local. Attributed to the neuropils, the budget is dominated by a few regions, and inside every region large enough to test the cell types are placed more cheaply than permutations of their own positions. The clearest exceptions are the antennal lobes, whose internal wiring is within a few per cent of the permuted mean in both hemispheres, so whatever fixes the position of a cell type inside an antennal lobe, it is not the length of the connections between them.
+
+How the budget is spread over connections sets the scale for what follows. It is uneven, with a Gini of 0.404 and nearly a third of the wire in the longest tenth of the connections, but the tail is not extreme: a lognormal describes it better than a power law does, and the longest connection spans about the longest axis the somata occupy. Nothing in the length distribution alone marks out a small set of connections as a class apart. What marks the neck-crossing connections out is where they run, not how unusual their length is.
+
 The connective is where those long connections concentrate. It is 7.5% of connections and a quarter of the wire, and in two respects it looks like the hub backbone of mammalian connectomes. Its cell types are over-represented among the most connected types of the CNS, as Lin et al. (2024) predicted, and it favours well-connected partners on both sides.
 
 The result the rich-club framing most directly predicts is that the connective preferentially joins hubs of the brain to hubs of the nerve cord. That result is weaker:
@@ -305,9 +388,10 @@ Returning to the question in the title: the fly places its most expensive wiring
 
 # What this does and does not show
 
-This analysis shows three things about one male fly CNS:
+This analysis shows four things about one male fly CNS:
 
 - the placement of its cell types is cheaper than random placement;
+- the placement is economical inside the neuropils as well as across them, in every region large enough to test but the antennal lobes;
 - the connective's cell types sit among its hubs;
 - how much the connective's wiring contributes to one measure of sensory-to-motor routing, measured against three explicitly constructed comparison sets.
 
@@ -317,6 +401,8 @@ It does not show that wiring economy is a law of nervous-system organization, or
 
 - **Resolution.** The graph is aggregated to cell types by hemisphere, and each type is placed at the centroid of its somata. Within a class, soma-to-output distance does not predict a neuron's cable length. Positions therefore capture differences in wiring cost between classes, not the cable of individual neurons.
 - **Cost measure.** Euclidean distance between centroids stands in for the length of real processes, which follow neuropil tracts rather than straight lines.
+- **Neuropil assignment.** A cell type is attributed to the neuropil surface nearest its position, which is the centroid of its cell bodies rather than of its synapses. Cell bodies lie in a rind outside the neuropils, so the attribution follows where a type's somata sit, and the wire it charges to a region is a property of its endpoints, not of the tract its processes take.
+- **Tail fit.** Connection length is bounded by the size of the animal, so the power-law comparison weighs imperfect descriptions of a truncated distribution against each other rather than testing a mechanism.
 - **Edge threshold.** Every result uses a 1% input threshold. The placement and hub results hold from 0.5% to 5%; the rich-to-rich route result does not hold at 0.5%.
 - **The connective set.** It is defined by majority superclass. Sensory ascending neurons also pass through the neck, but they are treated as sensory inputs because their cell bodies lie outside the CNS. Their neck-crossing wiring is therefore not part of the removed set.
 - **Value measure.** Flow capacity counts unweighted edge-disjoint paths, so it rewards many short connections over fewer long ones. For that reason the length-matched comparison is reported alongside count-matched and longest-edge comparisons, not replaced by them.

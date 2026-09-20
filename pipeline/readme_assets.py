@@ -480,6 +480,8 @@ def load_inputs(results: Path = RESULTS) -> dict:
         "graph": read("spatial_graph_summary.json"),
         "placement": read("spatial_optimality.json")["analyses"],
         "economy": read("wiring_economy_extensions.json"),
+        "atlas": read("wire_atlas.json"),
+        "concentration": read("wire_concentration.json"),
         "richclub": read("connective_richclub.json"),
         "value": read("connective_value.json"),
         "value_nulls": pd.read_csv(results / "connective_value_nulls.csv"),
@@ -771,8 +773,159 @@ def figure_cost(data: dict, theme: str) -> tuple[str, str, str]:
     return svg.render("Figure 3. Where the wire goes", desc), desc, f"fig-cost-{theme}.svg"
 
 
+def figure_atlas(data: dict, theme: str) -> tuple[str, str, str]:
+    """Figure 4: the wire each neuropil holds, and the placement of its own cell types inside it."""
+    svg = Svg(1030, theme)
+    atlas = data["atlas"]
+    totals = atlas["totals"]
+    tested = [r for r in atlas["neuropils"] if "cost_ratio" in r]
+    rows = tested[:12]
+    beyond = sum(1 for r in tested if r["n_at_or_below_real"] == 0)
+    closest = max(tested, key=lambda r: r["cost_ratio"])
+    heading(svg, 80, "The wire ends unevenly across the neuropils, and every region tested is packed cheaply",
+            "The twelve neuropils that hold most wire. Each connection lends half its length to the neuropil "
+            "nearest each of its ends. Right: the summed length of a neuropil's internal connections against "
+            "1000 permutations of which of its own cell types sits at which of its own positions.")
+    bx0, bx1 = 470, 900
+    cx0, cx1 = 1180, 1600
+    to_bar = linear(0, 0.105, bx0, bx1)
+    to_ratio = linear(0.4, 1.05, cx0, cx1)
+    top, step = 310, 40
+    bottom = top + step * (len(rows) - 1) + 34
+    x_axis(svg, to_bar, bottom, [0, 0.05, 0.10], ["0", "5%", "10%"], bx0, bx1, "Share of all wire")
+    x_axis(svg, to_ratio, bottom, [0.5, 0.75, 1.0], ["0.5", "0.75", "1"], cx0, cx1,
+           "Internal wire against the permuted mean", grid_top=top - 26)
+    svg.line(to_ratio(1), top - 26, to_ratio(1), bottom, "rule_strong", 2)
+    for i, row in enumerate(rows):
+        y = top + i * step
+        color = "null" if row["compartment"] == "vnc" else "wire"
+        svg.text(MARGIN, y + 8, row["neuropil"], 24, "ink" if i == 0 else "ink2", 500 if i == 0 else 400, mono=True)
+        svg.rect(bx0, y - 10, to_bar(row["wire_share"]) - bx0, 20, color, rx=2)
+        svg.text(to_bar(row["wire_share"]) + 12, y + 7, pct(row["wire_share"], 1), 20, "ink3", mono=True)
+        spread_sd = 1.96 * row["internal_null_sd_um"] / row["internal_null_mean_um"]
+        svg.rect(to_ratio(1 - spread_sd) - 2, y - 8, to_ratio(1 + spread_sd) - to_ratio(1 - spread_sd) + 4, 16,
+                 "null", rx=3, opacity=0.8)
+        svg.dot(to_ratio(row["cost_ratio"]), y, 9, "wire", ring=3)
+        svg.text(WIDTH - MARGIN, y + 8, f"{row['cost_ratio']:.3f}", 22, "ink2", anchor="end", mono=True)
+    key = bottom + 112
+    svg.rect(bx0, key, 30, 14, "wire", rx=2)
+    svg.text(bx0 + 42, key + 13, "brain", 22, "ink2")
+    svg.rect(bx0 + 190, key, 30, 14, "null", rx=2)
+    svg.text(bx0 + 232, key + 13, "nerve cord", 22, "ink2")
+    note = (f"{count(totals['neuropils_with_types'])} of the {count(totals['meshes'])} published neuropil surfaces "
+            f"hold cell types, and {pct(totals['share_within_one_neuropil'])} of the wire "
+            f"({count(totals['edges_within_one_neuropil'])} connections) stays inside one of them. All "
+            f"{len(tested)} neuropils large enough to test sit below their permuted mean, {beyond} of them below "
+            f"every one of the 1000 permutations; {closest['neuropil']} comes closest at "
+            f"{closest['cost_ratio']:.3f}, with {closest['n_at_or_below_real']} permutations as cheap.")
+    for k, line in enumerate(wrap(note, 24, WIDTH - 2 * MARGIN)):
+        svg.text(MARGIN, key + 76 + k * 34, line, 24, "ink2")
+    held = ", ".join(f"{r['neuropil']} {pct(r['wire_share'])}" for r in rows)
+    priced = ", ".join(f"{r['neuropil']} {r['cost_ratio']:.3f}" for r in rows)
+    desc = (
+        "Figure 4. Twelve rows, one per neuropil. Bars of the share of all wire that ends in each: "
+        f"{held}. Beside each, a dot for the summed length of its internal connections divided by the mean of "
+        f"1000 permutations of its own cell types: {priced}. "
+        f"{count(totals['neuropils_with_types'])} of {count(totals['meshes'])} neuropil surfaces hold cell types "
+        f"and {pct(totals['share_within_one_neuropil'])} of the wire stays inside one of them. All {len(tested)} "
+        f"neuropils large enough to test sit below their permuted mean, {beyond} of them below every permutation, "
+        f"and {closest['neuropil']} comes closest at {closest['cost_ratio']:.3f}."
+    )
+    return svg.render("Figure 4. Wire by neuropil", desc), desc, f"fig-atlas-{theme}.svg"
+
+
+SUPERCLASS_LABELS = {
+    "cb_intrinsic": "Central brain intrinsic",
+    "vnc_intrinsic": "Nerve cord intrinsic",
+    "ascending_neuron": "Ascending",
+    "descending_neuron": "Descending",
+    "visual_projection": "Visual projection",
+    "vnc_sensory": "Nerve cord sensory",
+    "ol_intrinsic": "Optic lobe intrinsic",
+    "cb_sensory": "Central brain sensory",
+    "visual_centrifugal": "Visual centrifugal",
+    "sensory_ascending": "Sensory ascending",
+    "vnc_motor": "Nerve cord motor",
+    "cb_motor": "Central brain motor",
+}
+LORENZ_LABELS = {"all": "All connections", "within the brain": "Within the brain",
+                 "within the nerve cord": "Within the nerve cord", "across the neck": "Across the neck"}
+LORENZ_COLORS = {"all": "wire", "within the brain": "ink", "within the nerve cord": "null",
+                 "across the neck": "ink3"}
+
+
+def superclass_label(name: str) -> str:
+    """Readable name for a superclass key, e.g. 'cb_intrinsic' -> 'Central brain intrinsic'."""
+    return SUPERCLASS_LABELS.get(name, name.replace("_", " ").capitalize())
+
+
+def figure_concentration(data: dict, theme: str) -> tuple[str, str, str]:
+    """Figure 5: the Lorenz curve of the wiring budget, and the share of it each class of cell type owns."""
+    svg = Svg(950, theme)
+    result = data["concentration"]
+    curves, lengths, tail = result["lorenz"], result["lengths"], result["tail"]
+    whole = curves["all"]
+    rows = result["superclasses"][:8]
+    heading(svg, 80, "The longest tenth of the connections holds nearly a third of the wire",
+            "Left: cumulative share of the wiring budget against the share of connections, longest first; the "
+            "diagonal is an even spread. Right: the wire owned by each class of cell type, counting a connection "
+            "for the class at each of its two ends.")
+    px0, px1, py0, py1 = 150, 780, 300, 720
+    to_x = linear(0, 1, px0, px1)
+    to_y = linear(0, 1, py1, py0)
+    y_axis(svg, to_y, px0, [0, 0.25, 0.5, 0.75, 1], ["0", "25", "50", "75", "100%"], py0, py1, grid_right=px1)
+    x_axis(svg, to_x, py1, [0, 0.25, 0.5, 0.75, 1], ["0", "25", "50", "75", "100%"], px0, px1,
+           "Connections, longest first")
+    svg.line(px0, py1, px1, py0, "rule_strong", 2, dash="6 6")
+    for name, curve in curves.items():
+        svg.polyline([to_x(v) for v in curve["connection_share"]], [to_y(v) for v in curve["wire_share"]],
+                     LORENZ_COLORS.get(name, "wire"), 3)
+    for k, (name, curve) in enumerate(curves.items()):
+        y = 590 + k * 34
+        svg.rect(px0 + 250, y - 11, 26, 12, LORENZ_COLORS.get(name, "wire"), rx=2)
+        svg.text(px0 + 288, y, f"{LORENZ_LABELS.get(name, name)}, G = {curve['gini']:.2f}", 22, "ink2")
+    tenth = whole["top_shares"]["0.1"]
+    svg.dot(to_x(0.1), to_y(tenth), 8, "wire", ring=3)
+    svg.text(to_x(0.1), to_y(tenth) - 26, pct(tenth), 22, "wire_ink", 500, anchor="middle", mono=True)
+
+    bx0, bx1 = 1200, 1500
+    to_bar = linear(0, 0.62, bx0, bx1)
+    top, step = 330, 48
+    svg.text(WIDTH - MARGIN, top - 54, "Mean length", 22, "ink3", anchor="end")
+    svg.text(bx0, top - 54, "Share of all wire", 22, "ink3")
+    for i, row in enumerate(rows):
+        y = top + i * step
+        svg.text(880, y + 8, superclass_label(row["superclass"]), 24, "ink" if i == 0 else "ink2",
+                 600 if i == 0 else 400)
+        svg.rect(bx0, y - 10, to_bar(row["wire_share"]) - bx0, 20, "wire", rx=2)
+        svg.text(to_bar(row["wire_share"]) + 12, y + 7, pct(row["wire_share"]), 20, "ink3", mono=True)
+        svg.text(WIDTH - MARGIN, y + 8, f"{row['mean_length_um']:.0f} µm", 22, "ink2", anchor="end", mono=True)
+    comparisons = tail["comparisons"]
+    note = (f"Connection length has a median of {lengths['within the brain']['median_um']:.0f} µm inside the brain "
+            f"and {lengths['across the neck']['median_um']:.0f} µm across the neck, and reaches "
+            f"{lengths['all']['max_um']:.0f} µm at most. A power law fitted above {tail['xmin_um']:.0f} µm, over "
+            f"{count(tail['tail_edges'])} connections, has exponent {tail['alpha']:.2f}: it beats an exponential "
+            f"(log-likelihood ratio {comparisons['exponential']['loglikelihood_ratio']:.1f}) but loses to a "
+            f"lognormal ({signed(comparisons['lognormal']['loglikelihood_ratio'], 1)}) and to a truncated power "
+            f"law ({signed(comparisons['truncated_power_law']['loglikelihood_ratio'], 1)}).")
+    for k, line in enumerate(wrap(note, 24, WIDTH - 2 * MARGIN)):
+        svg.text(MARGIN, 830 + k * 34, line, 24, "ink2")
+    ginis = ", ".join(f"{LORENZ_LABELS.get(n, n).lower()} {c['gini']:.2f}" for n, c in curves.items())
+    owned = ", ".join(f"{superclass_label(r['superclass']).lower()} {pct(r['wire_share'])} at a mean "
+                      f"{r['mean_length_um']:.0f} µm" for r in rows)
+    desc = (
+        "Figure 5. Left: Lorenz curves of the share of wire against the share of connections, longest first, with "
+        f"Gini coefficients {ginis}. The longest 1% of connections hold {pct(whole['top_shares']['0.01'])} of the "
+        f"wire and the longest 10% hold {pct(tenth)}. Right: bars of the share of the wire owned by each class of "
+        f"cell type, counting a connection for the class at each end: {owned}. A power law fitted above "
+        f"{tail['xmin_um']:.0f} µm has exponent {tail['alpha']:.2f}; it beats an exponential but loses to a "
+        "lognormal and to a truncated power law."
+    )
+    return svg.render("Figure 5. Concentration of the wiring budget", desc), desc, f"fig-concentration-{theme}.svg"
+
+
 def figure_routes(data: dict, theme: str) -> tuple[str, str, str]:
-    """Figure 4: rich-to-rich routing ratio by richness threshold and by edge threshold."""
+    """Figure 6: rich-to-rich routing ratio by richness threshold and by edge threshold."""
     svg = Svg(720, theme)
     curve = data["richclub"]["threshold_curve"]
     rows = data["robustness"]["thresholds"]
@@ -805,15 +958,15 @@ def figure_routes(data: dict, theme: str) -> tuple[str, str, str]:
     by_edge = ", ".join(f"{100 * r['fraction']:g}% {r['routes']['total']['ratio']:.3f}" for r in rows)
     significant = ", ".join(f"{100 * c['top_fraction']:g}%" for c in curve if c["p_value"] < 0.05)
     desc = (
-        "Figure 4. Two dot charts of the ratio of real rich-to-rich routes through the connective to the rewired "
+        "Figure 6. Two dot charts of the ratio of real rich-to-rich routes through the connective to the rewired "
         f"mean. By share of partners counted as rich: {listing}; significant at {significant} only. By edge "
         f"threshold: {by_edge}; the excess vanishes at 0.5% and grows as weak connections are dropped."
     )
-    return svg.render("Figure 4. Rich-to-rich routing", desc), desc, f"fig-routes-{theme}.svg"
+    return svg.render("Figure 6. Rich-to-rich routing", desc), desc, f"fig-routes-{theme}.svg"
 
 
 def figure_value(data: dict, theme: str) -> tuple[str, str, str]:
-    """Figure 5: flow lost by cutting the neck against cost-matched, count-matched and longest-edge removals."""
+    """Figure 7: flow lost by cutting the neck against cost-matched, count-matched and longest-edge removals."""
     svg = Svg(960, theme)
     value = data["value"]
     nulls = data["value_nulls"]
@@ -852,7 +1005,7 @@ def figure_value(data: dict, theme: str) -> tuple[str, str, str]:
                           "taken until their total length matches the neck.", 22, "ink2")
     fam = value["families"]
     desc = (
-        "Figure 5. Three rows of histograms of sensory-to-motor flow lost under random removals, with the loss from "
+        "Figure 7. Three rows of histograms of sensory-to-motor flow lost under random removals, with the loss from "
         f"cutting the neck marked. All flow: the cut removes {count(intact['flow'] - real['crossing']['flow'])}, "
         f"length-matched random sets {fam['crossing_cost']['flow']['null_mean']:.0f} on average (ratio "
         f"{fam['crossing_cost']['flow']['ratio']:.2f}), count-matched sets "
@@ -861,11 +1014,11 @@ def figure_value(data: dict, theme: str) -> tuple[str, str, str]:
         f"{fam['crossing_cost']['flow_brain_to_vnc']['ratio']:.2f}, the cut beyond every random set. Nerve cord to "
         f"brain: ratio {fam['crossing_cost']['flow_vnc_to_brain']['ratio']:.2f}."
     )
-    return svg.render("Figure 5. Value of the connective", desc), desc, f"fig-value-{theme}.svg"
+    return svg.render("Figure 7. Value of the connective", desc), desc, f"fig-value-{theme}.svg"
 
 
 def figure_price(data: dict, theme: str) -> tuple[str, str, str]:
-    """Figure 6: each connective cell type's neck-crossing wire length against the flow it carries alone."""
+    """Figure 8: each connective cell type's neck-crossing wire length against the flow it carries alone."""
     svg = Svg(820, theme)
     nodes = data["price_nodes"]
     tests = data["price"]["tests"]
@@ -901,7 +1054,7 @@ def figure_price(data: dict, theme: str) -> tuple[str, str, str]:
     svg.text(WIDTH / 2, 770, "Horizontal: total length of the type's neck-crossing connections, log scale. Vertical: "
                              "flow lost, in edge-disjoint paths.", 22, "ink2", anchor="middle")
     desc = (
-        "Figure 6. Two scatter plots, descending and ascending cell types, of neck-crossing wire length (logarithmic) "
+        "Figure 8. Two scatter plots, descending and ascending cell types, of neck-crossing wire length (logarithmic) "
         "against the flow lost when that wire alone is removed. Most dots lie on zero: "
         f"{tests['descending']['zero_value']} of {tests['descending']['n']} descending and "
         f"{tests['ascending']['zero_value']} of {count(tests['ascending']['n'])} ascending types lose no flow. Rank "
@@ -909,7 +1062,7 @@ def figure_price(data: dict, theme: str) -> tuple[str, str, str]:
         f"{tests['descending']['partial_rho']:.3f} once the number of connections is controlled for; "
         f"{signed(tests['ascending']['spearman_rho'], 3)} for ascending types."
     )
-    return svg.render("Figure 6. Price and value by cell type", desc), desc, f"fig-price-{theme}.svg"
+    return svg.render("Figure 8. Price and value by cell type", desc), desc, f"fig-price-{theme}.svg"
 
 
 GENERATIVE_LABELS = {
@@ -934,7 +1087,7 @@ def reproduced_count(models: dict, key: str) -> int:
 
 
 def figure_generative(data: dict, theme: str) -> tuple[str, str, str]:
-    """Figure 7: each real graph property against the 50 synthetic graphs of each generative model."""
+    """Figure 9: each real graph property against the 50 synthetic graphs of each generative model."""
     models = data["comparison"]["models"]
     fits = data["fits"]["models"]
     svg = Svg(300 + 50 * len(GENERATIVE_LABELS) + 120, theme)
@@ -971,7 +1124,7 @@ def figure_generative(data: dict, theme: str) -> tuple[str, str, str]:
     svg.text(MARGIN, bottom + 36, "Real ÷ synthetic mean", 22, "ink3", mono=True)
     g = models["G"]["properties"]
     desc = (
-        "Figure 7. For thirteen graph properties, the real value relative to the mean of 50 synthetic graphs from two "
+        "Figure 9. For thirteen graph properties, the real value relative to the mean of 50 synthetic graphs from two "
         f"logistic models, with the synthetic 95% range. Model G reproduces {reproduced_count(models, 'G')} "
         f"properties, including rich-to-rich routes (real {g['rich_routes']['real']:.0f}, synthetic mean "
         f"{g['rich_routes']['synthetic_mean']:.0f}); model G+deg reproduces {reproduced_count(models, 'G_deg')}. The "
@@ -979,7 +1132,7 @@ def figure_generative(data: dict, theme: str) -> tuple[str, str, str]:
         f"reciprocity and {g['transitivity']['real'] / g['transitivity']['synthetic_mean']:.0f} times its "
         f"transitivity."
     )
-    return svg.render("Figure 7. What the generative models reproduce", desc), desc, f"fig-generative-{theme}.svg"
+    return svg.render("Figure 9. What the generative models reproduce", desc), desc, f"fig-generative-{theme}.svg"
 
 
 def methods_pipeline(data: dict, theme: str) -> tuple[str, str, str]:
@@ -1030,8 +1183,8 @@ def methods_pipeline(data: dict, theme: str) -> tuple[str, str, str]:
     return svg.render("The analysis pipeline in eight steps", desc), desc, f"methods-pipeline-{theme}.svg"
 
 
-THEMED = (stat_plate, figure_placement, figure_distance, figure_cost, figure_routes, figure_value, figure_price,
-          figure_generative, methods_pipeline)
+THEMED = (stat_plate, figure_placement, figure_distance, figure_cost, figure_atlas, figure_concentration,
+          figure_routes, figure_value, figure_price, figure_generative, methods_pipeline)
 
 
 def build_all(data: dict, out_dir: Path) -> list[Path]:

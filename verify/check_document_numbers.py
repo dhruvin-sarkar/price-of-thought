@@ -23,9 +23,14 @@ def claims() -> list[tuple[str, str, tuple[str, ...]]]:
     comparison = result_json("generative_comparison.json")["models"]
     robustness = {r["fraction"]: r for r in result_json("threshold_robustness.json")["thresholds"]}
     cable = result_json("cable_length.json")
+    atlas = result_json("wire_atlas.json")
+    concentration = result_json("wire_concentration.json")
     shares = {row["label"]: row for row in economy["cost_share"]["rows"]}
     both, paper = ("paper", "readme"), ("paper",)
     reproduced = round(comparison["G"]["fraction_reproduced"] * 13)
+    tested = [row for row in atlas["neuropils"] if "cost_ratio" in row]
+    cheapest, closest = min(tested, key=lambda r: r["cost_ratio"]), max(tested, key=lambda r: r["cost_ratio"])
+    budget, tail = concentration["lorenz"]["all"], concentration["tail"]
     return [
         ("nodes", f"{graph['nodes']:,}", both),
         ("edges", f"{graph['edges']:,}", both),
@@ -58,6 +63,15 @@ def claims() -> list[tuple[str, str, tuple[str, ...]]]:
         ("properties reproduced, README", f"{reproduced} of 13", ("readme",)),
         ("route ratio at 0.5%", f"{robustness[0.005]['routes']['total']['ratio']:.3f}", paper),
         ("cable rho", f"{cable['spearman_rho']:.3f}", paper),
+        ("wire inside one neuropil", f"{100 * atlas['totals']['share_within_one_neuropil']:.1f}%", both),
+        ("most economical neuropil", f"{cheapest['cost_ratio']:.3f}", both),
+        ("neuropil closest to chance", f"{closest['cost_ratio']:.3f}", both),
+        ("permutations as cheap there",
+         f"{closest['n_at_or_below_real']} of {atlas['totals']['permutations']}", both),
+        ("Gini of the budget", f"{budget['gini']:.3f}", both),
+        ("wire in the longest tenth", f"{100 * budget['top_shares']['0.1']:.1f}%", both),
+        ("tail exponent", f"{tail['alpha']:.2f}", both),
+        ("tail lower bound", f"{tail['xmin_um']:.0f} µm", both),
     ]
 
 

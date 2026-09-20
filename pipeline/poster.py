@@ -31,9 +31,10 @@ GUTTER = 88
 COLUMNS = 3
 BAND_HEIGHT = 1270
 METHODS_HEIGHT = 230
-COLUMN_TOP = BAND_HEIGHT + METHODS_HEIGHT + 160
-CHECKS_TOP = 4080
-FOOTER_TOP = 4580
+LEDE_TOP = BAND_HEIGHT + METHODS_HEIGHT + 80
+COLUMN_TOP = 2040
+CHECKS_TOP = 4050
+FOOTER_TOP = 4600
 OUT_DIR = ASSETS / "readme"
 POSTER_PATH = OUT_DIR / "price-of-thought-poster.png"
 PREVIEW_PATH = OUT_DIR / "poster-preview.png"
@@ -61,12 +62,20 @@ WIRE_INK = LIGHT["wire_ink"]
 NULL = LIGHT["null"]
 
 # Poster figures share their numbers with the README figures they redraw.
-FIGURE_LAYOUT = (("placement", "distance"), ("cost", "routes", "value"), ("price", "generative"))
-FIGURE_NUMBERS = {"placement": 1, "distance": 2, "cost": 3, "routes": 4, "value": 5, "price": 6, "generative": 7}
-FINDINGS = (
-    "Cell types are placed economically, but far from the cheapest arrangement.",
-    "The neck connective holds a quarter of the wire and joins well-connected cell types.",
-    "Per unit of wire it carries no more routing than ordinary long wiring, except from brain to nerve cord.",
+FIGURE_LAYOUT = (("placement", "distance", "cost"), ("atlas", "concentration", "routes"),
+                 ("value", "price", "generative"))
+FIGURE_NUMBERS = {"placement": 1, "distance": 2, "cost": 3, "atlas": 4, "concentration": 5, "routes": 6,
+                  "value": 7, "price": 8, "generative": 9}
+# Each column carries a heading before the figure it names; the others continue the heading above them.
+COLUMN_HEADINGS = {"placement": "What the layout costs", "atlas": "Where the wire goes",
+                   "routes": "The connective and its hubs", "value": "What the connective buys",
+                   "generative": "A model without degrees"}
+QUESTION = (
+    "Nervous systems are thought to place their parts so as to keep wiring short,^2^ and in the human brain the "
+    "best-connected regions are joined by long, costly connections that carry much of the traffic.^3^ The complete "
+    "connectome of a male fruit fly, brain and nerve cord together,^1^ was tested for both. **Its cell types are "
+    "placed economically and far from optimally; the neck connective joins its hubs, and buys less routing per "
+    "unit of wire than ordinary wiring does.**"
 )
 REFERENCES = (
     "Berg S, et al. (2026). Sexual dimorphism in the complete *Drosophila* male central nervous system connectome. "
@@ -79,9 +88,9 @@ REFERENCES = (
     "634(8032):153–165. doi:10.1038/s41586-024-07968-y",
 )
 NBSP = " "
-TICK = 27
-LABEL = 28
-CAPTION = 29
+TICK = 25
+LABEL = 27
+CAPTION = 27
 
 
 # Layout and formatting
@@ -192,15 +201,45 @@ def hypotheses(data: dict) -> list[tuple[str, str, bool]]:
     ]
 
 
-def limitations() -> list[tuple[str, str]]:
+def limitations(data: dict) -> list[tuple[str, str]]:
     """Lead and text of each limitation on the poster."""
+    atlas = data["atlas"]["totals"]
     return [
         ("Cell-type resolution.", "Types sit at the centroid of their cell bodies, and straight lines between "
                                   "centroids stand in for processes that follow tracts."),
+        ("Nearest surface, not arbor.", f"A type is charged to the neuropil nearest its centroid, a median "
+                                        f"{atlas['median_distance_to_surface_um']:.1f} µm away, not to the "
+                                        "regions its branches enter."),
         ("One edge threshold.", "Rich-to-rich routing vanishes at 0.5%; placement and hubs hold from 0.5% to 5%."),
         ("Routes, not signal.", "Flow counts disjoint paths, which rewards many short connections over a few "
                                 "long ones."),
+        ("A bounded tail.", "The length distribution is not a power law: a lognormal and a truncated power law "
+                            "both fit its upper tail better."),
         ("One animal.", "A single male fly and one static reconstruction, not peer reviewed."),
+    ]
+
+
+def lede_findings(data: dict) -> list[tuple[str, str, str, str]]:
+    """Label, display number, body and colour of each headline finding, read from the results."""
+    atlas, concentration = data["atlas"], data["concentration"]
+    tested = [row for row in atlas["neuropils"] if "cost_ratio" in row]
+    beyond = sum(1 for row in tested if row["n_at_or_below_real"] == 0)
+    top = atlas["neuropils"][0]
+    curves = concentration["lorenz"]
+    families = data["value"]["families"]["crossing_cost"]
+    return [
+        ("Where the wire ends", ra.pct(top["wire_share"]),
+         f"of the wiring budget ends in the gnathal ganglia ({top['neuropil']}), more than in any other region. "
+         f"Inside all {len(tested)} regions large enough to test, the cell types are packed below their own "
+         f"permuted mean, {beyond} of them below every one of the 1000 permutations.", INK),
+        ("How unevenly it is spread", ra.pct(curves["all"]["top_shares"]["0.1"]),
+         f"of the wire lies in the longest tenth of the connections, a Gini coefficient of "
+         f"{curves['all']['gini']:.3f}. The neck-crossing connections are the most uniform set of all, at "
+         f"{curves['across the neck']['gini']:.3f}: long, and nearly all of a length.", INK),
+        ("What the longest wire buys", f"{families['flow']['ratio']:.2f}×",
+         f"the sensory-to-motor routing that random ordinary wiring of the same total length carries. This was "
+         f"registered to exceed 1 and does not; only from brain to nerve cord does the neck carry more, at "
+         f"{families['flow_brain_to_vnc']['ratio']:.2f}×.", WIRE_INK),
     ]
 
 
@@ -345,8 +384,8 @@ def caption(sheet: Sheet, x0, x1, y, key, title, body) -> float:
 
 
 def heading(sheet: Sheet, x0, y, text) -> float:
-    sheet.text(x0 - 4, y, text, 80, "sans_bold", INK)
-    return y + 84
+    sheet.text(x0 - 4, y, text, 62, "sans_bold", INK)
+    return y + 66
 
 
 def swatch(sheet: Sheet, x, y, color, label, kind="bar") -> float:
@@ -368,27 +407,27 @@ def figure_placement(sheet: Sheet, data: dict, x0, x1, y) -> float:
             ("Within brain or cord", p["within_compartment"]), ("Synapse centroids", p["synapse_positions"]),
             ("Brain connections", e["brain"]), ("Nerve-cord connections", e["vnc"])]
     chart_title(sheet, x0, x1, y, "Wiring cost, relative to random placement", "1000 permutations each")
-    px0, px1 = x0 + 390, x1 - 110
+    px0, px1 = x0 + 370, x1 - 108
     sx = linear(0, 1.1, px0, px1)
-    top, step = y + 96, 60
-    bottom = top + step * (len(rows) - 1) + 36
+    top, step = y + 86, 52
+    bottom = top + step * (len(rows) - 1) + 32
     for t in (0, 0.25, 0.5, 0.75, 1.0):
-        sheet.line([float(sx(t))] * 2, [top - 36, bottom], RULE, 1.5, zorder=1)
-        sheet.text(float(sx(t)), bottom + 44, f"{t:g}", TICK, "mono", INK_3, ha="center")
+        sheet.line([float(sx(t))] * 2, [top - 32, bottom], RULE, 1.5, zorder=1)
+        sheet.text(float(sx(t)), bottom + 40, f"{t:g}", TICK, "mono", INK_3, ha="center")
     sheet.line([px0, px1], [bottom, bottom], RULE_STRONG, 2)
     for i, (label, s) in enumerate(rows):
         yy = top + i * step
         sheet.text(x0, yy + 10, label, TICK, "sans_bold" if i == 0 else "sans", INK if i == 0 else INK_2)
         lo, hi = s["null_min"] / s["null_mean"], s["null_max"] / s["null_mean"]
-        sheet.rect(float(sx(lo)) - 3, yy - 13, float(sx(hi)) + 3, yy + 13, NULL, alpha=0.85, zorder=3)
-        sheet.dot(float(sx(s["cost_ratio"])), yy, 12, WIRE)
+        sheet.rect(float(sx(lo)) - 3, yy - 12, float(sx(hi)) + 3, yy + 12, NULL, alpha=0.85, zorder=3)
+        sheet.dot(float(sx(s["cost_ratio"])), yy, 11, WIRE)
         sheet.text(x1, yy + 10, f"{s['cost_ratio']:.3f}", TICK, "mono_medium" if i == 0 else "mono",
                    INK if i == 0 else INK_2, ha="right")
     swap = float(sx(h["swap_ratio"]))
     sheet.line([swap + 12, float(sx(h["ratio"])) - 14], [top, top], WIRE, 3, dashes=(7, 6))
-    sheet.dot(swap, top, 12, WIRE, hollow=True)
-    sheet.text(swap, top - 26, f"after swaps {h['swap_ratio']:.3f}", 24, "mono_medium", WIRE_INK, ha="center")
-    return caption(sheet, x0, x1, bottom + 120, "placement", "Less than half the cost of random, and far from optimal.",
+    sheet.dot(swap, top, 11, WIRE, hollow=True)
+    sheet.text(swap, top - 24, f"after swaps {h['swap_ratio']:.3f}", 23, "mono_medium", WIRE_INK, ha="center")
+    return caption(sheet, x0, x1, bottom + 104, "placement", "Less than half the cost of random, and far from optimal.",
                    f"Blue: the full range of the 1000 permutations; none came as low as the real layout. Hollow: the "
                    f"layout after 2,000,000 proposed swaps within compartments, which cut at least "
                    f"{ra.pct(h['swap'])} and had not converged.^2^")
@@ -402,8 +441,8 @@ def figure_distance(sheet: Sheet, data: dict, x0, x1, y) -> float:
     series = [("brain-brain", "brain", INK), ("vnc-vnc", "nerve cord", NULL), ("cross", "across the neck", WIRE)]
     x = x0
     for _, label, color in series:
-        x = swatch(sheet, x, y + 58, color, label, "line")
-    frame = axis_frame(sheet, x0 + 100, y + 100, x1, y + 380, (0, 1000), (-4.6, -1.5), [0, 250, 500, 750, 1000],
+        x = swatch(sheet, x, y + 52, color, label, "line")
+    frame = axis_frame(sheet, x0 + 96, y + 88, x1, y + 330, (0, 1000), (-4.6, -1.5), [0, 250, 500, 750, 1000],
                        [-4, -3, -2], lambda t: f"{t:g}", lambda t: {-4: "0.01%", -3: "0.1%", -2: "1%"}[t],
                        xlabel="Distance between the two cell types (µm)")
     for key, _, color in series:
@@ -412,7 +451,7 @@ def figure_distance(sheet: Sheet, data: dict, x0, x1, y) -> float:
         probability = (kept[f"edges_{key}"] / kept[f"pairs_{key}"]).to_numpy()
         keep = probability > 0
         sheet.line(frame.sx(centres[keep]), frame.sy(np.log10(probability[keep])), color, 3.6, zorder=5, cap="round")
-    return caption(sheet, x0, x1, frame.y1 + 150, "distance", "Nearby cell types connect far more often.",
+    return caption(sheet, x0, x1, frame.y1 + 138, "distance", "Nearby cell types connect far more often.",
                    f"Length constant {dependence['all']['length_constant_um']:.0f} µm over all pairs. Within brain and "
                    f"cord it is lowest at {minima['brain-brain']['minimum_bin_um']:.0f} and "
                    f"{minima['vnc-vnc']['minimum_bin_um']:.0f} µm, then rises where connections join the two sides.")
@@ -424,30 +463,115 @@ def figure_cost(sheet: Sheet, data: dict, x0, x1, y) -> float:
               "high-degree-incident": f"Touching a hub (degree ≥ {shares['degree_threshold']:.0f})",
               "none of these": "None of these"}
     chart_title(sheet, x0, x1, y, "Share of connections and of wire", "mean length")
-    sx = linear(0, 0.62, x0, x1 - 250)
-    yy = y + 30
+    sx = linear(0, 0.62, x0, x1 - 230)
+    yy = y + 22
     for i, row in enumerate(shares["rows"]):
-        yy += 56
+        yy += 48
         sheet.text(x0, yy, labels[row["label"]], TICK, "sans_bold" if i == 0 else "sans", INK if i == 0 else INK_2)
         sheet.text(x1, yy, f"{row['mean_length_um']:.0f} µm", TICK, "mono", INK_2, ha="right")
         for k, (share, color, ink) in enumerate(((row["edge_share"], RULE_STRONG, INK_3),
                                                  (row["cost_share"], WIRE, WIRE_INK))):
-            top = yy + 18 + k * 26
-            sheet.rect(x0, top, float(sx(share)), top + 20, color, zorder=3)
-            sheet.text(float(sx(share)) + 12, top + 19, ra.pct(share), 24, "mono_medium" if k else "mono", ink)
-        yy += 50
-    x = swatch(sheet, x0, yy + 56, RULE_STRONG, "share of connections")
-    swatch(sheet, x, yy + 56, WIRE, "share of wire")
+            top = yy + 14 + k * 24
+            sheet.rect(x0, top, float(sx(share)), top + 18, color, zorder=3)
+            sheet.text(float(sx(share)) + 12, top + 17, ra.pct(share), 23, "mono_medium" if k else "mono", ink)
+        yy += 40
+    x = swatch(sheet, x0, yy + 46, RULE_STRONG, "share of connections")
+    swatch(sheet, x, yy + 46, WIRE, "share of wire")
     neck = shares["rows"][0]
-    return caption(sheet, x0, x1, yy + 132, "cost", "The neck holds a quarter of the wire.",
+    return caption(sheet, x0, x1, yy + 108, "cost", "The neck holds a quarter of the wire.",
                    f"Its {ra.count(neck['edges'])} connections average {neck['mean_length_um']:.0f} µm. Hub "
                    "connections are longer too, the high-cost backbone of the human connectome.^3^")
+
+
+def figure_atlas(sheet: Sheet, data: dict, x0, x1, y) -> float:
+    atlas = data["atlas"]
+    totals = atlas["totals"]
+    tested = [row for row in atlas["neuropils"] if "cost_ratio" in row]
+    rows = atlas["neuropils"][:8]
+    beyond = sum(1 for row in tested if row["n_at_or_below_real"] == 0)
+    closest = max(tested, key=lambda row: row["cost_ratio"])
+    heaviest = atlas["pairs"][0]
+    chart_title(sheet, x0, x1, y, "Wire held by each neuropil")
+    x = swatch(sheet, x0, y + 50, WIRE, "brain")
+    swatch(sheet, x, y + 50, NULL, "nerve cord")
+    bx0, bx1 = x0 + 250, x0 + 545
+    cx0, cx1 = x0 + 700, x1
+    to_bar = linear(0, 0.105, bx0, bx1)
+    to_ratio = linear(0.6, 1.05, cx0, cx1)
+    sheet.text(bx0, y + 88, "share of all wire", 22, "sans", INK_3)
+    sheet.text(cx0, y + 88, "internal wire, real over permuted", 22, "sans", INK_3)
+    top, step = y + 126, 31
+    bottom = top + step * (len(rows) - 1) + 22
+    for t in (0, 0.05, 0.10):
+        sheet.line([float(to_bar(t))] * 2, [top - 22, bottom], RULE, 1.5, zorder=1)
+        sheet.text(float(to_bar(t)), bottom + 38, f"{100 * t:g}%", TICK, "mono", INK_3, ha="center")
+    for t in (0.6, 0.8, 1.0):
+        sheet.line([float(to_ratio(t))] * 2, [top - 22, bottom], RULE_STRONG if t == 1 else RULE,
+                   2 if t == 1 else 1.5, zorder=1)
+        sheet.text(float(to_ratio(t)), bottom + 38, f"{t:g}", TICK, "mono", INK_3, ha="center")
+    for i, row in enumerate(rows):
+        yy = top + i * step
+        color = NULL if row["compartment"] == "vnc" else WIRE
+        sheet.text(x0, yy + 8, row["neuropil"], 23, "mono_medium" if i == 0 else "mono",
+                   INK if i == 0 else INK_2)
+        sheet.rect(bx0, yy - 9, float(to_bar(row["wire_share"])), yy + 9, color, zorder=3)
+        sheet.text(float(to_bar(row["wire_share"])) + 12, yy + 8, ra.pct(row["wire_share"]), 22, "mono", INK_3)
+        spread = 1.96 * row["internal_null_sd_um"] / row["internal_null_mean_um"]
+        sheet.rect(float(to_ratio(1 - spread)) - 3, yy - 8, float(to_ratio(1 + spread)) + 3, yy + 8, NULL, zorder=3)
+        sheet.dot(float(to_ratio(row["cost_ratio"])), yy, 9, WIRE)
+    return caption(sheet, x0, x1, bottom + 78, "atlas", "Every region large enough to test is packed cheaply.",
+                   f"Each connection lends half its length to the neuropil nearest each end; only "
+                   f"{ra.pct(totals['share_within_one_neuropil'])} of the wire stays inside one region, and "
+                   f"{heaviest['a']}\u2013{heaviest['b']} is the heaviest route between two at "
+                   f"{ra.count(round(heaviest['wire_um'] / 1000))}\u00a0mm. Reshuffling a region's own types "
+                   f"over its own positions puts all {len(tested)} below their permuted mean, {beyond} below every "
+                   f"permutation; {closest['neuropil']} comes closest at {closest['cost_ratio']:.3f}.^2^")
+
+
+def figure_concentration(sheet: Sheet, data: dict, x0, x1, y) -> float:
+    result = data["concentration"]
+    curves, lengths, tail = result["lorenz"], result["lengths"], result["tail"]
+    whole = curves["all"]
+    chart_title(sheet, x0, x1, y, "Wire against connections, longest first")
+    px0, px1, py0, py1 = x0 + 96, x0 + 520, y + 62, y + 312
+    frame = axis_frame(sheet, px0, py0, px1, py1, (0, 1), (0, 1), [0, 0.5, 1], [0, 0.5, 1],
+                       lambda t: f"{100 * t:g}%", lambda t: f"{100 * t:g}%",
+                       xlabel="Connections, longest first")
+    sheet.line([px0, px1], [py1, py0], RULE_STRONG, 2, dashes=(7, 7), zorder=2)
+    order = ["all", "within the brain", "within the nerve cord", "across the neck"]
+    colors = {"all": WIRE, "within the brain": INK, "within the nerve cord": NULL, "across the neck": INK_3}
+    for name in order:
+        curve = curves[name]
+        sheet.line(frame.sx(curve["connection_share"]), frame.sy(curve["wire_share"]), colors[name], 3.2, zorder=5)
+    tenth = whole["top_shares"]["0.1"]
+    sheet.dot(float(frame.sx(0.1)), float(frame.sy(tenth)), 10, WIRE)
+    sheet.text(float(frame.sx(0.1)) + 24, float(frame.sy(tenth)) + 42, ra.pct(tenth), 24, "mono_medium", WIRE_INK)
+    lx0 = x0 + 590
+    sheet.text(lx0, y + 58, "Gini coefficient of length", 22, "sans", INK_3)
+    for k, name in enumerate(order):
+        yy = y + 96 + k * 37
+        sheet.rect(lx0, yy - 20, lx0 + 30, yy - 6, colors[name], zorder=4)
+        sheet.text(lx0 + 44, yy, ra.LORENZ_LABELS[name], 23, "sans", INK_2)
+        sheet.text(x1, yy, f"{curves[name]['gini']:.3f}", 23, "mono", INK_2, ha="right")
+    sheet.text(lx0, y + 266, "Share of the wire owned, and its mean length", 22, "sans", INK_3)
+    for k, row in enumerate(result["superclasses"][:4]):
+        yy = y + 302 + k * 34
+        sheet.text(lx0, yy, ra.superclass_label(row["superclass"]), 23, "sans", INK_2)
+        sheet.text(x1, yy, f"{ra.pct(row['wire_share'])}  {row['mean_length_um']:.0f}\u00a0µm", 23, "mono",
+                   INK_2, ha="right")
+    return caption(sheet, x0, x1, y + 442, "concentration",
+                   "A tenth of the connections holds a third of the wire.",
+                   f"Neck-crossing connections are the most uniform set of all, a median "
+                   f"{lengths['across the neck']['median_um']:.0f}\u00a0µm against "
+                   f"{lengths['within the brain']['median_um']:.0f}\u00a0µm inside the brain. A power law above "
+                   f"{tail['xmin_um']:.0f}\u00a0µm has exponent {tail['alpha']:.2f} and beats an exponential, but "
+                   f"a lognormal and a truncated power law fit the tail better.")
 
 
 def figure_routes(sheet: Sheet, data: dict, x0, x1, y) -> float:
     rows = data["robustness"]["thresholds"]
     chart_title(sheet, x0, x1, y, "Rich-to-rich routes, real over rewired", "by edge threshold")
-    frame = axis_frame(sheet, x0 + 90, y + 60, x1, y + 330, (0, len(rows)), (0.8, 1.8), [], [0.8, 1.0, 1.4, 1.8],
+    frame = axis_frame(sheet, x0 + 86, y + 48, x1, y + 232, (0, len(rows)), (0.8, 1.8), [], [0.8, 1.0, 1.4, 1.8],
                        str, lambda t: f"{t:.1f}", xlabel="Edge threshold, share of the target's input")
     xs = [float(frame.sx(k + 0.5)) for k in range(len(rows))]
     lo, hi = [], []
@@ -460,11 +584,11 @@ def figure_routes(sheet: Sheet, data: dict, x0, x1, y) -> float:
     ratios = [r["routes"]["total"]["ratio"] for r in rows]
     sheet.line(xs, [float(frame.sy(v)) for v in ratios], WIRE, 3.5)
     for x, r, v in zip(xs, rows, ratios):
-        sheet.dot(x, float(frame.sy(v)), 13, WIRE, hollow=r["routes"]["total"]["p_value"] >= 0.05)
-        sheet.text(x, float(frame.sy(v)) - 28, f"{v:.3f}", 24, "mono", INK_2, ha="center")
-        sheet.text(x, frame.y1 + 44, f"{100 * r['fraction']:g}%", TICK, "mono", INK_3, ha="center")
+        sheet.dot(x, float(frame.sy(v)), 12, WIRE, hollow=r["routes"]["total"]["p_value"] >= 0.05)
+        sheet.text(x, float(frame.sy(v)) - 26, f"{v:.3f}", 23, "mono", INK_2, ha="center")
+        sheet.text(x, frame.y1 + 40, f"{100 * r['fraction']:g}%", TICK, "mono", INK_3, ha="center")
     rc = data["richclub"]["routes_top10"]
-    return caption(sheet, x0, x1, frame.y1 + 150, "routes", "The hub routing is modest and fragile.",
+    return caption(sheet, x0, x1, frame.y1 + 130, "routes", "The hub routing is modest and fragile.",
                    f"Routes from a rich partner on one side, through a connective type, to one on the other, "
                    f"against 1000 rewirings (blue: central 95%; filled: p{NBSP}<{NBSP}0.05). The "
                    f"{rc['total']['ratio']:.3f} excess at 1% vanishes at 0.5%, though connective types are "
@@ -477,28 +601,28 @@ def figure_value(sheet: Sheet, data: dict, x0, x1, y) -> float:
     chart_title(sheet, x0, x1, y, "Sensory-to-motor flow lost", "share of intact")
     groups = [("flow", "All sensory to motor"), ("flow_brain_to_vnc", "Brain sensory to cord motor"),
               ("flow_vnc_to_brain", "Cord sensory to brain motor")]
-    sx = linear(0, 0.7, x0, x1 - 190)
-    yy = y + 30
+    sx = linear(0, 0.7, x0, x1 - 175)
+    yy = y + 22
     for i, (metric, label) in enumerate(groups):
-        yy += 56
+        yy += 48
         sheet.text(x0, yy, label, TICK, "sans_bold" if i == 0 else "sans", INK if i == 0 else INK_2)
-        sheet.text(x1, yy, f"{ra.count(intact[metric])} intact", 24, "mono", INK_3, ha="right")
+        sheet.text(x1, yy, f"{ra.count(intact[metric])} intact", 23, "mono", INK_3, ha="right")
         f = families[metric]
         bars = [(f["real"], WIRE, WIRE_INK), (f["null_mean"], NULL, NULL),
                 (intact[metric] - real["longest"][metric], RULE_STRONG, INK_3)]
         for k, (lost, color, ink) in enumerate(bars):
-            top = yy + 16 + k * 28
+            top = yy + 12 + k * 22
             share = lost / intact[metric]
-            sheet.rect(x0, top, float(sx(share)), top + 22, color, zorder=3)
-            sheet.text(float(sx(share)) + 12, top + 20, ra.count(lost), 24, "mono_medium" if k == 0 else "mono", ink)
+            sheet.rect(x0, top, float(sx(share)), top + 17, color, zorder=3)
+            sheet.text(float(sx(share)) + 12, top + 16, ra.count(lost), 23, "mono_medium" if k == 0 else "mono", ink)
         lo, hi = f["null_min"] / intact[metric], f["null_max"] / intact[metric]
-        sheet.line([float(sx(lo)), float(sx(hi))], [yy + 55, yy + 55], INK, 2, zorder=4)
-        yy += 94
-    x = swatch(sheet, x0, yy + 50, WIRE, "neck cut")
-    x = swatch(sheet, x, yy + 50, NULL, "random, same length")
-    swatch(sheet, x, yy + 50, RULE_STRONG, "longest ordinary")
+        sheet.line([float(sx(lo)), float(sx(hi))], [yy + 42, yy + 42], INK, 2, zorder=4)
+        yy += 72
+    x = swatch(sheet, x0, yy + 38, WIRE, "neck cut")
+    x = swatch(sheet, x, yy + 38, NULL, "random, same length")
+    swatch(sheet, x, yy + 38, RULE_STRONG, "longest ordinary")
     flow = families["flow"]
-    return caption(sheet, x0, x1, yy + 128, "value", "The neck buys less routing per unit of wire.",
+    return caption(sheet, x0, x1, yy + 96, "value", "The neck buys less routing per unit of wire.",
                    f"Cutting it removes {flow['ratio']:.2f} times the flow of 1000 random sets of ordinary "
                    f"connections of the same length (black: their range), as much as the longest ordinary ones, and "
                    f"{families['flow_brain_to_vnc']['ratio']:.2f} times from brain to cord.")
@@ -509,16 +633,16 @@ def figure_price(sheet: Sheet, data: dict, x0, x1, y) -> float:
     chart_title(sheet, x0, x1, y, "Wire length and flow of each connective type")
     top = max(18, int(nodes["value"].max()) + 1)
     floor_mm = 0.5
-    cells = split_cells(x0 + 60, x1, 2, 90)
-    bottom = y + 410
+    cells = split_cells(x0 + 56, x1, 2, 84)
+    bottom = y + 292
     for (group, title), (cx0, cx1) in zip((("descending", "Descending"), ("ascending", "Ascending")), cells):
         part = nodes[nodes["direction"] == group]
         t = tests[group]
         first = cx0 == cells[0][0]
-        sheet.text(cx0, y + 62, title, TICK, "sans_bold", INK)
-        sheet.text(cx0, y + 100, f"ρ {ra.signed(t['spearman_rho'], 3)}, given edges {ra.signed(t['partial_rho'], 3)}",
-                   24, "mono", INK_2)
-        frame = axis_frame(sheet, cx0, y + 140, cx1, bottom, (math.log10(floor_mm), math.log10(200)), (0, top),
+        sheet.text(cx0, y + 52, title, TICK, "sans_bold", INK)
+        sheet.text(cx0, y + 86, f"ρ {ra.signed(t['spearman_rho'], 3)}, given edges "
+                   f"{ra.signed(t['partial_rho'], 3)}", 23, "mono", INK_2)
+        frame = axis_frame(sheet, cx0, y + 118, cx1, bottom, (math.log10(floor_mm), math.log10(200)), (0, top),
                            [0, 1, 2], [0, 5, 10, 15] if first else [], lambda v: f"{10 ** v:g} mm",
                            lambda v: f"{v:g}")
         if not first:
@@ -530,11 +654,11 @@ def figure_price(sheet: Sheet, data: dict, x0, x1, y) -> float:
         for mask, color, r, alpha in ((zero, INK_3, 4, 0.35), (~zero, WIRE, 6, 0.6)):
             for x, v in zip(frame.sx(xs[mask]), frame.sy(values[mask])):
                 sheet.dot(float(x), float(v), r, color, alpha=alpha, zorder=5)
-    sheet.text((x0 + 60 + x1) / 2, bottom + 90, "Total length of the type's neck-crossing connections", LABEL, "sans",
-               INK_2, ha="center")
+    sheet.text((x0 + 56 + x1) / 2, bottom + 78, "Total length of the type's neck-crossing connections", LABEL,
+               "sans", INK_2, ha="center")
     zero = (f"{tests['descending']['zero_value']} of {tests['descending']['n']} and "
             f"{tests['ascending']['zero_value']} of {ra.count(tests['ascending']['n'])}")
-    return caption(sheet, x0, x1, bottom + 150, "price", "More wire does not buy a cell type more flow.",
+    return caption(sheet, x0, x1, bottom + 122, "price", "More wire does not buy a cell type more flow.",
                    "Each dot is a type on one side: the length of its neck-crossing connections and the flow lost "
                    f"when those alone are removed; {zero} lose none. At a given number of connections, longer "
                    "wiring buys nothing more.")
@@ -544,36 +668,36 @@ def figure_generative(sheet: Sheet, data: dict, x0, x1, y) -> float:
     model = data["comparison"]["models"]["G"]
     fits = data["fits"]["models"]["G"]
     chart_title(sheet, x0, x1, y, "Real value over model G's synthetic mean", "log scale")
-    px0, px1 = x0 + 420, x1 - 20
+    px0, px1 = x0 + 390, x1 - 108
     sx = linear(-5, 5, px0, px1)
-    top, step = y + 76, 36
+    top, step = y + 56, 24
     rows = list(ra.GENERATIVE_LABELS.items())
-    bottom = top + step * (len(rows) - 1) + 30
+    bottom = top + step * (len(rows) - 1) + 22
     for t, label in ((-4, "1/16"), (-2, "1/4"), (0, "1"), (2, "4"), (4, "16")):
-        sheet.line([float(sx(t))] * 2, [top - 30, bottom], RULE_STRONG if t == 0 else RULE, 2 if t == 0 else 1.5)
-        sheet.text(float(sx(t)), bottom + 44, label, TICK, "mono", INK_3, ha="center")
+        sheet.line([float(sx(t))] * 2, [top - 22, bottom], RULE_STRONG if t == 0 else RULE, 2 if t == 0 else 1.5)
+        sheet.text(float(sx(t)), bottom + 40, label, TICK, "mono", INK_3, ha="center")
     for i, (key, label) in enumerate(rows):
         prop = model["properties"][key]
         yy = top + i * step
-        sheet.text(x0, yy + 9, label, 24, "sans", INK_2)
+        sheet.text(x0, yy + 8, label, 23, "sans", INK_2)
         mean = prop["synthetic_mean"]
         lo, hi = (math.log2(v / mean) for v in prop["interval_95"])
-        sheet.rect(float(sx(lo)) - 3, yy - 9, float(sx(hi)) + 3, yy + 9, NULL, zorder=3)
+        sheet.rect(float(sx(lo)) - 3, yy - 8, float(sx(hi)) + 3, yy + 8, NULL, zorder=3)
         ratio = math.log2(prop["real"] / mean)
-        sheet.dot(float(sx(max(min(ratio, 5), -5))), yy, 10, INK if prop["reproduced"] else WIRE)
-        if abs(ratio) > 3.5:
-            sheet.text(float(sx(ratio)) - 20, yy + 8, f"{2 ** ratio:.1f}×", 22, "mono", WIRE_INK, ha="right")
+        sheet.dot(float(sx(max(min(ratio, 5), -5))), yy, 9, INK if prop["reproduced"] else WIRE)
+        if abs(ratio) > 4.0:
+            sheet.text(x1, yy + 8, f"{2 ** ratio:.1f}×", 22, "mono", WIRE_INK, ha="right")
     reproduced = sum(p["reproduced"] for p in model["properties"].values())
-    return caption(sheet, x0, x1, bottom + 120, "generative", "Distance and cell class reproduce the hub routes.",
+    return caption(sheet, x0, x1, bottom + 74, "generative", "Distance and cell class reproduce the hub routes.",
                    f"A logistic model of distance, compartment and class pairing (pseudo-R² "
                    f"{fits['pseudo_r2_mcfadden']:.3f}) reproduces {reproduced} of {len(rows)} properties of 50 "
                    "synthetic graphs (black: inside their central 95%, blue), the route count among them, without "
-                   "knowing any degree.")
+                   "knowing a single degree.")
 
 
 FIGURE_DRAW = {"placement": figure_placement, "distance": figure_distance, "cost": figure_cost,
-               "routes": figure_routes, "value": figure_value, "price": figure_price,
-               "generative": figure_generative}
+               "atlas": figure_atlas, "concentration": figure_concentration, "routes": figure_routes,
+               "value": figure_value, "price": figure_price, "generative": figure_generative}
 
 
 # Sections
@@ -652,7 +776,8 @@ def draw_methods(sheet: Sheet, data: dict) -> None:
                   "connections"),
         ("Pre-register", f"every hypothesis committed before it was computed, in {len(ra.PREREGISTRATION_COMMITS)} "
                          "commits"),
-        ("Placement", "1000 permutations of positions; 2,000,000 proposed swaps"),
+        ("Placement", "1000 permutations of positions; 2,000,000 proposed swaps; 1000 more inside each "
+                      "neuropil"),
         ("Connective", "1000 layer-preserving rewirings; 1000 length-matched removals"),
         ("Model", "logistic fit on distance, compartment and class; 50 synthetic graphs"),
     ]
@@ -663,68 +788,65 @@ def draw_methods(sheet: Sheet, data: dict) -> None:
         sheet.paragraph(cx0 + 52, y + 134, cx1 - cx0 - 52, body, 27, INK_2, leading=1.36)
 
 
-def draw_column_one(sheet: Sheet, data: dict, x0, x1, y) -> float:
-    y = heading(sheet, x0, y, "Question")
-    y = sheet.paragraph(x0, y + 8, x1 - x0,
-                        "Nervous systems are thought to place their parts so as to keep wiring short,^2^ and in the "
-                        "human brain the most connected regions are joined by long, costly connections that carry "
-                        "much of the traffic.^3^ The complete connectome of a male fruit fly, brain and nerve cord "
-                        "together,^1^ was tested for both: are its cell types placed where their wiring is short, "
-                        "and does the neck connective, the wire that must span head to thorax, join its hubs and buy "
-                        "routing that ordinary wire cannot?", 33, INK, leading=1.4)
-    y += 40
-    sheet.text(x0, y, "What this shows", CAPTION, "sans_bold", INK)
-    sheet.line([x0, x1], [y + 22, y + 22], RULE_STRONG, 2)
-    y += 72
-    for item in FINDINGS:
-        y = sheet.paragraph(x0, y, x1 - x0, item, CAPTION, INK_2, leading=1.38) + 14
-    y = heading(sheet, x0, y + 72, "Placement")
-    for i, key in enumerate(FIGURE_LAYOUT[0]):
-        y = FIGURE_DRAW[key](sheet, data, x0, x1, y + (36 if i == 0 else 64))
-    return y
+def draw_lede(sheet: Sheet, data: dict, edges) -> float:
+    """The question on the left and the headline findings across the other two columns."""
+    sheet.line([MARGIN, WIDTH - MARGIN], [LEDE_TOP - 36, LEDE_TOP - 36], INK, 3)
+    x0, x1 = edges[0]
+    y = heading(sheet, x0, LEDE_TOP + 40, "Question")
+    bottom = sheet.paragraph(x0, y + 6, x1 - x0, QUESTION, 31, INK, leading=1.4, colors={"bold": INK})
+    cells = split_cells(edges[1][0], edges[2][1], 3, GUTTER)
+    for (label, value, body, color), (cx0, cx1) in zip(lede_findings(data), cells):
+        sheet.text(cx0, LEDE_TOP + 24, label, 29, "sans_bold", INK)
+        sheet.text(cx0 - 6, LEDE_TOP + 146, value, 110, "mono_medium", color)
+        bottom = max(bottom, sheet.paragraph(cx0, LEDE_TOP + 202, cx1 - cx0, body, 27, INK_2, leading=1.38))
+    return bottom
 
 
-def draw_figure_column(sheet: Sheet, data: dict, x0, x1, y, title: str, keys: tuple[str, ...]) -> float:
-    y = heading(sheet, x0, y, title)
+def draw_figure_column(sheet: Sheet, data: dict, x0, x1, y, keys: tuple[str, ...]) -> float:
+    """One column of figures, each preceded by its section heading when it opens one."""
     for i, key in enumerate(keys):
-        y = FIGURE_DRAW[key](sheet, data, x0, x1, y + (36 if i == 0 else 64))
-    return y
-
-
-def draw_limitations(sheet: Sheet, x0, x1, y) -> float:
-    y = heading(sheet, x0, y, "Where it falls short") + 16
-    for lead, text in limitations():
-        y = sheet.paragraph(x0, y, x1 - x0, f"**{lead}** {text}", CAPTION, INK_2, leading=1.38,
-                            colors={"bold": INK}) + 12
+        if key in COLUMN_HEADINGS:
+            y = heading(sheet, x0, y + (0 if i == 0 else 34), COLUMN_HEADINGS[key]) + 22
+        else:
+            y += 46
+        y = FIGURE_DRAW[key](sheet, data, x0, x1, y)
     return y
 
 
 def draw_checks(sheet: Sheet, data: dict) -> float:
+    """The pre-registered register across two columns, with the limitations beside it in the third."""
     y = CHECKS_TOP
     sheet.line([MARGIN, WIDTH - MARGIN], [y, y], INK, 3)
-    sheet.text(MARGIN, y + 90, "Pre-registered hypotheses", 64, "sans_bold", INK)
+    edges = column_edges(WIDTH, MARGIN, GUTTER, COLUMNS)
     items = hypotheses(data)
     supported = sum(ok for _, _, ok in items)
-    sheet.text(WIDTH - MARGIN, y + 90, f"{supported} of {len(items)} supported; the rest are reported as they stand",
-               CAPTION, "sans", INK_3, ha="right")
-    per = math.ceil(len(items) / COLUMNS)
+    sheet.text(MARGIN, y + 78, "Pre-registered hypotheses", 54, "sans_bold", INK)
+    sheet.text(edges[1][1], y + 78, f"{supported} of {len(items)} supported", CAPTION, "sans", INK_3, ha="right")
+    per = math.ceil(len(items) / 2)
     ends = []
-    for c, (cx0, cx1) in enumerate(column_edges(WIDTH, MARGIN, GUTTER, COLUMNS)):
-        yy = y + 170
+    for c, (cx0, cx1) in enumerate(edges[:2]):
+        yy = y + 138
         for label, text, ok in items[c * per:(c + 1) * per]:
-            sheet.dot(cx0 + 12, yy - 10, 12, INK if ok else WIRE, hollow=not ok)
-            sheet.text(cx0 + 40, yy, label, 26, "mono_medium", INK)
-            yy = sheet.paragraph(cx0 + 130, yy, cx1 - cx0 - 130, text, 26, INK_2 if ok else WIRE_INK,
-                                 leading=1.34) + 14
+            sheet.dot(cx0 + 11, yy - 9, 11, INK if ok else WIRE, hollow=not ok)
+            sheet.text(cx0 + 36, yy, label, 25, "mono_medium", INK)
+            yy = sheet.paragraph(cx0 + 120, yy, cx1 - cx0 - 120, text, 25, INK_2 if ok else WIRE_INK,
+                                 leading=1.34) + 12
         ends.append(yy)
-    base = max(ends) + 22
-    sheet.dot(MARGIN + 12, base - 10, 12, INK)
-    sheet.text(MARGIN + 40, base, "supported", 25, "sans", INK_3)
-    x = MARGIN + 40 + sheet.width_of("supported", 25, "sans") + 44
-    sheet.dot(x + 12, base - 10, 12, WIRE, hollow=True)
-    sheet.text(x + 40, base, "not supported. Each was committed, with its direction and null, before it was "
-                             f"computed: {', '.join(ra.PREREGISTRATION_COMMITS)}.", 25, "sans", INK_3)
-    return base
+    base = max(ends) + 18
+    sheet.dot(MARGIN + 11, base - 9, 11, INK)
+    sheet.text(MARGIN + 36, base, "supported", 24, "sans", INK_3)
+    x = MARGIN + 36 + sheet.width_of("supported", 24, "sans") + 40
+    sheet.dot(x + 11, base - 9, 11, WIRE, hollow=True)
+    sheet.text(x + 36, base, "not supported. Each was committed, with its direction and null, before it was "
+                             f"computed: {', '.join(ra.PREREGISTRATION_COMMITS)}.", 24, "sans", INK_3)
+
+    lx0, lx1 = edges[2]
+    sheet.text(lx0, y + 78, "Where it falls short", 54, "sans_bold", INK)
+    yy = y + 138
+    for lead, text in limitations(data):
+        yy = sheet.paragraph(lx0, yy, lx1 - lx0, f"**{lead}** {text}", 25, INK_2, leading=1.32,
+                             colors={"bold": INK}) + 7
+    return max(base, yy)
 
 
 def draw_footer(sheet: Sheet) -> None:
@@ -781,12 +903,9 @@ def render(output: Path = POSTER_PATH, preview: Path = PREVIEW_PATH) -> dict[str
     edges = column_edges(WIDTH, MARGIN, GUTTER, COLUMNS)
     draw_band(sheet, data, edges)
     draw_methods(sheet, data)
-    bottoms = {
-        "column 1": draw_column_one(sheet, data, *edges[0], COLUMN_TOP),
-        "column 2": draw_figure_column(sheet, data, *edges[1], COLUMN_TOP, "The connective", FIGURE_LAYOUT[1]),
-    }
-    y = draw_figure_column(sheet, data, *edges[2], COLUMN_TOP, "What more wire buys", FIGURE_LAYOUT[2])
-    bottoms["column 3"] = draw_limitations(sheet, *edges[2], y + 80)
+    bottoms = {"lede": draw_lede(sheet, data, edges)}
+    for i, keys in enumerate(FIGURE_LAYOUT):
+        bottoms[f"column {i + 1}"] = draw_figure_column(sheet, data, *edges[i], COLUMN_TOP, keys)
     bottoms["checks"] = draw_checks(sheet, data)
     draw_footer(sheet)
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -806,7 +925,7 @@ def main() -> None:
     args = parser.parse_args()
     bottoms = render(args.output, args.preview)
     print("Bottoms: " + ", ".join(f"{k} {v:.0f}" for k, v in bottoms.items())
-          + f" (checks start {CHECKS_TOP}, footer starts {FOOTER_TOP})")
+          + f" (columns start {COLUMN_TOP}, checks {CHECKS_TOP}, footer {FOOTER_TOP})")
     print(f"Wrote {args.output} ({WIDTH} x {HEIGHT}) and {args.preview}")
 
 

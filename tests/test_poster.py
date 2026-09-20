@@ -44,7 +44,7 @@ def test_linear_scale_maps_endpoints_and_can_invert_direction():
 
 
 def test_figures_are_numbered_as_in_the_readme_and_read_in_order():
-    assert reading_order() == [1, 2, 3, 4, 5, 6, 7]
+    assert reading_order() == [1, 2, 3, 4, 5, 6, 7, 8, 9]
     with pytest.raises(ValueError):
         reading_order((("b",), ("a",)), {"a": 1, "b": 2})
 
@@ -90,6 +90,7 @@ def test_the_poster_renders_at_print_size_with_every_section_in_its_band(tmp_pat
         assert round(im.info["dpi"][0]) == poster.PRINT_DPI
     with Image.open(tmp_path / "preview.png") as im:
         assert im.width == poster.PREVIEW_WIDTH
+    assert bottoms["lede"] < poster.COLUMN_TOP
     for column in ("column 1", "column 2", "column 3"):
         assert bottoms[column] < poster.CHECKS_TOP, column
     assert bottoms["checks"] < poster.FOOTER_TOP

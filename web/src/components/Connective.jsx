@@ -55,7 +55,7 @@ export default function Connective({ data }) {
           </TextBlock>
 
           <Figure
-            number={3}
+            number={7}
             title="The neck holds a quarter of the wire in under a tenth of the connections"
             caption={
               <>
@@ -66,7 +66,7 @@ export default function Connective({ data }) {
             }
           >
             <CostShare data={data} />
-            <More summary="Values behind Figure 3">
+            <More summary="Values behind Figure 7">
               <CostShareTable data={data} />
             </More>
           </Figure>
@@ -108,7 +108,7 @@ export default function Connective({ data }) {
           </TextBlock>
 
           <Figure
-            number={4}
+            number={8}
             title="The connective favours well-connected partners, but its rich-to-rich routing is modest and fragile"
             caption={
               <>
@@ -120,7 +120,7 @@ export default function Connective({ data }) {
             }
           >
             <RichClub data={data} />
-            <More summary="Values behind Figure 4">
+            <More summary="Values behind Figure 8">
               <RichClubTable data={data} />
             </More>
           </Figure>
@@ -164,7 +164,7 @@ export default function Connective({ data }) {
           </TextBlock>
 
           <Figure
-            number={5}
+            number={9}
             title="Per unit of wire, the neck carries less routing than ordinary wiring, except from brain to nerve cord"
             caption={
               <>
@@ -176,13 +176,13 @@ export default function Connective({ data }) {
             }
           >
             <ValueNulls data={data} />
-            <More summary="Values behind Figure 5">
+            <More summary="Values behind Figure 9">
               <ValueTable data={data} />
             </More>
           </Figure>
 
           <Figure
-            number={6}
+            number={10}
             title="More wire does not buy a cell type more flow"
             caption={
               <>
@@ -196,7 +196,7 @@ export default function Connective({ data }) {
             }
           >
             <PriceValue data={data} />
-            <More summary="Values behind Figure 6">
+            <More summary="Values behind Figure 10">
               <PriceTestsTable data={data} />
             </More>
           </Figure>

@@ -61,7 +61,7 @@ export default function Model({ data }) {
           </TextBlock>
 
           <Figure
-            number={7}
+            number={11}
             title="Distance, compartment and cell class reproduce the rich-to-rich routes, and little else"
             caption={
               <>
@@ -74,7 +74,7 @@ export default function Model({ data }) {
             controls={<Segmented label="Wiring model" options={MODELS} value={model} onChange={setModel} />}
           >
             <Generative data={data} model={model} />
-            <More summary="Values behind Figure 7">
+            <More summary="Values behind Figure 11">
               <GenerativeTable data={data} model={model} />
               <FitTable data={data} />
               <p className="caption">

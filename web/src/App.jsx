@@ -1,3 +1,4 @@
+import Budget from "./components/Budget.jsx";
 import Connective from "./components/Connective.jsx";
 import Hero from "./components/Hero.jsx";
 import Methods, { Footer } from "./components/Methods.jsx";
@@ -33,6 +34,9 @@ export default function App() {
             </SectionBoundary>
             <SectionBoundary id="placement">
               <Placement data={data} />
+            </SectionBoundary>
+            <SectionBoundary id="budget">
+              <Budget data={data} />
             </SectionBoundary>
             <SectionBoundary id="connective">
               <Connective data={data} />

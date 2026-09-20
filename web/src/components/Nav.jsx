@@ -5,6 +5,7 @@ import { useTheme } from "../lib/theme.js";
 
 const LINKS = [
   ["placement", "Placement"],
+  ["budget", "The budget"],
   ["connective", "The connective"],
   ["model", "A wiring model"],
   ["methods", "Methods"],

@@ -499,3 +499,13 @@ details.more[open] summary {
 .chart.is-drawn [data-mark="bar"] {
   transition: cx 460ms var(--ease), cy 460ms var(--ease), x 460ms var(--ease), width 460ms var(--ease);
 }
+
+/* A legend above a chart clears the value-axis title, which sits inside the plot's own top margin. */
+.legend + .chart {
+  margin-top: 0.4rem;
+}
+
+/* A second run of prose after a figure takes the air the next figure would have taken. */
+.figure + .text-grid {
+  margin-top: 3.25rem;
+}

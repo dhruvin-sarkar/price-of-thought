@@ -75,3 +75,18 @@ It does not claim to be the first wiring-economy, rich-club, or connective-flow 
 - van den Heuvel MP, Sporns O (2011). Rich-club organization of the human connectome. *J Neurosci* 31(44):15775–15786. doi:10.1523/JNEUROSCI.3539-11.2011
 - van den Heuvel MP, Kahn RS, Goñi J, Sporns O (2012). High-cost, high-capacity backbone for global brain communication. *PNAS* 109(28):11372–11377. doi:10.1073/pnas.1203593109
 - Worrell JC, Rumschlag J, Betzel RF, Sporns O, Mišić B (2017). Optimized connectome architecture for sensory-motor integration. *Netw Neurosci* 1(4):415–430. doi:10.1162/NETN_a_00022
+
+### Methods, software and data sources cited in the report
+
+Citation details for these were confirmed against Crossref or arXiv. They are cited in the report for the methods, software and datasets it uses, and were not reviewed as prior art.
+
+- Alstott J, Bullmore E, Plenz D (2014). powerlaw: a Python package for analysis of heavy-tailed distributions. *PLoS ONE* 9(1):e85777. doi:10.1371/journal.pone.0085777
+- Clauset A, Shalizi CR, Newman MEJ (2009). Power-law distributions in empirical data. *SIAM Review* 51(4):661–703. doi:10.1137/070710111
+- Dorkenwald S, Matsliah A, Sterling AR, et al. (2024). Neuronal wiring diagram of an adult brain. *Nature* 634:124–138. doi:10.1038/s41586-024-07558-y
+- Ford LR, Fulkerson DR (1956). Maximal flow through a network. *Canadian Journal of Mathematics* 8:399–404. doi:10.4153/CJM-1956-045-5
+- Menger K (1927). Zur allgemeinen Kurventheorie. *Fundamenta Mathematicae* 10:96–115. doi:10.4064/fm-10-1-96-115
+- Pedregosa F, Varoquaux G, Gramfort A, et al. (2011). Scikit-learn: machine learning in Python. *Journal of Machine Learning Research* 12:2825–2830. arXiv:1201.0490
+- Plaza SM, Clements J, Dolafi T, et al. (2022). neuPrint: an open access tool for EM connectomics. *Frontiers in Neuroinformatics* 16:896292. doi:10.3389/fninf.2022.896292
+- Schlegel P, Yin Y, Bates AS, et al. (2024). Whole-brain annotation and multi-connectome cell typing of *Drosophila*. *Nature* 634:139–152. doi:10.1038/s41586-024-07686-5
+- Takemura S, Hayworth KJ, Huang GB, et al. (2024). A connectome of the male *Drosophila* ventral nerve cord. *eLife* 13:RP97769. doi:10.7554/eLife.97769
+- Vuong QH (1989). Likelihood ratio tests for model selection and non-nested hypotheses. *Econometrica* 57(2):307–333. doi:10.2307/1912557

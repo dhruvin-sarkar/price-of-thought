@@ -428,3 +428,17 @@
   font-size: var(--step--2);
   color: var(--ink-2);
 }
+
+/* A three-stop scale sits its middle label over the midpoint of the bar, not midway between the outer two. */
+.ramp-ticks.is-three {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.ramp-ticks.is-three > :nth-child(2) {
+  justify-self: center;
+}
+
+.ramp-ticks.is-three > :last-child {
+  justify-self: end;
+}

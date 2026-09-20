@@ -40,15 +40,17 @@ def quantize(values: np.ndarray, low, high) -> np.ndarray:
     return np.clip(np.rint((values - low) / span * STEPS), 0, STEPS).astype(np.uint16)
 
 
-def merged_shell(meshes: dict, cell_nm: float = MESH_CELL_NM) -> tuple[np.ndarray, np.ndarray]:
-    """All neuropil meshes decimated and merged into one vertex array (µm) and one triangle index array."""
-    vertices, faces, offset = [], [], 0
-    for v, f in meshes.values():
+def merged_shell(meshes: dict, cell_nm: float = MESH_CELL_NM) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """All neuropil meshes decimated and merged into one vertex array (µm), one triangle index array, and the
+    neuropil each vertex belongs to, indexed into the order the meshes are given in."""
+    vertices, faces, group, offset = [], [], [], 0
+    for i, (v, f) in enumerate(meshes.values()):
         v, f = simplify(v, f, cell_nm)
         vertices.append(v / 1000.0)
         faces.append(f + offset)
+        group.append(np.full(len(v), i, dtype=np.uint8))
         offset += len(v)
-    return np.concatenate(vertices), np.concatenate(faces)
+    return np.concatenate(vertices), np.concatenate(faces), np.concatenate(group)
 
 
 def scene(graph, price: pd.DataFrame) -> dict:
@@ -69,7 +71,8 @@ def scene(graph, price: pd.DataFrame) -> dict:
     if (node_index < 0).any():
         raise RuntimeError("a neck-crossing wire has a connective endpoint missing from the price table")
 
-    shell_vertices, shell_faces = merged_shell(load_all_meshes())
+    meshes = load_all_meshes()
+    shell_vertices, shell_faces, shell_group = merged_shell(meshes)
     if len(shell_vertices) > STEPS + 1:
         raise RuntimeError(f"{len(shell_vertices)} shell vertices do not index as uint16; coarsen MESH_CELL_NM")
     wire_ends = positions[wires]
@@ -81,6 +84,7 @@ def scene(graph, price: pd.DataFrame) -> dict:
     arrays = {
         "shell_positions": quantize(shell_vertices, low, high).ravel(),
         "shell_indices": shell_faces.astype(np.uint16).ravel(),
+        "shell_group": shell_group,
         "wire_positions": quantize(wire_ends, low, high).ravel(),
         "wire_length": quantize(lengths, *length_range),
         "wire_rich_partner": rich[partner_end].astype(np.uint8),
@@ -98,6 +102,19 @@ def scene(graph, price: pd.DataFrame) -> dict:
     header["steps"] = STEPS
     header["wires"] = int(len(wires))
     header["shell_triangles"] = int(len(shell_faces))
+    # One entry per mesh, in the order shell_group indexes, so the view can paint each neuropil by what it holds.
+    atlas = {row["neuropil"]: row for row in read_json("wire_atlas.json")["neuropils"]}
+    header["neuropils"] = [
+        {
+            "name": name,
+            "compartment": atlas.get(name, {}).get("compartment", "brain"),
+            "types": atlas.get(name, {}).get("types", 0),
+            "wire_um": atlas.get(name, {}).get("wire_um", 0.0),
+            "wire_share": atlas.get(name, {}).get("wire_share", 0.0),
+            "cost_ratio": atlas.get(name, {}).get("cost_ratio"),
+        }
+        for name in meshes
+    ]
     # Shipped as base64 inside JSON: download managers intercept binary URLs such as .bin.
     header["data"] = base64.b64encode(b"".join(chunks)).decode("ascii")
     return header
@@ -171,6 +188,8 @@ def site_data(price: pd.DataFrame) -> dict:
         "generative": {"fit": model, "comparison": comparison},
         # The front view the title plate draws, so the hero can show the same still while the scene loads.
         "front": front_view(read_json("front_view.json")),
+        "atlas": read_json("wire_atlas.json"),
+        "concentration": read_json("wire_concentration.json"),
         # The same list the poster prints, so the site cannot drift from it or from the pre-registration index.
         "hypotheses": [{"label": label, "statement": statement, "supported": bool(supported)}
                        for label, statement, supported in hypotheses(load_results())],

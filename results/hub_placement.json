@@ -1,0 +1,446 @@
+{
+ "scopes": [
+  {
+   "scope": "all",
+   "types": 23073,
+   "centroid_um": [
+    391.7,
+    271.3,
+    391.5
+   ],
+   "median_distance_um": 297.1,
+   "max_distance_um": 689.27
+  },
+  {
+   "scope": "brain",
+   "types": 16052,
+   "centroid_um": [
+    387.2,
+    195.4,
+    213.3
+   ],
+   "median_distance_um": 162.48,
+   "max_distance_um": 865.52
+  },
+  {
+   "scope": "nerve cord",
+   "types": 7021,
+   "centroid_um": [
+    401.8,
+    444.9,
+    799.0
+   ],
+   "median_distance_um": 157.75,
+   "max_distance_um": 755.81
+  }
+ ],
+ "correlations": [
+  {
+   "scope": "all",
+   "measure": "degree",
+   "types": 23073,
+   "spearman_rho": -0.0428,
+   "spearman_p": 0.0,
+   "pearson_log_r": -0.0055,
+   "pearson_log_p": 0.40187
+  },
+  {
+   "scope": "all",
+   "measure": "wire",
+   "types": 23073,
+   "spearman_rho": 0.0015,
+   "spearman_p": 0.824353,
+   "pearson_log_r": 0.0439,
+   "pearson_log_p": 0.0
+  },
+  {
+   "scope": "brain",
+   "measure": "degree",
+   "types": 16052,
+   "spearman_rho": 0.0181,
+   "spearman_p": 0.021494,
+   "pearson_log_r": 0.0501,
+   "pearson_log_p": 0.0
+  },
+  {
+   "scope": "brain",
+   "measure": "wire",
+   "types": 16052,
+   "spearman_rho": -0.0979,
+   "spearman_p": 0.0,
+   "pearson_log_r": 0.0698,
+   "pearson_log_p": 0.0
+  },
+  {
+   "scope": "nerve cord",
+   "measure": "degree",
+   "types": 7021,
+   "spearman_rho": -0.1443,
+   "spearman_p": 0.0,
+   "pearson_log_r": -0.1061,
+   "pearson_log_p": 0.0
+  },
+  {
+   "scope": "nerve cord",
+   "measure": "wire",
+   "types": 7021,
+   "spearman_rho": -0.054,
+   "spearman_p": 6e-06,
+   "pearson_log_r": 0.0275,
+   "pearson_log_p": 0.021252
+  }
+ ],
+ "degree_bins": [
+  {
+   "scope": "all",
+   "bin": 1,
+   "types": 1896,
+   "median_value": 20.0,
+   "median_distance_um": 306.67
+  },
+  {
+   "scope": "all",
+   "bin": 2,
+   "types": 2388,
+   "median_value": 25.0,
+   "median_distance_um": 305.67
+  },
+  {
+   "scope": "all",
+   "bin": 3,
+   "types": 2271,
+   "median_value": 28.0,
+   "median_distance_um": 306.28
+  },
+  {
+   "scope": "all",
+   "bin": 4,
+   "types": 2292,
+   "median_value": 31.0,
+   "median_distance_um": 299.06
+  },
+  {
+   "scope": "all",
+   "bin": 5,
+   "types": 2072,
+   "median_value": 34.0,
+   "median_distance_um": 292.76
+  },
+  {
+   "scope": "all",
+   "bin": 6,
+   "types": 2854,
+   "median_value": 38.0,
+   "median_distance_um": 293.49
+  },
+  {
+   "scope": "all",
+   "bin": 7,
+   "types": 2296,
+   "median_value": 43.0,
+   "median_distance_um": 291.86
+  },
+  {
+   "scope": "all",
+   "bin": 8,
+   "types": 2287,
+   "median_value": 49.0,
+   "median_distance_um": 282.5
+  },
+  {
+   "scope": "all",
+   "bin": 9,
+   "types": 2376,
+   "median_value": 58.0,
+   "median_distance_um": 286.74
+  },
+  {
+   "scope": "all",
+   "bin": 10,
+   "types": 2341,
+   "median_value": 82.0,
+   "median_distance_um": 305.62
+  },
+  {
+   "scope": "brain",
+   "bin": 1,
+   "types": 1594,
+   "median_value": 20.0,
+   "median_distance_um": 156.91
+  },
+  {
+   "scope": "brain",
+   "bin": 2,
+   "types": 1203,
+   "median_value": 25.0,
+   "median_distance_um": 157.45
+  },
+  {
+   "scope": "brain",
+   "bin": 3,
+   "types": 2008,
+   "median_value": 29.0,
+   "median_distance_um": 161.7
+  },
+  {
+   "scope": "brain",
+   "bin": 4,
+   "types": 1587,
+   "median_value": 32.0,
+   "median_distance_um": 164.11
+  },
+  {
+   "scope": "brain",
+   "bin": 5,
+   "types": 1416,
+   "median_value": 35.0,
+   "median_distance_um": 164.2
+  },
+  {
+   "scope": "brain",
+   "bin": 6,
+   "types": 1656,
+   "median_value": 38.0,
+   "median_distance_um": 165.34
+  },
+  {
+   "scope": "brain",
+   "bin": 7,
+   "types": 1672,
+   "median_value": 43.0,
+   "median_distance_um": 166.9
+  },
+  {
+   "scope": "brain",
+   "bin": 8,
+   "types": 1501,
+   "median_value": 48.0,
+   "median_distance_um": 161.32
+  },
+  {
+   "scope": "brain",
+   "bin": 9,
+   "types": 1738,
+   "median_value": 56.0,
+   "median_distance_um": 163.52
+  },
+  {
+   "scope": "brain",
+   "bin": 10,
+   "types": 1677,
+   "median_value": 79.0,
+   "median_distance_um": 161.7
+  },
+  {
+   "scope": "nerve cord",
+   "bin": 1,
+   "types": 611,
+   "median_value": 20.0,
+   "median_distance_um": 159.92
+  },
+  {
+   "scope": "nerve cord",
+   "bin": 2,
+   "types": 620,
+   "median_value": 24.0,
+   "median_distance_um": 166.88
+  },
+  {
+   "scope": "nerve cord",
+   "bin": 3,
+   "types": 752,
+   "median_value": 27.0,
+   "median_distance_um": 167.07
+  },
+  {
+   "scope": "nerve cord",
+   "bin": 4,
+   "types": 758,
+   "median_value": 30.0,
+   "median_distance_um": 164.61
+  },
+  {
+   "scope": "nerve cord",
+   "bin": 5,
+   "types": 637,
+   "median_value": 33.0,
+   "median_distance_um": 162.84
+  },
+  {
+   "scope": "nerve cord",
+   "bin": 6,
+   "types": 799,
+   "median_value": 37.0,
+   "median_distance_um": 162.42
+  },
+  {
+   "scope": "nerve cord",
+   "bin": 7,
+   "types": 658,
+   "median_value": 42.0,
+   "median_distance_um": 167.09
+  },
+  {
+   "scope": "nerve cord",
+   "bin": 8,
+   "types": 740,
+   "median_value": 48.0,
+   "median_distance_um": 150.79
+  },
+  {
+   "scope": "nerve cord",
+   "bin": 9,
+   "types": 730,
+   "median_value": 60.5,
+   "median_distance_um": 130.24
+  },
+  {
+   "scope": "nerve cord",
+   "bin": 10,
+   "types": 716,
+   "median_value": 90.0,
+   "median_distance_um": 114.79
+  }
+ ],
+ "partners": {
+  "scopes": {
+   "all": {
+    "real_um": 127.31,
+    "null_mean_um": 320.67,
+    "null_sd_um": 0.311,
+    "z_score": -622.7,
+    "ratio": 0.397,
+    "n_at_or_below_real": 0,
+    "p_value": 0.000999,
+    "permutations": 1000
+   },
+   "brain": {
+    "real_um": 120.61,
+    "null_mean_um": 259.32,
+    "null_sd_um": 0.352,
+    "z_score": -393.7,
+    "ratio": 0.4651,
+    "n_at_or_below_real": 0,
+    "p_value": 0.000999,
+    "permutations": 1000
+   },
+   "nerve cord": {
+    "real_um": 142.64,
+    "null_mean_um": 460.91,
+    "null_sd_um": 0.6,
+    "z_score": -530.6,
+    "ratio": 0.3095,
+    "n_at_or_below_real": 0,
+    "p_value": 0.000999,
+    "permutations": 1000
+   }
+  },
+  "types_tested": 23070,
+  "share_nearer_than_chance": 0.9544,
+  "seed": 20360916,
+  "extremes": [
+   {
+    "cell_type": "SNppxx",
+    "side": "R",
+    "compartment": "vnc",
+    "degree": 402,
+    "distance_to_partners_um": 18.4,
+    "z_score": -29.1
+   },
+   {
+    "cell_type": "SNta37",
+    "side": "R",
+    "compartment": "vnc",
+    "degree": 260,
+    "distance_to_partners_um": 48.55,
+    "z_score": -26.9
+   },
+   {
+    "cell_type": "SNppxx",
+    "side": "L",
+    "compartment": "vnc",
+    "degree": 292,
+    "distance_to_partners_um": 16.87,
+    "z_score": -26.1
+   },
+   {
+    "cell_type": "IN12B002",
+    "side": "R",
+    "compartment": "vnc",
+    "degree": 390,
+    "distance_to_partners_um": 78.34,
+    "z_score": -25.9
+   },
+   {
+    "cell_type": "IN12B002",
+    "side": "L",
+    "compartment": "vnc",
+    "degree": 370,
+    "distance_to_partners_um": 99.62,
+    "z_score": -25.0
+   },
+   {
+    "cell_type": "SNta29",
+    "side": "L",
+    "compartment": "vnc",
+    "degree": 317,
+    "distance_to_partners_um": 46.54,
+    "z_score": -23.8
+   },
+   {
+    "cell_type": "SNta37",
+    "side": "L",
+    "compartment": "vnc",
+    "degree": 222,
+    "distance_to_partners_um": 44.03,
+    "z_score": -23.2
+   },
+   {
+    "cell_type": "SNta29",
+    "side": "R",
+    "compartment": "vnc",
+    "degree": 300,
+    "distance_to_partners_um": 46.94,
+    "z_score": -22.9
+   },
+   {
+    "cell_type": "IN02A030",
+    "side": "L",
+    "compartment": "vnc",
+    "degree": 147,
+    "distance_to_partners_um": 57.65,
+    "z_score": -22.5
+   },
+   {
+    "cell_type": "SNta20",
+    "side": "R",
+    "compartment": "vnc",
+    "degree": 224,
+    "distance_to_partners_um": 51.25,
+    "z_score": -22.0
+   },
+   {
+    "cell_type": "SNta38",
+    "side": "R",
+    "compartment": "vnc",
+    "degree": 194,
+    "distance_to_partners_um": 69.54,
+    "z_score": -21.6
+   },
+   {
+    "cell_type": "INXXX258",
+    "side": "R",
+    "compartment": "vnc",
+    "degree": 126,
+    "distance_to_partners_um": 56.36,
+    "z_score": -21.6
+   }
+  ]
+ },
+ "totals": {
+  "types": 23073,
+  "isolated_types": 3,
+  "connections": 490884,
+  "permutations": 1000
+ }
+}

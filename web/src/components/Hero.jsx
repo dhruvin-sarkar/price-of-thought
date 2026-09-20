@@ -24,12 +24,12 @@ export default function Hero({ data }) {
           </p>
           <dl className="hero-stats">
             <div>
-              <dd>{times(h.ratio, 3)}</dd>
-              <dt>the wire of random placement</dt>
-            </div>
-            <div>
               <dd>{percent(h.neck.cost_share)}</dd>
               <dt>of all wire in the {percent(h.neck.edge_share)} of connections that cross the neck</dt>
+            </div>
+            <div>
+              <dd>{times(h.flowRatio, 2)}</dd>
+              <dt>the routing lost by cutting the neck, against random wiring of the same length</dt>
             </div>
           </dl>
           <p className="hero-links">

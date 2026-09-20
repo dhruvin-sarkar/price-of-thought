@@ -91,7 +91,7 @@ export default function Lorenz({ data }) {
                 Spread evenly
               </text>
 
-              {hover != null && <line x1={x(hover)} x2={x(hover)} y1={0} y2={height} className="crosshair" />}
+              {hover != null && <line x1={x(hover)} x2={x(hover)} y1={0} y2={height} stroke="var(--rule-strong)" strokeWidth="1" />}
 
               {curves.map(({ key, color, curve }) => (
                 <path

@@ -9,7 +9,7 @@ export const tested = (data) => data.atlas.neuropils.filter((row) => row.cost_ra
 /** Regions called out on the chart: the two least economical, and the most. */
 function labelled(rows) {
   const byRatio = [...rows].sort((a, b) => b.cost_ratio - a.cost_ratio);
-  return [byRatio[0], byRatio[1], byRatio[byRatio.length - 1]];
+  return [byRatio[0], byRatio[1], byRatio.at(-1)];
 }
 
 /** One, two and five in each decade the domain covers: powers of ten alone leave this axis with two ticks. */
@@ -106,6 +106,8 @@ export default function RegionEconomy({ data }) {
             {rows.map((row, i) => (
               <circle
                 key={row.neuropil}
+                data-mark="dot"
+                style={{ "--mark-index": i }}
                 cx={x(wires[i])}
                 cy={y(row.cost_ratio)}
                 r={hover === i ? 7 : 5}

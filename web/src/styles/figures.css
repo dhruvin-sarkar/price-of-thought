@@ -449,6 +449,12 @@ details.more[open] summary {
   animation: mark-line 900ms var(--ease) both;
 }
 
+/* Points carry their index, so a cloud of them settles in sequence rather than appearing all at once. */
+.chart.is-drawn [data-mark="dot"] {
+  transform-origin: center;
+  animation: mark-dot 380ms var(--ease) calc(var(--mark-index, 0) * 8ms) both;
+}
+
 .chart.is-drawn [data-mark="fade"] {
   animation: mark-fade 420ms var(--ease) 240ms both;
 }
@@ -481,6 +487,13 @@ details.more[open] summary {
   }
 }
 
+@keyframes mark-dot {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
 @keyframes mark-fade {
   from {
     opacity: 0;
@@ -508,4 +521,9 @@ details.more[open] summary {
 /* A second run of prose after a figure takes the air the next figure would have taken. */
 .figure + .text-grid {
   margin-top: 3.25rem;
+}
+
+/* A table showing both ends of a ranking rules off where the middle was left out. */
+.data tbody tr.row-gap > * {
+  border-top: 1px solid var(--rule-strong);
 }

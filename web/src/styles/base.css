@@ -502,6 +502,8 @@ input[type="search"]::placeholder {
   *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+    /* A delayed animation filling backwards holds its first frame, which for a mark drawn in means nothing. */
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
   }

@@ -1,7 +1,8 @@
 PYTHON ?= python
 export PYTHONUTF8 = 1
 CHECKS := schema spatial_graph preregistration spatial_optimality richclub value wiring_economy cable_length price \
-	generative threshold_robustness wire_atlas wire_concentration hero readme_assets references citations document_numbers
+	generative threshold_robustness wire_atlas wire_concentration hub_placement wire_symmetry synapse_value \
+	hero readme_assets references citations document_numbers
 
 .PHONY: reproduce data analyze hero readme poster export paper test verify clean
 
@@ -23,6 +24,9 @@ analyze:
 	$(PYTHON) -m pipeline.generative_comparison --workers 6
 	$(PYTHON) -m pipeline.wire_atlas
 	$(PYTHON) -m pipeline.wire_concentration
+	$(PYTHON) -m pipeline.hub_placement
+	$(PYTHON) -m pipeline.wire_symmetry
+	$(PYTHON) -m pipeline.synapse_value
 
 hero:
 	$(PYTHON) -m pipeline.hero_render

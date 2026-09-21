@@ -1,4 +1,4 @@
-"""Make the project's two typefaces available, from a local cache first and Google Fonts only when it is short."""
+"""Make the project's two typefaces available, from the files committed with it where they are complete."""
 
 import re
 from pathlib import Path
@@ -7,8 +7,9 @@ import requests
 from fontTools.ttLib import TTFont
 from matplotlib import font_manager
 
-from pipeline.common import DATA
+from pipeline.common import DATA, ROOT
 
+FONTS = ROOT / "assets" / "fonts"
 FONT_CACHE = DATA / "fonts"
 CSS_URL = ("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&"
            "family=Spline+Sans+Mono:wght@400;500&display=swap")
@@ -97,9 +98,27 @@ def download_fonts(destination: Path | None = None, user_agent: str = "Wget/1.20
     return paths
 
 
+def font_files(user_agent: str = "Wget/1.20") -> list[Path]:
+    """The files the figures are set in: those committed with the project, or fetched when one is absent.
+
+    Args:
+        user_agent: sent with the stylesheet request; it decides the file format Google Fonts serves.
+
+    Returns:
+        Paths to the font files, which together cover every entry of :data:`FACES`.
+
+    Raises:
+        FontsUnavailable: a face is neither committed nor cached and Google Fonts cannot be reached.
+    """
+    committed = cached_fonts(FONTS)
+    if not missing_faces(committed):
+        return committed
+    return download_fonts(user_agent=user_agent)
+
+
 def register() -> tuple[str, str]:
     """Register the typefaces with matplotlib and return the (sans, mono) family names."""
-    for path in download_fonts():
+    for path in font_files():
         font_manager.fontManager.addfont(str(path))
     available = {f.name for f in font_manager.fontManager.ttflist}
     missing = {SANS, MONO} - available

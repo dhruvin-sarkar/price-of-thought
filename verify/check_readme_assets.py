@@ -46,7 +46,7 @@ def check() -> str:
     stale = [name for name, (svg, _) in drawn.items() if (ra.OUT_DIR / name).read_text(encoding="utf-8") != svg]
     assert not stale, (f"{len(stale)} figures state the right numbers but are not drawn as the code draws them: "
                        f"{', '.join(sorted(stale))}; run make readme. Typefaces in use: "
-                       f"{', '.join(p.name for p in fonts.cached_fonts())}")
+                       f"{', '.join(p.name for p in fonts.font_files())}")
     return f"{len(jobs)} README figures redraw from the results byte for byte, glyph outlines included"
 
 

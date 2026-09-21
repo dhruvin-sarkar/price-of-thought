@@ -258,7 +258,7 @@ Five further analyses — hub placement, the wire on the two sides, synapses aga
 
 Table: Software versions.
 
-Software versions are listed in Table 2 and every dependency is pinned in `requirements.txt`. The pipeline is a set of Python modules in `pipeline/`, run through `make` (Table 3).
+Software versions are listed in Table 2 and every dependency is pinned in `requirements.txt`. The two typefaces the figures are set in, Archivo and Spline Sans Mono, are committed under `assets/fonts/` with their SIL Open Font Licenses, so a figure redraws to the same bytes rather than to whichever cut a font service happens to serve that day. The pipeline is a set of Python modules in `pipeline/`, run through `make` (Table 3).
 
 | target | what it runs |
 |---|---|

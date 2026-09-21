@@ -235,16 +235,14 @@ def pair_adjustment(subtables: Sequence[tuple[object, dict[str, int]]], left: st
 
 
 def project_fonts() -> dict[str, Path]:
-    """Static files of the project's faces, by role, from the font cache that ``pipeline.fonts`` fills."""
-    from pipeline.fonts import download_fonts
+    """Static files of the project's faces, by role, from the set ``pipeline.fonts`` makes available."""
+    from pipeline.fonts import face_of, font_files
 
     found: dict[str, Path] = {}
-    for path in download_fonts():
-        font = TTFont(path, lazy=True)
-        name = font["name"].getDebugName(1)
-        family = "Spline Sans Mono" if name.startswith("Spline Sans Mono") else name.split(" ")[0]
+    for path in font_files():
+        face = face_of(path)
         for role, spec in FACE_SPECS.items():
-            if spec == (family, font["OS/2"].usWeightClass):
+            if spec == face:
                 found[role] = path
     return found
 

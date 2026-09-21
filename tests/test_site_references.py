@@ -17,7 +17,10 @@ def test_the_site_lists_the_prior_work_the_report_builds_on():
 
 def test_every_reference_the_site_cites_is_one_verified_in_the_prior_art_review():
     reviewed = (RESULTS / "prior_art.md").read_text(encoding="utf-8").partition("## References")[2]
-    for reference in site_references():
+    assert reviewed.strip(), "prior_art.md lists no verified reference"
+    references = site_references()
+    assert references, "the site's methods section lists no reference"
+    for reference in references:
         doi = re.search(r"doi:(\S+)", reference).group(1)
         assert doi in reviewed, doi
 
@@ -29,6 +32,8 @@ BUILT = {"": ROOT / "web" / "index.html", "report.pdf": ROOT / "paper" / "report
 
 
 def test_every_asset_the_page_metadata_points_at_is_published():
-    for url in set(re.findall(rf'content="{re.escape(SITE)}([^"]*)"', INDEX.read_text(encoding="utf-8"))):
+    urls = set(re.findall(rf'content="{re.escape(SITE)}([^"]*)"', INDEX.read_text(encoding="utf-8")))
+    assert urls, "the page metadata points at nothing on the site"
+    for url in urls:
         path = BUILT.get(url, ROOT / "web" / "public" / url)
         assert path.exists(), url

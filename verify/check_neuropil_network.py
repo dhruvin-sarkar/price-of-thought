@@ -96,9 +96,11 @@ def check() -> str:
         assert all(labelled[name] == community["community"] for name in community["members"]), \
             f"community {community['community']} disagrees with the region rows"
 
-    for split, agreement in s["anatomy"].items():
-        if agreement is None:
-            continue
+    # A label fewer than two regions carry is left uncompared; the compartment split is the one the report quotes.
+    compared = [split for split, agreement in s["anatomy"].items() if agreement is not None]
+    assert "compartment" in compared, "the communities were never compared with brain against nerve cord"
+    for split in compared:
+        agreement = s["anatomy"][split]
         assert 2 <= agreement["regions"] <= totals["regions"], f"{split} labels an impossible number of regions"
         assert -1 <= agreement["adjusted_rand"] <= 1 and 0 <= agreement["nmi"] <= 1, f"{split} index out of range"
     mirror = s["mirrored"]

@@ -1,9 +1,15 @@
+import json
 import xml.etree.ElementTree as ET
 
 import numpy as np
 import pytest
 
 from pipeline import readme_assets as ra
+from pipeline.common import RESULTS
+
+
+def result(name: str) -> dict:
+    return json.loads((RESULTS / name).read_text(encoding="utf-8"))
 
 
 def test_linear_maps_endpoints_and_midpoint():
@@ -28,8 +34,9 @@ def test_pct(value, digits, expected):
 
 
 def test_count_and_signed():
-    assert ra.count(490884) == "490,884"
-    assert ra.count(36943.4) == "36,943"
+    assert ra.count(1234567) == "1,234,567"
+    assert ra.count(2500.4) == "2,500"
+    assert ra.count(2500.6) == "2,501"
     assert ra.signed(-0.1224, 3) == "−0.122"
     assert ra.signed(0.231, 3) == "0.231"
 
@@ -165,14 +172,34 @@ def test_build_is_deterministic(tmp_path):
 
 def test_headline_numbers_come_from_the_results():
     h = ra.headline(ra.load_inputs())
-    assert h["nodes"] == 23073
-    assert h["edges"] == 490884
-    assert h["neck_edges"] == 36943
-    assert f"{h['ratio']:.3f}" == "0.459"
-    assert f"{h['within']:.3f}" == "0.728"
-    assert ra.pct(h["swap"]) == "33.6%"
-    assert ra.pct(h["neck_edge_share"]) == "7.5%"
-    assert ra.pct(h["neck_cost_share"]) == "24.0%"
-    assert f"{h['routes']:.3f}" == "1.103"
-    assert f"{h['value_ratio']:.2f}" == "0.36"
-    assert f"{h['value_b2v']:.2f}" == "1.83"
+    graph = result("spatial_graph_summary.json")["spatial_graph"]
+    placement = result("spatial_optimality.json")["analyses"]
+    economy = result("wiring_economy_extensions.json")
+    neck = next(r for r in economy["cost_share"]["rows"] if r["label"] == "neck-crossing")
+    richclub = result("connective_richclub.json")
+    value = result("connective_value.json")
+    crossing = value["families"]["crossing_cost"]
+    routes_low = next(r for r in result("threshold_robustness.json")["thresholds"] if r["fraction"] == 0.005)
+
+    assert h["nodes"] == graph["nodes"]
+    assert h["edges"] == graph["edges"]
+    assert h["ratio"] == placement["primary"]["cost_ratio"]
+    assert h["within"] == placement["within_compartment"]["cost_ratio"]
+    assert h["swap"] == economy["local_optimum"]["reduction"]
+    assert h["swap_ratio"] == economy["local_optimum"]["final_cost"] / placement["primary"]["null_mean"]
+    assert h["neck_edges"] == neck["edges"]
+    assert h["neck_edge_share"] == neck["edge_share"]
+    assert h["neck_cost_share"] == neck["cost_share"]
+    assert h["neck_mean"] == neck["mean_length_um"]
+    assert h["mean_length"] == placement["primary"]["real"] / graph["edges"]
+    assert h["odds"] == richclub["whole_cns_membership"]["odds_ratio"]
+    assert h["routes"] == richclub["routes_top10"]["total"]["ratio"]
+    assert h["routes_low"] == routes_low["routes"]["total"]["ratio"]
+    assert h["value_ratio"] == crossing["flow"]["ratio"]
+    assert h["value_b2v"] == crossing["flow_brain_to_vnc"]["ratio"]
+    assert h["lost"] == crossing["flow"]["real"]
+    assert h["lost_longest"] == value["intact"]["flow"] - value["real"]["longest"]["flow"]
+    # A number added to the headline without a source here would otherwise go unchecked.
+    assert set(h) == {"nodes", "edges", "ratio", "within", "swap", "swap_ratio", "neck_edges", "neck_edge_share",
+                      "neck_cost_share", "neck_mean", "mean_length", "odds", "routes", "routes_low", "value_ratio",
+                      "value_b2v", "lost", "lost_longest"}

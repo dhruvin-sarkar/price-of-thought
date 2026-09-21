@@ -48,6 +48,8 @@ def check() -> str:
         "the tail is weighed against other alternatives"
     beaten = [n for n, c in t["comparisons"].items() if c["loglikelihood_ratio"] > 0 and c["p_value"] < 0.05]
     lost = [n for n, c in t["comparisons"].items() if c["loglikelihood_ratio"] < 0 and c["p_value"] < 0.05]
+    undecided = sorted(set(t["comparisons"]) - set(beaten) - set(lost))
+    assert not undecided, f"the tail fit is neither better nor worse than {', '.join(undecided)}"
 
     assert close(sum(r["wire_share"] for r in rows), sum(r["wire_um"] for r in rows) / s["total_wire_um"], rel=1e-3), \
         "the superclass shares do not match their wire"

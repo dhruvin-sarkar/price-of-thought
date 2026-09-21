@@ -72,8 +72,11 @@ def check() -> str:
         else:
             assert reached <= length_tradeoff.HALF, f"the {name} curve never halves but a crossing was recorded"
             assert 0 < share <= curves[name][-1]["wire_removed_share"], f"{name} crossing is off the curve"
-    if "halving_wire_ratio" in comparison:
-        half = comparison["wire_share_to_halve_efficiency"]
+    half = comparison["wire_share_to_halve_efficiency"]
+    both_halve = half[LONGEST] is not None and half[SHORTEST] is not None
+    assert ("halving_wire_ratio" in comparison) == both_halve, \
+        "the halving ratio is recorded exactly when both ends do halve efficiency"
+    if both_halve:
         assert close(comparison["halving_wire_ratio"], half[LONGEST] / half[SHORTEST], rel=1e-3), "halving ratio"
 
     assert same_text(result_text("length_tradeoff.md"), length_tradeoff.report(s)), "length_tradeoff.md is out of date"

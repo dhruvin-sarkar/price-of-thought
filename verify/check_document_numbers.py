@@ -1,10 +1,16 @@
 """Check the headline numbers in the paper and the README are the ones in the result files."""
 
+import re
+
+import pipeline.generative_comparison as generative_comparison
 from pipeline.common import ROOT
 from verify.common import result_json, run
 
 PAPER = ROOT / "paper" / "report.md"
 README = ROOT / "README.md"
+# A claim must sit on its own digits: "1.02" is not satisfied by the "1.02" inside "11.023".
+BEFORE = r"(?<![\d.,−-])"
+AFTER = r"(?!\d|[.,]\d)"
 
 
 def minus(value: float, digits: int) -> str:
@@ -27,7 +33,8 @@ def claims() -> list[tuple[str, str, tuple[str, ...]]]:
     concentration = result_json("wire_concentration.json")
     shares = {row["label"]: row for row in economy["cost_share"]["rows"]}
     both, paper = ("paper", "readme"), ("paper",)
-    reproduced = round(comparison["G"]["fraction_reproduced"] * 13)
+    properties = len(generative_comparison.PROPERTIES)
+    reproduced = round(comparison["G"]["fraction_reproduced"] * properties)
     tested = [row for row in atlas["neuropils"] if "cost_ratio" in row]
     cheapest, closest = min(tested, key=lambda r: r["cost_ratio"]), max(tested, key=lambda r: r["cost_ratio"])
     budget, tail = concentration["lorenz"]["all"], concentration["tail"]
@@ -59,8 +66,8 @@ def claims() -> list[tuple[str, str, tuple[str, ...]]]:
         ("ascending zero-value nodes", f"{price['ascending']['zero_value']} of {price['ascending']['n']:,}", paper),
         ("model G pseudo-R2", f"{fits['G']['pseudo_r2_mcfadden']:.3f}", paper),
         ("model G AUC", f"{fits['G']['cv_auc_mean']:.3f}", paper),
-        ("properties reproduced", f"{reproduced} of the 13", paper),
-        ("properties reproduced, README", f"{reproduced} of 13", ("readme",)),
+        ("properties reproduced", f"{reproduced} of the {properties}", paper),
+        ("properties reproduced, README", f"{reproduced} of {properties}", ("readme",)),
         ("route ratio at 0.5%", f"{robustness[0.005]['routes']['total']['ratio']:.3f}", paper),
         ("cable rho", f"{cable['spearman_rho']:.3f}", paper),
         ("wire inside one neuropil", f"{100 * atlas['totals']['share_within_one_neuropil']:.1f}%", both),
@@ -75,12 +82,19 @@ def claims() -> list[tuple[str, str, tuple[str, ...]]]:
     ]
 
 
+def occurrences(number: str, text: str) -> int:
+    """How often ``number`` is written out in ``text``, not counting the digits of some longer number."""
+    return len(re.findall(BEFORE + re.escape(number) + AFTER, text))
+
+
 def check() -> str:
     texts = {"paper": PAPER.read_text(encoding="utf-8"), "readme": README.read_text(encoding="utf-8")}
-    missing = [f"{what} ({number}) not in {doc}" for what, number, docs in claims() for doc in docs
-               if number not in texts[doc]]
+    counted = [(what, number, doc, occurrences(number, texts[doc]))
+               for what, number, docs in claims() for doc in docs]
+    missing = [f'{what} ("{number}") appears nowhere in the {doc}' for what, number, doc, n in counted if n == 0]
     assert not missing, f"{len(missing)} headline numbers differ from the results: {'; '.join(missing)}"
-    return f"{len(claims())} headline numbers in the paper and README match the result files"
+    return (f"{len(claims())} headline numbers are written out {sum(n for *_, n in counted)} times in the paper "
+            "and README, each as the result file has it")
 
 
 if __name__ == "__main__":

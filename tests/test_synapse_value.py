@@ -69,9 +69,23 @@ def test_decile_bounds_run_from_the_shortest_connection_to_the_longest():
 
 def test_correlate_recovers_a_perfect_monotone_relationship():
     lengths = np.arange(1.0, 31.0)
-    assert correlate(lengths, lengths * 3)["spearman_rho"] == pytest.approx(1.0)
-    assert correlate(lengths, lengths * 3)["pearson_log_r"] == pytest.approx(1.0, abs=1e-6)
+    rising = correlate(lengths, lengths * 3)
+    assert rising["spearman_rho"] == pytest.approx(1.0)
+    assert rising["pearson_log_r"] == pytest.approx(1.0, abs=1e-6)
     assert correlate(lengths, 1000.0 / lengths)["spearman_rho"] == pytest.approx(-1.0)
+    # Thirty points on an exact line leave no room for chance.
+    assert rising["spearman_p"] == 0.0
+    assert rising["pearson_log_p"] == 0.0
+
+
+def test_correlate_reports_a_large_p_value_for_an_unrelated_pair():
+    lengths = np.arange(1.0, 31.0)
+    synapses = np.array([5.0, 4.0] * 15)
+    unrelated = correlate(lengths, synapses)
+
+    assert abs(unrelated["spearman_rho"]) < 0.2
+    assert unrelated["spearman_p"] > 0.2
+    assert unrelated["pearson_log_p"] > 0.2
 
 
 PATTERN = np.array([4.0, 5.0, 6.0, 5.0, 5.0, 5.0, 4.0, 6.0, 5.0, 5.0])

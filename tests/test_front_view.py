@@ -35,21 +35,25 @@ def test_silhouette_orders_separate_bodies_largest_first():
 
 
 def test_wire_sample_is_sorted_unique_and_seeded():
-    a = front_view.wire_sample(36943, 3000, 7)
+    a = front_view.wire_sample(40000, 3000, 7)
     assert len(a) == len(np.unique(a)) == 3000
     assert np.all(np.diff(a) > 0)
-    assert a.max() < 36943
-    assert np.array_equal(a, front_view.wire_sample(36943, 3000, 7))
-    assert not np.array_equal(a, front_view.wire_sample(36943, 3000, 8))
+    assert a.max() < 40000
+    assert np.array_equal(a, front_view.wire_sample(40000, 3000, 7))
+    assert not np.array_equal(a, front_view.wire_sample(40000, 3000, 8))
 
 
 def test_wire_sample_caps_at_the_population():
     assert np.array_equal(front_view.wire_sample(5, 10, 0), np.arange(5))
 
 
+def result(name: str) -> dict:
+    return json.loads((RESULTS / name).read_text(encoding="utf-8"))
+
+
 def test_committed_front_view_is_consistent():
-    summary = json.loads((RESULTS / "front_view.json").read_text(encoding="utf-8"))
-    assert summary["crossing_edges"] == 36943
+    summary = result("front_view.json")
+    assert summary["crossing_edges"] == result("connective_value.json")["removal_sets"]["crossing"]["edges"]
     assert summary["sample"]["n"] == len(summary["wires"]) == front_view.N_WIRES
     lengths = [w[4] for w in summary["wires"]]
     assert lengths == sorted(lengths)

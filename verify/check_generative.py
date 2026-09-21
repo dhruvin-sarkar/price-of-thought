@@ -70,10 +70,10 @@ def check() -> str:
         base.write_text(fitted, encoding="utf-8")
         expected = regenerated_report(comparison, comp, report=base)
     assert same_text(result_text("generative_model.md"), expected), "generative_model.md is out of date"
-    g = comp["models"]["G"]
+    g, properties = comp["models"]["G"], len(comparison.PROPERTIES)
     return (f"{len(fits['models'])} nested fits consistent; {comparison.N_SYNTHETIC} graphs per model reproduce every "
-            f"interval; model G reproduces {round(g['fraction_reproduced'] * 13)} of 13; real values match the "
-            f"analyses that measured them; report current")
+            f"interval; model G reproduces {round(g['fraction_reproduced'] * properties)} of {properties}; real "
+            f"values match the analyses that measured them; report current")
 
 
 if __name__ == "__main__":

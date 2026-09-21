@@ -27,6 +27,7 @@ def check() -> str:
             if not target.resolve().exists():
                 broken.append(f"{doc.relative_to(ROOT).as_posix()} -> {target.resolve().relative_to(ROOT).as_posix()}")
     assert not broken, f"{len(broken)} broken references: {'; '.join(sorted(set(broken)))}"
+    assert checked, "no document pointed at a file, so nothing was resolved"
     return f"{checked} file references in {len(documents())} documents all resolve"
 
 

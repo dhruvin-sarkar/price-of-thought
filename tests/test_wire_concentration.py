@@ -54,8 +54,10 @@ def test_summary_reports_the_count_total_and_upper_quantiles():
 def test_tail_recovers_the_exponent_of_a_power_law_sample():
     fit = tail(power_law_sample(alpha=2.5, xmin=60.0, size=2000, seed=1))
     assert fit["alpha"] == pytest.approx(2.5, abs=0.3)
-    assert fit["xmin_um"] >= 1
-    assert 0 < fit["tail_edges"] <= 2000
+    # The whole sample is power-law above 60 µm, so the search for the lower bound should land there and
+    # keep all but a handful of the draws.
+    assert fit["xmin_um"] == pytest.approx(60.0, abs=5.0)
+    assert 1900 <= fit["tail_edges"] <= 2000
     assert set(fit["comparisons"]) == {"lognormal", "exponential", "truncated_power_law"}
     for comparison in fit["comparisons"].values():
         assert np.isfinite(comparison["loglikelihood_ratio"])

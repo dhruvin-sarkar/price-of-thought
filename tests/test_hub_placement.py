@@ -12,6 +12,7 @@ from pipeline.hub_placement import (
     distance_to_centroid,
     hub_placement,
     partner_distance,
+    partner_test,
     random_partner_distance,
     report,
 )
@@ -59,6 +60,18 @@ def test_correlate_recovers_a_perfect_monotone_relationship():
     falling = correlate(np.exp(-distance / 4), distance)
     assert falling["spearman_rho"] == pytest.approx(-1.0)
     assert falling["pearson_log_r"] == pytest.approx(-1.0, abs=1e-6)
+    # Twenty points on an exact curve leave no room for chance, in either direction.
+    assert (rising["spearman_p"], rising["pearson_log_p"]) == (0.0, 0.0)
+    assert (falling["spearman_p"], falling["pearson_log_p"]) == (0.0, 0.0)
+
+
+def test_correlate_reports_a_large_p_value_for_a_quantity_unrelated_to_distance():
+    distance = np.arange(1.0, 21.0)
+    unrelated = correlate(np.array([2.0, 1.0] * 10), distance)
+
+    assert abs(unrelated["spearman_rho"]) < 0.2
+    assert unrelated["spearman_p"] > 0.2
+    assert unrelated["pearson_log_p"] > 0.2
 
 
 def test_binned_splits_into_equal_count_bins_ordered_by_the_value():
@@ -156,3 +169,52 @@ def test_report_states_the_headline_numbers_it_was_given(chain):
     assert "100.0% of types sit nearer their own partners" in text
     assert "| all | degree | 12 |" in text
     assert "![Hub placement](hub_placement.png)" in text
+
+
+def ring_graph(n: int = 24, seed: int = 4) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Positions, edges and total degree of a ring of types wired to two neighbours each, placed at random."""
+    positions = np.random.default_rng(seed).uniform(0, 500, size=(n, 3))
+    edges = np.array([[i, (i + 1) % n] for i in range(n)] + [[i, (i + 7) % n] for i in range(n)])
+    return positions, edges, np.bincount(edges.ravel(), minlength=n)
+
+
+def test_partner_test_reports_each_scope_against_its_own_draws():
+    positions, edges, degree = ring_graph()
+    masks = {"all": np.ones(24, dtype=bool), "half": np.arange(24) < 12}
+    scopes, index, real, _ = partner_test(positions, edges, degree, masks, seed=13, permutations=200)
+
+    assert index.tolist() == list(range(24))
+    assert real == pytest.approx(partner_distance(edges, positions, degree))
+    assert set(scopes) == {"all", "half"}
+    for name, mask in masks.items():
+        assert scopes[name]["permutations"] == 200
+        assert scopes[name]["real_um"] == pytest.approx(round(float(real[mask].mean()), 2))
+        assert 0 <= scopes[name]["n_at_or_below_real"] <= 200
+
+
+def test_partner_z_scores_match_a_spread_computed_from_the_draws_themselves():
+    # The per-type z-score is accumulated from running sums of the draws and their squares, which is where
+    # cancellation would bite; the same draws are kept in full here and their spread taken directly.
+    positions, edges, degree = ring_graph()
+    masks = {"all": np.ones(24, dtype=bool)}
+    scopes, index, real, z = partner_test(positions, edges, degree, masks, seed=13, permutations=200)
+
+    rng = np.random.default_rng(13)
+    drawn = np.array([random_partner_distance(positions, index, degree[index], rng) for _ in range(200)])
+
+    assert z == pytest.approx((real - drawn.mean(axis=0)) / drawn.std(axis=0, ddof=1), rel=1e-8)
+    assert np.isfinite(z).all()
+    assert scopes["all"]["null_mean_um"] == pytest.approx(round(float(drawn.mean(axis=1).mean()), 2))
+    assert scopes["all"]["null_sd_um"] == pytest.approx(round(float(drawn.mean(axis=1).std(ddof=1)), 3))
+    assert scopes["all"]["n_at_or_below_real"] == int((drawn.mean(axis=1) <= real.mean()).sum())
+
+
+def test_a_type_with_no_partner_is_left_out_of_the_partner_test():
+    positions, edges, degree = ring_graph()
+    positions = np.vstack([positions, [[0.0, 0.0, 0.0]]])
+    degree = np.append(degree, 0)
+    _, index, real, z = partner_test(positions, edges, degree, {"all": np.ones(25, dtype=bool)},
+                                     seed=13, permutations=50)
+
+    assert 24 not in index
+    assert len(index) == len(real) == len(z) == 24

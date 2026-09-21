@@ -56,7 +56,11 @@ def test_the_hub_placement_correlations_and_partner_nulls_are_exported_whole(dat
     assert len(data["hubs"]["correlations"]) == len(hub_placement["correlations"])
     assert len(data["hubs"]["degree_bins"]) == len(hub_placement["degree_bins"])
     assert set(data["hubs"]["partners"]["scopes"]) == set(hub_placement["partners"]["scopes"])
-    assert data["hubs"]["partners"]["extremes"], "the types furthest below their own null are shown"
+    # The page shows a prefix of the extremes, which are saved furthest below their own null first.
+    extremes, saved = data["hubs"]["partners"]["extremes"], hub_placement["partners"]["extremes"]
+    assert extremes, "the types furthest below their own null are shown"
+    assert [(r["cell_type"], r["side"], r["z_score"]) for r in extremes] == \
+        [(r["cell_type"], r["side"], r["z_score"]) for r in saved[:len(extremes)]]
 
 
 def test_the_neuropils_outside_a_pair_are_exported_rather_than_dropped(data):

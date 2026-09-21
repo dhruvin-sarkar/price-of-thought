@@ -16,8 +16,10 @@ def check() -> str:
     body, _, references = PAPER.read_text(encoding="utf-8").partition("\n# References\n")
     assert references, "the paper has no References section"
     entries = [line.strip() for line in references.strip().split("\n") if line.strip()]
+    assert entries, "the paper's References section lists no reference"
     reviewed = result_text("prior_art.md").partition("## References")[2]
     verified = {line[2:].strip() for line in reviewed.split("\n") if line.startswith("- ")}
+    assert verified, "prior_art.md lists no verified reference to check the paper against"
 
     missing = [e[:60] for e in entries if e not in verified]
     assert not missing, f"{len(missing)} references not in the verified prior-art list: {'; '.join(missing)}"

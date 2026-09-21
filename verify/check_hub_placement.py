@@ -49,6 +49,7 @@ def check() -> str:
             f"{scope} p-value arithmetic"
 
     extremes = partners["extremes"]
+    assert extremes, "no type is listed among the extremes"
     assert len(extremes) <= hub_placement.EXTREMES, "more extremes are listed than asked for"
     assert [r["z_score"] for r in extremes] == sorted(r["z_score"] for r in extremes), \
         "the extremes are not ordered by z-score"

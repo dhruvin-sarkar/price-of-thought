@@ -62,8 +62,8 @@ export default function Placement({ data }) {
               <>
                 Each test keeps the graph and the set of positions and shuffles only which cell type sits where, 1000
                 times. Bars give the real cost as a share of the permuted mean, so 1.0 is random placement. The mark
-                at {fixed(h.ratio * (1 - h.swap), 3)} is where cost-reducing swaps take the primary layout. Hover a
-                bar for its real cost, its permuted mean and its z-score.
+                at {fixed(h.ratio * (1 - h.swap), 3)} is where cost-reducing swaps take the primary layout. Hover or
+                focus a bar for its real cost, its permuted mean and its z-score.
               </>
             }
           >

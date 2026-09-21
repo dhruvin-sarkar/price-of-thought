@@ -8,6 +8,8 @@ const MODELS = [
   { value: "G_deg", label: "Model G + degrees" },
 ];
 
+const modelLabel = (value) => MODELS.find((option) => option.value === value).label;
+
 export default function Model({ data }) {
   const [model, setModel] = useState("G");
   const comparison = data.generative.comparison.models[model];
@@ -31,7 +33,7 @@ export default function Model({ data }) {
           <TextBlock
             notes={[
               <Keynote key="reproduced" value={`${reproduced} of ${properties.length}`}>
-                properties of the real graph reproduced by {model === "G" ? "model G" : "model G + degrees"}
+                properties of the real graph reproduced by {modelLabel(model).toLowerCase()}
               </Keynote>,
               <Sidenote key="fit" title="It is not a bad fit">
                 Model G reaches a cross-validated AUC of {fixed(data.generative.fit.models.G.cv_auc_mean, 3)} at
@@ -61,20 +63,23 @@ export default function Model({ data }) {
           </TextBlock>
 
           <Figure
-            number={11}
+            number={12}
             title="Distance, compartment and cell class reproduce the rich-to-rich routes, and little else"
             caption={
               <>
                 Each property of the real graph as a multiple of the mean of {data.generative.comparison.n_synthetic}{" "}
                 synthetic graphs, on a logarithmic axis. The pale band is the synthetic central 95%: a hollow point
-                inside it is a property the model reproduces, a filled point outside it is one it misses. Hover a row
-                for the values in their own units.
+                inside it is a property the model reproduces, a filled point outside it is one it misses. Hover or focus
+                a row for the values in their own units.
               </>
             }
             controls={<Segmented label="Wiring model" options={MODELS} value={model} onChange={setModel} />}
           >
             <Generative data={data} model={model} />
-            <More summary="Values behind Figure 11">
+            <p className="visually-hidden" aria-live="polite">
+              {modelLabel(model)}: {reproduced} of {properties.length} properties reproduced.
+            </p>
+            <More summary="Values behind Figure 12">
               <GenerativeTable data={data} model={model} />
               <FitTable data={data} />
               <p className="caption">

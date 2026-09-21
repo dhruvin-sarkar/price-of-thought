@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { ChartFrame, Row, Tooltip, XAxis, barPath } from "../Chart.jsx";
+import { useRovingRows } from "./useRovingRows.js";
+import { TableWrap } from "../ui.jsx";
 import { count, fixed, pValue, percent, times } from "../../lib/format.js";
 import { linear } from "../../lib/scales.js";
 
@@ -18,6 +20,10 @@ function RatioRows({ rows, title, label }) {
   const [hover, setHover] = useState(null);
   const margin = { top: 30, right: 54, bottom: 46, left: 76 };
   const height = margin.top + margin.bottom + rows.length * ROW;
+  const rowProps = useRovingRows(
+    rows.map((row) => row.key),
+    (key) => setHover(key == null ? null : rows.findIndex((row) => row.key === key)),
+  );
 
   return (
     <ChartFrame
@@ -67,7 +73,22 @@ function RatioRows({ rows, title, label }) {
               const y = i * step + step / 2;
               const [lo, hi] = row.band;
               return (
-                <g key={row.key}>
+                <g
+                  key={row.key}
+                  {...rowProps(row.key)}
+                  role="img"
+                  aria-label={`${row.title}: ${fixed(row.ratio, 3)} times the rewired mean, ${count(
+                    row.real,
+                  )} real routes against ${count(row.nullMean)}, p ${pValue(row.p)}`}
+                >
+                  <rect
+                    className="row-band"
+                    x={-margin.left + 2}
+                    width={width + margin.left + margin.right - 4}
+                    y={i * step + 1}
+                    height={step - 2}
+                    rx={3}
+                  />
                   {/* The band the rewirings occupy; a point outside it is the result. */}
                   <path data-mark="bar" d={barPath(x(clamp(lo)), y - 5, x(clamp(hi)) - x(clamp(lo)), 10, 2)} fill="var(--wash)" />
                   <text className="row-label" x={-12} y={y} dy="0.32em" textAnchor="end">
@@ -145,7 +166,7 @@ export function RichClubTable({ data }) {
   ];
   return (
     <>
-      <div className="table-wrap">
+      <TableWrap label="Values behind Figure 8: rich-to-rich routes by direction">
         <table className="data">
           <caption>Routes counted with the top 10% of partners on each side treated as rich.</caption>
           <thead>
@@ -179,9 +200,9 @@ export function RichClubTable({ data }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableWrap>
       {data.robustness && (
-        <div className="table-wrap">
+        <TableWrap label="Values behind Figure 8: the same tests at four edge thresholds">
           <table className="data">
             <caption>The same tests at four edge thresholds.</caption>
             <thead>
@@ -217,7 +238,7 @@ export function RichClubTable({ data }) {
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       )}
       <p className="caption">
         p = (1 + k) / 1001, where k is the number of rewirings with at least as many routes; 0.001 is the smallest

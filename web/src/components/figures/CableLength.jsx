@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { ChartFrame, Row, Tooltip, XAxis, YAxis } from "../Chart.jsx";
+import { TableWrap } from "../ui.jsx";
 import { count, fixed, micron, pValue, superclassName } from "../../lib/format.js";
 import { log, logTicks } from "../../lib/scales.js";
 
@@ -125,7 +126,7 @@ export default function CableLength({ data }) {
 
 export function CableTable({ data }) {
   return (
-    <div className="table-wrap">
+    <TableWrap label="Values behind Figure 13: cable length against soma-to-output distance by class">
       <table className="data">
         <caption>
           Skeleton cable length against soma-to-output distance for {count(data.cable.analysed)} sampled neurons.
@@ -169,6 +170,6 @@ export function CableTable({ data }) {
           })}
         </tbody>
       </table>
-    </div>
+    </TableWrap>
   );
 }

@@ -191,7 +191,7 @@ export default function Connective({ data }) {
                 removed. Most types can be removed at no cost to flow. Among descending types price and value are
                 correlated (ρ = {fixed(descending.spearman_rho, 3)}), but at a given number of connections longer
                 wiring buys nothing more (partial ρ = {fixed(descending.partial_rho, 3)}); among ascending types they
-                are unrelated. Hover a point for its cell type.
+                are unrelated. Figure 11 lists every type with the same two numbers.
               </>
             }
           >
@@ -203,6 +203,7 @@ export default function Connective({ data }) {
 
           <Figure
             id="lookup"
+            number={11}
             title="Every connective cell type, with what its wiring costs and what it carries"
             caption="Sort by any column, or search for a cell type by name. Price is the summed straight-line length of a type's neck-crossing connections."
           >

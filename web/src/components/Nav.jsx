@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { repoUrl } from "../lib/data.js";
-import { useReducedMotion } from "../lib/hooks.js";
 import { useTheme } from "../lib/theme.js";
 
 const LINKS = [
@@ -49,22 +48,18 @@ function ThemeIcon({ dark }) {
 export default function Nav({ ready = true }) {
   const [current, setCurrent] = useState(null);
   const [theme, toggleTheme] = useTheme();
-  const strip = useRef(null);
-  const reduced = useReducedMotion();
+  const bar = useRef(null);
 
-  // On narrow screens the links scroll sideways; bring the current one into the strip without moving the page.
-  useEffect(() => {
-    const box = strip.current;
-    const link = current && box?.querySelector(`a[href="#${current}"]`);
-    if (!link || box.scrollWidth <= box.clientWidth) return;
-    const edge = 32;
-    const outer = box.getBoundingClientRect();
-    const inner = link.getBoundingClientRect();
-    let delta = 0;
-    if (inner.left < outer.left) delta = inner.left - outer.left - 8;
-    else if (inner.right > outer.right - edge) delta = inner.right - outer.right + edge;
-    if (delta) box.scrollTo({ left: box.scrollLeft + delta, behavior: reduced ? "auto" : "smooth" });
-  }, [current, reduced]);
+  // The links take a second row on a narrow screen, so the height anything scrolled to must clear is measured.
+  useLayoutEffect(() => {
+    const node = bar.current;
+    if (!node) return undefined;
+    const publish = () => document.documentElement.style.setProperty("--nav-bar", `${node.offsetHeight}px`);
+    publish();
+    const observer = new ResizeObserver(publish);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!ready) return undefined;
@@ -99,13 +94,13 @@ export default function Nav({ ready = true }) {
   }, [ready]);
 
   return (
-    <header className="nav">
+    <header className="nav" ref={bar}>
       <div className="wrap nav-inner">
         <a className="wordmark" href="#main">
           <Mark />
           The Price of Thought
         </a>
-        <nav className="nav-links" aria-label="Sections" ref={strip}>
+        <nav className="nav-links" aria-label="Sections">
           {LINKS.map(([id, label]) => (
             <a
               key={id}

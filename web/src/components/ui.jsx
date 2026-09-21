@@ -16,7 +16,8 @@ export function useHeading(level) {
 
 /**
  * A figure: its number and title with optional controls on the right, the graphic, and a caption on how to read
- * it. The number counts itself with a CSS counter; pass `number` to set it explicitly, matching the README.
+ * it. `number` is required of every numbered figure and runs in its own sequence, which is longer than the
+ * README's: the site splits the wire atlas in two and carries the concentration and cell-class figures separately.
  * The number is hidden from assistive technology, so the figure is named by its title alone.
  * `variant="field"` sets the figure on the black field.
  */
@@ -125,17 +126,15 @@ export function Keynote({ value, children }) {
   );
 }
 
-/** A short list of headline figures under their descriptions. */
-export function Facts({ items }) {
+/**
+ * A table that scrolls sideways when it is wider than the page. The scroller is a focus stop and carries a name,
+ * so a reader without a pointer can reach it and scroll it.
+ */
+export function TableWrap({ label, children }) {
   return (
-    <dl className="facts">
-      {items.map(({ value, label }) => (
-        <div key={label}>
-          <dd>{value}</dd>
-          <dt>{label}</dt>
-        </div>
-      ))}
-    </dl>
+    <div className="table-wrap" tabIndex={0} role="region" aria-label={label}>
+      {children}
+    </div>
   );
 }
 

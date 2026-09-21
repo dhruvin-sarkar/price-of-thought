@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { ChartFrame, Row, Tooltip, XAxis, barPath } from "../Chart.jsx";
+import { useRovingRows } from "./useRovingRows.js";
+import { TableWrap } from "../ui.jsx";
 import { fixed, propertyName, propertyValue } from "../../lib/format.js";
+import { useMedia } from "../../lib/hooks.js";
 import { log } from "../../lib/scales.js";
 
 const ROW = 30;
+// Narrow rows give the property names a line of their own above the marks, so the plot keeps a usable width.
+const STACKED_ROW = 48;
 const DOMAIN = [0.55, 30];
 const TICKS = [1, 2, 5, 10, 20];
 
@@ -23,9 +28,14 @@ function relative(properties) {
 
 export default function Generative({ data, model }) {
   const [hover, setHover] = useState(null);
+  const wide = useMedia("(min-width: 700px)");
   const rows = relative(data.generative.comparison.models[model].properties);
-  const margin = { top: 30, right: 56, bottom: 46, left: 196 };
-  const height = margin.top + margin.bottom + rows.length * ROW;
+  const margin = { top: 30, right: 56, bottom: 46, left: wide ? 196 : 12 };
+  const height = margin.top + margin.bottom + rows.length * (wide ? ROW : STACKED_ROW);
+  const rowProps = useRovingRows(
+    rows.map((row) => row.key),
+    (key) => setHover(key == null ? null : rows.findIndex((row) => row.key === key)),
+  );
 
   return (
     <ChartFrame
@@ -77,17 +87,58 @@ export default function Generative({ data, model }) {
               format={(t) => `${t}×`}
               title="Real value / synthetic mean"
             />
-            <line x1={x(1)} x2={x(1)} y1={-6} y2={inner} stroke="var(--rule-strong)" strokeDasharray="3 3" />
+            {/* Where the real value equals the synthetic mean. Narrow, the property names run above the marks, so
+                the rule is cut into one segment per row and passes behind them rather than through them. */}
+            {wide ? (
+              <line x1={x(1)} x2={x(1)} y1={-6} y2={inner} stroke="var(--rule-strong)" strokeDasharray="3 3" />
+            ) : (
+              rows.map((row, i) => (
+                <line
+                  key={row.key}
+                  x1={x(1)}
+                  x2={x(1)}
+                  y1={i * step + 18}
+                  y2={(i + 1) * step}
+                  stroke="var(--rule-strong)"
+                  strokeDasharray="3 3"
+                />
+              ))
+            )}
             {rows.map((row, i) => {
-              const y = i * step + step / 2;
+              const top = i * step;
+              const y = wide ? top + step / 2 : top + step / 2 + 9;
               const lo = Math.max(DOMAIN[0], row.band[0]);
               const hi = Math.min(DOMAIN[1], row.band[1]);
               const at = Math.min(Math.max(row.ratio, DOMAIN[0]), DOMAIN[1]);
               return (
-                <g key={row.key}>
-                  <text className="row-label" x={-12} y={y} dy="0.32em" textAnchor="end">
-                    {row.label}
-                  </text>
+                <g
+                  key={row.key}
+                  {...rowProps(row.key)}
+                  role="img"
+                  aria-label={`${row.label}: ${fixed(row.ratio, 2)} times the synthetic mean, real ${propertyValue(
+                    row.key,
+                    row.property.real,
+                  )} against ${propertyValue(row.key, row.property.synthetic_mean)}, ${
+                    row.property.reproduced ? "reproduced" : "not reproduced"
+                  }`}
+                >
+                  <rect
+                    className="row-band"
+                    x={-margin.left + 2}
+                    width={width + margin.left + margin.right - 4}
+                    y={top + 1}
+                    height={step - 2}
+                    rx={3}
+                  />
+                  {wide ? (
+                    <text className="row-label" x={-12} y={y} dy="0.32em" textAnchor="end">
+                      {row.label}
+                    </text>
+                  ) : (
+                    <text className="row-label" x={0} y={top + 12}>
+                      {row.label}
+                    </text>
+                  )}
                   <path data-mark="bar" d={barPath(x(lo), y - 4.5, Math.max(3, x(hi) - x(lo)), 9, 2)} fill="var(--wash)" />
                   <circle
                     data-mark="fade"
@@ -114,7 +165,7 @@ export default function Generative({ data, model }) {
 export function GenerativeTable({ data, model }) {
   const properties = data.generative.comparison.models[model].properties;
   return (
-    <div className="table-wrap">
+    <TableWrap label="Values behind Figure 12: every property against the synthetic graphs">
       <table className="data">
         <caption>
           A property counts as reproduced when the real value falls inside the central 95% of the{" "}
@@ -149,7 +200,7 @@ export function GenerativeTable({ data, model }) {
           ))}
         </tbody>
       </table>
-    </div>
+    </TableWrap>
   );
 }
 
@@ -162,7 +213,7 @@ const FITS = [
 
 export function FitTable({ data }) {
   return (
-    <div className="table-wrap">
+    <TableWrap label="Values behind Figure 12: the logistic fits of edge presence">
       <table className="data">
         <caption>Logistic fits of edge presence, with five-fold cross-validated AUC.</caption>
         <thead>
@@ -193,6 +244,6 @@ export function FitTable({ data }) {
           })}
         </tbody>
       </table>
-    </div>
+    </TableWrap>
   );
 }

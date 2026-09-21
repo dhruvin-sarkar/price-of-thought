@@ -26,6 +26,30 @@ export function useMedia(query) {
   return matches;
 }
 
+/**
+ * False on the first render and true once the browser has painted and has time to spare, so a caller can start
+ * work too heavy to sit in front of the first frame. The timeout caps the wait on a main thread that never idles.
+ */
+export function useIdle(timeout = 2000) {
+  const [idle, setIdle] = useState(false);
+  useEffect(() => {
+    if (typeof requestIdleCallback === "function") {
+      const id = requestIdleCallback(() => setIdle(true), { timeout });
+      return () => cancelIdleCallback(id);
+    }
+    // Safari has no idle callback; two frames put the work behind the first paint, which is what this is for.
+    let inner = 0;
+    const outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => setIdle(true));
+    });
+    return () => {
+      cancelAnimationFrame(outer);
+      cancelAnimationFrame(inner);
+    };
+  }, [timeout]);
+  return idle;
+}
+
 // One observer for every measured element, so a resize reaches all charts in a single callback and one render.
 const widthListeners = new Map();
 let widthObserver = null;

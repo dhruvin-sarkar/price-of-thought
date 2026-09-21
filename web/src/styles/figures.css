@@ -1,12 +1,7 @@
-/* Figures are numbered as they are in the README, so a reader can move between the two. */
-main {
-  counter-reset: figure;
-}
-
+/* Every figure carries its own number; there is no fallback, so a figure missing one shows an empty slot. */
 .figure {
   margin: 3.25rem 0 0;
   min-width: 0;
-  counter-increment: figure;
 }
 
 .figure-head {
@@ -37,10 +32,6 @@ main {
   font-weight: 500;
   letter-spacing: 0;
   color: var(--ink-3);
-}
-
-.figure-number:empty::before {
-  content: "Figure " counter(figure);
 }
 
 .figure-controls {
@@ -266,10 +257,37 @@ main {
   box-shadow: 0 0 0 1px var(--field-rule), 0 10px 26px rgb(0 0 0 / 0.6);
 }
 
+/*
+ * One row of a chart, reachable in turn with the arrow keys. The band is the focus ring: the row's own marks are
+ * too thin to carry an outline, and an outline on the group would trace their bounding box rather than the row.
+ */
+.chart .row-mark {
+  outline: none;
+}
+
+.chart .row-band {
+  fill: none;
+  stroke: none;
+}
+
+.chart .row-mark:focus-visible .row-band {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+:is(.field, .hero) .chart .row-mark:focus-visible .row-band {
+  stroke: var(--field-ink);
+}
+
 /* Tables */
 .table-wrap {
   overflow-x: auto;
   overscroll-behavior-x: contain;
+}
+
+/* A scroller is a focus stop, so its outline must sit inside it rather than under the rule of the row above. */
+.table-wrap:focus-visible {
+  outline-offset: -2px;
 }
 
 table.data {
@@ -409,8 +427,9 @@ details.more[open] summary {
   gap: 1.5rem;
 }
 
+/* The track floors at 20rem so two panels never crowd, but never below the column it sits in. */
 .panels.is-two {
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
   gap: 1.5rem clamp(1.5rem, 3vw, 2.5rem);
 }
 

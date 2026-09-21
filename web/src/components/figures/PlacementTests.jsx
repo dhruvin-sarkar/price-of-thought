@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { ChartFrame, Row, Tooltip, XAxis, barPath } from "../Chart.jsx";
+import { useRovingRows } from "./useRovingRows.js";
+import { TableWrap } from "../ui.jsx";
 import { count, fixed, millimetre, pValue, percent, times } from "../../lib/format.js";
 import { useMedia } from "../../lib/hooks.js";
 import { linear } from "../../lib/scales.js";
@@ -18,14 +20,22 @@ export function rows(data) {
   ].map(([label, result, kind]) => ({ label, result, kind }));
 }
 
+const testName = (test) => `${test.label}${test.kind === "primary" ? " (primary)" : ""}`;
+
 export default function PlacementTests({ data }) {
   const [hover, setHover] = useState(null);
   const wide = useMedia("(min-width: 700px)");
   const tests = rows(data);
   const swapped = data.placement.primary.cost_ratio * (1 - data.swaps.reduction);
-  const margin = { top: 34, right: 56, bottom: 46, left: wide ? 232 : 12 };
-  const step = wide ? ROW : ROW + 20;
+  // Wide enough for the longest row name; the others are set against the same right edge.
+  const margin = { top: 34, right: 56, bottom: 46, left: wide ? 252 : 12 };
+  // Narrow rows carry the name above the bar, and the first also carries the swap label below it.
+  const step = wide ? ROW : ROW + 26;
   const height = margin.top + margin.bottom + tests.length * step;
+  const rowProps = useRovingRows(
+    tests.map((test) => test.label),
+    (label) => setHover(label == null ? null : { index: tests.findIndex((test) => test.label === label) }),
+  );
 
   return (
     <ChartFrame
@@ -65,6 +75,7 @@ export default function PlacementTests({ data }) {
       {({ width, height: inner }) => {
         const x = linear([0, 1.08], [0, width]);
         const rowHeight = inner / tests.length;
+        const firstBar = wide ? rowHeight / 2 - 9 : rowHeight / 2 + 2;
         return (
           <g>
             <XAxis
@@ -75,8 +86,22 @@ export default function PlacementTests({ data }) {
               format={(t) => (t === 1 ? "1.0" : t.toFixed(2))}
               title="Cost as a share of the permuted mean"
             />
-            {/* Random placement is the baseline every bar is read against. */}
-            <line x1={x(1)} x2={x(1)} y1={-10} y2={inner} stroke="var(--rule-strong)" strokeDasharray="3 3" />
+            {/* Random placement is the baseline every bar is read against. Narrow, the test names run across the
+                plot, so the rule is broken where each one sits and passes behind it. */}
+            {(wide
+              ? [[-10, inner]]
+              : [[-10, 8], ...tests.map((_, i) => [i * rowHeight + 28, Math.min((i + 1) * rowHeight + 8, inner)])]
+            ).map(([y1, y2]) => (
+              <line
+                key={y1}
+                x1={x(1)}
+                x2={x(1)}
+                y1={y1}
+                y2={y2}
+                stroke="var(--rule-strong)"
+                strokeDasharray="3 3"
+              />
+            ))}
             <text className="direct-label" x={x(1)} y={-18} textAnchor="end">
               Random placement
             </text>
@@ -85,9 +110,24 @@ export default function PlacementTests({ data }) {
               const top = i * rowHeight;
               const barTop = wide ? top + rowHeight / 2 - 9 : top + rowHeight / 2 + 2;
               const active = hover?.index === i;
-              const name = `${test.label}${test.kind === "primary" ? " (primary)" : ""}`;
+              const name = testName(test);
               return (
-                <g key={test.label}>
+                <g
+                  key={test.label}
+                  {...rowProps(test.label)}
+                  role="img"
+                  aria-label={`${name}: ${fixed(test.result.cost_ratio, 3)} of the permuted mean, real ${millimetre(
+                    test.result.real,
+                  )} against ${millimetre(test.result.null_mean)}, z ${fixed(test.result.z_score, 1)}`}
+                >
+                  <rect
+                    className="row-band"
+                    x={-margin.left + 2}
+                    width={width + margin.left + margin.right - 4}
+                    y={top + 1}
+                    height={rowHeight - 2}
+                    rx={3}
+                  />
                   {wide ? (
                     <text className="row-label" x={-14} y={top + rowHeight / 2} dy="0.32em" textAnchor="end">
                       {name}
@@ -111,16 +151,24 @@ export default function PlacementTests({ data }) {
             })}
 
             {/* Where cost-reducing swaps take the primary layout: a lower bound on how far from optimal it is. */}
+            {/* Wide, the rule reaches into the top margin for its label; narrow, the first row's name is there, */}
+            {/* so the rule keeps to its own bar and the label hangs under it. */}
             <g>
               <line
                 x1={x(swapped)}
                 x2={x(swapped)}
-                y1={rowHeight * 0.2}
-                y2={rowHeight * 0.86}
+                y1={wide ? 0 : firstBar - 6}
+                y2={wide ? rowHeight * 0.86 : firstBar + 24}
                 stroke="var(--wire-ink)"
                 strokeWidth="2"
               />
-              <text className="mark-label" x={x(swapped)} y={rowHeight * 0.1} textAnchor="middle" fill="var(--wire-ink)">
+              <text
+                className="mark-label"
+                x={x(swapped)}
+                y={wide ? -6 : firstBar + 37}
+                textAnchor="middle"
+                fill="var(--wire-ink)"
+              >
                 {fixed(swapped, 3)} after swaps
               </text>
             </g>
@@ -135,7 +183,7 @@ export default function PlacementTests({ data }) {
 export function PlacementTable({ data }) {
   return (
     <>
-      <div className="table-wrap">
+      <TableWrap label="Values behind Figure 1: the six permutation tests">
         <table className="data">
           <thead>
             <tr>
@@ -155,20 +203,20 @@ export function PlacementTable({ data }) {
             </tr>
           </thead>
           <tbody>
-            {rows(data).map(({ label, result, kind }) => (
-              <tr key={label}>
-                <th scope="row">{`${label}${kind === "primary" ? " (primary)" : ""}`}</th>
-                <td className="num-col">{fixed(result.cost_ratio, 3)}</td>
-                <td className="num-col">{fixed(result.z_score, 1)}</td>
+            {rows(data).map((test) => (
+              <tr key={test.label}>
+                <th scope="row">{testName(test)}</th>
+                <td className="num-col">{fixed(test.result.cost_ratio, 3)}</td>
+                <td className="num-col">{fixed(test.result.z_score, 1)}</td>
                 <td className="num-col">
-                  {count(result.n_at_or_below_real)} / {count(result.n_permutations)}
+                  {count(test.result.n_at_or_below_real)} / {count(test.result.n_permutations)}
                 </td>
-                <td className="num-col">{pValue(result.p_value)}</td>
+                <td className="num-col">{pValue(test.result.p_value)}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
+      </TableWrap>
       <p className="caption">
         The real placement costs {millimetre(data.swaps.start_cost)} of wire. Of {count(data.swaps.proposals)} proposed
         swaps, {count(data.swaps.accepted)} lowered the cost, together to {millimetre(data.swaps.final_cost)}, a saving

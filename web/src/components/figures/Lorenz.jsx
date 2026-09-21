@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { ChartFrame, Row, Tooltip, XAxis, YAxis } from "../Chart.jsx";
+import { TableWrap } from "../ui.jsx";
 import { count, fixed, micron, millimetre, percent, pValue, signed } from "../../lib/format.js";
 import { line, linear, nearestIndex } from "../../lib/scales.js";
 
-/** The four sets of connections the concentration is measured over, with the colours Figure 2 uses. */
+/** The four sets of connections the concentration is measured over, with the colours the distance curves use. */
 const SERIES = [
   { key: "all", label: "All connections", color: "var(--wire)" },
   { key: "within the brain", label: "Brain", color: "var(--ink)" },
@@ -119,7 +120,7 @@ export function TailTable({ data }) {
   const { lorenz, lengths, tail } = data.concentration;
   return (
     <>
-      <div className="table-wrap">
+      <TableWrap label="Values behind Figure 5: concentration of the budget in each set">
         <table className="data">
           <thead>
             <tr>
@@ -158,9 +159,9 @@ export function TailTable({ data }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableWrap>
 
-      <div className="table-wrap">
+      <TableWrap label="Values behind Figure 5: the fitted tail against its alternatives">
         <table className="data">
           <thead>
             <tr>
@@ -190,7 +191,7 @@ export function TailTable({ data }) {
             })}
           </tbody>
         </table>
-      </div>
+      </TableWrap>
       <p className="caption">
         The tail fit takes the {count(tail.tail_edges)} connections longer than {micron(tail.xmin_um)}, the lower
         bound that minimises the distance between the fitted and the observed distribution, and gives an exponent

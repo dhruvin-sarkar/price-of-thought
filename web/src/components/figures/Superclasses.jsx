@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { ChartFrame, Row, Tooltip, XAxis, barPath } from "../Chart.jsx";
+import { useRovingRows } from "./useRovingRows.js";
+import { TableWrap } from "../ui.jsx";
 import { count, micron, millimetre, percent, superclassName } from "../../lib/format.js";
 import { useMedia } from "../../lib/hooks.js";
 import { linear, niceTicks } from "../../lib/scales.js";
@@ -18,6 +20,10 @@ export default function Superclasses({ data }) {
   const step = wide ? ROW : ROW + 18;
   const height = margin.top + margin.bottom + rows.length * step;
   const top = rows[0].wire_share;
+  const rowProps = useRovingRows(
+    rows.map((row) => row.superclass),
+    (id) => setHover(id == null ? null : rows.findIndex((row) => row.superclass === id)),
+  );
 
   return (
     <ChartFrame
@@ -70,7 +76,22 @@ export default function Superclasses({ data }) {
               const barTop = wide ? rowTop + rowHeight / 2 - 8 : rowTop + rowHeight / 2 + 2;
               const name = superclassName(row.superclass);
               return (
-                <g key={row.superclass}>
+                <g
+                  key={row.superclass}
+                  {...rowProps(row.superclass)}
+                  role="img"
+                  aria-label={`${name}: ${percent(row.wire_share)} of the budget over ${count(
+                    row.edges,
+                  )} connections, mean ${micron(row.mean_length_um)}, median ${micron(row.median_length_um)}`}
+                >
+                  <rect
+                    className="row-band"
+                    x={-margin.left + 2}
+                    width={width + margin.left + margin.right - 4}
+                    y={rowTop + 1}
+                    height={rowHeight - 2}
+                    rx={3}
+                  />
                   {wide ? (
                     <text className="row-label" x={-14} y={rowTop + rowHeight / 2} dy="0.32em" textAnchor="end">
                       {name}
@@ -104,7 +125,7 @@ export function SuperclassTable({ data }) {
   const rows = data.concentration.superclasses;
   return (
     <>
-      <div className="table-wrap">
+      <TableWrap label="Values behind Figure 6: every class of cell by the wire it touches">
         <table className="data">
           <thead>
             <tr>
@@ -143,7 +164,7 @@ export function SuperclassTable({ data }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableWrap>
       <p className="caption">
         All {count(rows.length)} classes, by the wire on connections they touch. A connection between two classes
         counts for both, so the shares add to more than one; a connection between two types of the same class

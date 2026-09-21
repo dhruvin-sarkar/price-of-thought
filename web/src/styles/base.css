@@ -7,7 +7,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  scroll-padding-top: calc(var(--nav-height) + 1rem);
+  /* --nav-bar is the bar's measured height, which grows when the links wrap; the token is the one-row case. */
+  scroll-padding-top: calc(var(--nav-bar, var(--nav-height)) + 1rem);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -261,39 +262,6 @@ sup {
 
 .keynote .label {
   max-width: 16rem;
-}
-
-.facts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  gap: 1.25rem 2rem;
-  margin: 0;
-}
-
-.facts div {
-  display: grid;
-  gap: 0.35rem;
-  align-content: start;
-  padding-top: 0.7rem;
-  border-top: 1px solid var(--rule);
-}
-
-.facts dt {
-  order: 2;
-  font-size: var(--step--1);
-  line-height: 1.4;
-  color: var(--ink-2);
-}
-
-.facts dd {
-  order: 1;
-  margin: 0;
-  font-size: var(--step-3);
-  font-weight: 500;
-  font-stretch: 94%;
-  font-variant-numeric: lining-nums tabular-nums;
-  line-height: 1;
-  letter-spacing: -0.028em;
 }
 
 /* Controls */

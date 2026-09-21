@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { sceneUrl } from "../lib/data.js";
 import { count, micron, millimetre, percent, times } from "../lib/format.js";
-import { useMedia, useNear, useReducedMotion } from "../lib/hooks.js";
+import { useIdle, useMedia, useNear, useReducedMotion } from "../lib/hooks.js";
 import FrontView from "./FrontView.jsx";
 import { Segmented } from "./ui.jsx";
 
@@ -68,6 +68,7 @@ export default function Scene({ nodes, neck, front, atlas }) {
   const holder = useRef(null);
   const viewer = useRef(null);
   const near = useNear(holder);
+  const idle = useIdle();
   const reducedMotion = useReducedMotion();
   const small = useMedia("(max-width: 700px)");
   const [wanted, setWanted] = useState(false);
@@ -86,7 +87,9 @@ export default function Scene({ nodes, neck, front, atlas }) {
   const selected = byLabel.get(picked.trim().toLowerCase()) ?? null;
 
   const supported = useMemo(webglAvailable, []);
-  const shouldLoad = near && supported && (wanted || !small);
+  // The 2 MB scene and the three.js chunk are fetched and parsed on the main thread, which in front of the first
+  // paint costs the reader over a second for a view the still render already stands in for.
+  const shouldLoad = near && supported && (wanted || (idle && !small));
 
   useEffect(() => {
     if (!shouldLoad || viewer.current || failed) return undefined;

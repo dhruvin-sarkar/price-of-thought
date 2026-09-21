@@ -1,0 +1,380 @@
+/*
+ * The cell-type lookup: a typeahead over every connective node, the ledger for the node in hand, and the full
+ * table under it. Colour, rule weight and type scale come from tokens.css, so both themes follow.
+ */
+.lk {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+}
+
+.lk > * {
+  min-width: 0;
+}
+
+/* Search and filter */
+.lk-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 1.5rem;
+}
+
+.lk-search {
+  position: relative;
+  flex: 1 1 18rem;
+  min-width: 0;
+  max-width: 30rem;
+}
+
+.lk-listbox {
+  position: absolute;
+  z-index: var(--z-tooltip);
+  top: calc(100% + 0.35rem);
+  right: 0;
+  left: 0;
+  max-height: 20rem;
+  margin: 0;
+  padding: 0.3rem;
+  overflow-y: auto;
+  list-style: none;
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  box-shadow: 0 0 0 1px var(--rule), var(--shadow);
+}
+
+.lk-listbox [role="option"] {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 4px;
+  font-size: var(--step--1);
+  cursor: pointer;
+}
+
+.lk-listbox [role="option"][aria-selected="true"] {
+  background: var(--wash);
+  box-shadow: inset 2px 0 0 var(--ink);
+}
+
+.lk-listbox .id {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The match is underlined rather than washed, so it reads the same on both papers. */
+.lk-listbox mark,
+.lk-table mark {
+  background: none;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--wire);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.lk-option-meta {
+  flex: none;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.lk-empty {
+  padding: 0.55rem 0.65rem;
+  font-size: var(--step--1);
+  color: var(--ink-3);
+}
+
+/* A linked name that matches nothing */
+.lk-unknown {
+  max-width: 46rem;
+  padding: 0.1rem 0 0.1rem 0.9rem;
+  border-left: 2px solid var(--wire);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.lk-empty-note {
+  max-width: 42rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: var(--step--1);
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.lk-count {
+  max-width: none;
+  margin-bottom: -0.5rem;
+  font-size: var(--step--1);
+  color: var(--ink-2);
+}
+
+/* The ledger for the selected node */
+.lk-ledger {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  padding-top: 1.1rem;
+  border-top: 2px solid var(--ink);
+}
+
+.lk-ledger > * {
+  min-width: 0;
+}
+
+.lk-name {
+  font-size: var(--step-3);
+  font-weight: 550;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.lk-name .id {
+  font-size: 1em;
+  white-space: normal;
+}
+
+.lk-ledger-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1.25rem;
+  margin-top: 0.5rem;
+  font-size: var(--step--1);
+  color: var(--ink-2);
+}
+
+/* The number over what it counts, each fact ruled off from the one above it. */
+.lk-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+  gap: 1.25rem 2rem;
+  margin: 0;
+}
+
+.lk-facts div {
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--rule);
+}
+
+.lk-facts dt {
+  order: 2;
+  font-size: var(--step--1);
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.lk-facts dd {
+  order: 1;
+  margin: 0;
+  font-size: var(--step-2);
+  font-weight: 500;
+  font-stretch: 94%;
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.028em;
+}
+
+.lk-read {
+  max-width: 44rem;
+  font-size: var(--step-0);
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+/* Where the node falls among the nodes running the same way across the neck */
+.lk-peers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 1.25rem 2.5rem;
+}
+
+.lk-peer-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.15rem 1rem;
+  margin-bottom: 0.45rem;
+}
+
+.lk-peer-text {
+  font-size: var(--step--1);
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--ink-2);
+}
+
+.lk-track {
+  position: relative;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--wash);
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+
+.lk-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 5px;
+  background: var(--wire);
+  opacity: 0.35;
+}
+
+.lk-half {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  left: 50%;
+  width: 1px;
+  background: var(--rule-strong);
+}
+
+.lk-dot {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--wire-ink);
+  box-shadow: 0 0 0 2px var(--paper);
+}
+
+.lk-peer-note {
+  margin-top: -0.6rem;
+}
+
+/* One row per side of the same cell type */
+.lk-sides {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+}
+
+.lk-sides-title {
+  font-size: var(--step-1);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.lk-sides table.data {
+  max-width: 36rem;
+}
+
+.lk-share {
+  overflow-wrap: anywhere;
+}
+
+/* The full table */
+.lk-scroll {
+  position: relative;
+  /* The same measure the other tables hold to: past it a row is too wide to follow across. */
+  max-width: 62rem;
+  max-height: 30rem;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.lk-scroll:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+table.data.lk-table {
+  max-width: none;
+  min-width: 42rem;
+}
+
+/* The heading row stays put while the reader runs down 1,921 rows. */
+.lk-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding-top: 0.6rem;
+  background: var(--paper);
+}
+
+.lk-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.lk-table thead th.num-col .lk-sort {
+  flex-direction: row-reverse;
+}
+
+.lk-sort:hover {
+  color: var(--ink);
+}
+
+.lk-mark {
+  opacity: 0;
+  font-size: 0.9em;
+}
+
+.lk-mark.is-on {
+  opacity: 1;
+  color: var(--wire-ink);
+}
+
+.lk-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  padding: 0.1rem 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lk-row:hover .id {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.lk-table tbody tr.is-on td,
+.lk-table tbody tr.is-on th,
+.lk-sides tbody tr.is-on td,
+.lk-sides tbody tr.is-on th {
+  background: var(--wash);
+}
+
+.lk-table tbody tr.is-on th[scope="row"] {
+  box-shadow: inset 2px 0 0 var(--wire);
+}
+
+@media (max-width: 640px) {
+  .lk-scroll {
+    max-height: 24rem;
+  }
+
+  .lk-facts dd {
+    font-size: var(--step-1);
+  }
+}

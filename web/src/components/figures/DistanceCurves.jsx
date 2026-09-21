@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { ChartFrame, Row, Tooltip, XAxis, YAxis, spreadLabels } from "../Chart.jsx";
+import { TableWrap } from "../ui.jsx";
 import { fixed, micron } from "../../lib/format.js";
+import { useMedia } from "../../lib/hooks.js";
 import { line, linear, log, logTicks, nearestIndex } from "../../lib/scales.js";
 
 /** The three curves of the committed Figure 2, with the colours it uses. */
@@ -14,6 +16,7 @@ const DOMAIN = [10 ** -4.6, 10 ** -1.5];
 
 export default function DistanceCurves({ data }) {
   const [hover, setHover] = useState(null);
+  const wide = useMedia("(min-width: 700px)");
   const curves = SERIES.map((series) => {
     const curve = data.distance.curves[series.key];
     const points = curve.distance_um
@@ -85,13 +88,14 @@ export default function DistanceCurves({ data }) {
               format={(t) => t.toFixed(Math.max(0, -Math.log10(t)))}
               title="Share of pairs joined by a connection"
             />
+            {/* The plot is narrow once the direct labels have their column, so it carries three ticks, not six. */}
             <XAxis
               scale={x}
-              ticks={[0, 200, 400, 600, 800, 1000]}
+              ticks={wide ? [0, 200, 400, 600, 800, 1000] : [0, 500, 1000]}
               height={height}
               width={width}
-              format={(t) => (t === 1000 ? "1000 µm" : String(t))}
-              title="Distance between the two cell types"
+              format={String}
+              title={wide ? "Distance between the two cell types (µm)" : "Distance (µm)"}
             />
             {hover != null && (
               <line x1={x(hover)} x2={x(hover)} y1={0} y2={height} stroke="var(--rule-strong)" strokeWidth="1" />
@@ -130,7 +134,7 @@ const LENGTH_ROWS = [
 
 export function DistanceTable({ data }) {
   return (
-    <div className="table-wrap">
+    <TableWrap label="Values behind Figure 2: length constants by group of pairs">
       <table className="data">
         <caption>
           Length constant of the fall in connection probability over the first 600 µm, fitted per group of pairs.
@@ -156,6 +160,6 @@ export function DistanceTable({ data }) {
           ))}
         </tbody>
       </table>
-    </div>
+    </TableWrap>
   );
 }

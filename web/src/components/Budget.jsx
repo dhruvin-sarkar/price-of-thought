@@ -80,7 +80,8 @@ export default function Budget({ data }) {
                 Share of the {metres(totals.total_wire_um)} wiring budget held by each of the {shown.length}{" "}
                 neuropils holding the most, of {count(totals.neuropils_with_types)} that hold any. Each connection
                 lends half its length to the neuropil nearest each of its ends. Brain regions are drawn in copper
-                and nerve-cord regions in grey. Hover a bar for its wire, its cell types and its internal economy.
+                and nerve-cord regions in grey. Hover or focus a bar for its wire, its cell types and its internal
+                economy.
               </>
             }
           >
@@ -100,7 +101,8 @@ export default function Budget({ data }) {
                 {count(totals.permutations)} reshuffles of its own cell types among its own positions, so 1.0 is no
                 better than chance. Economy does not follow size: the most economical region, {thrifty.neuropil} at{" "}
                 {fixed(thrifty.cost_ratio, 3)}, holds {percent(thrifty.wire_share)} of the budget, while the two
-                regions sitting closest to chance are among the largest in the brain.
+                regions sitting closest to chance are among the largest in the brain. Hover or focus a point for
+                that region&rsquo;s wire, its internal cost and its z-score.
               </>
             }
           >
@@ -157,7 +159,8 @@ export default function Budget({ data }) {
                 Cumulative share of the wiring budget against the cumulative share of connections, taken longest
                 first, for all {count(lengths.all.edges)} connections and for three subsets. A budget spread evenly
                 over its connections would follow the diagonal; the further a curve bows above it, the more of the
-                cost sits on the longest few. Hover for the share each set has reached at that point.
+                cost sits on the longest few. The values behind it give each set&rsquo;s Gini coefficient and the
+                share its longest 1% and 10% hold.
               </>
             }
           >
@@ -175,7 +178,7 @@ export default function Budget({ data }) {
                 Share of the wiring budget on connections touching each class of cell. A connection between two
                 classes counts for both, so the shares add to more than one. The ordering follows how many cells a
                 class has rather than how far they reach: the classes with the longest mean connections sit well
-                down the list. Hover a bar for its counts and its mean and median length.
+                down the list. Hover or focus a bar for its counts and its mean and median length.
               </>
             }
           >

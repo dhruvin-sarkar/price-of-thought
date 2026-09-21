@@ -1,5 +1,5 @@
 import CableLength, { CableTable } from "./figures/CableLength.jsx";
-import { Figure, HeadingLevel, More, Outcome } from "./ui.jsx";
+import { Figure, HeadingLevel, More, Outcome, TableWrap } from "./ui.jsx";
 import { blobUrl, repoUrl, reportUrl } from "../lib/data.js";
 import { count, fixed } from "../lib/format.js";
 import "../styles/methods.css";
@@ -130,7 +130,7 @@ export default function Methods({ data }) {
 
           <div className="block">
             <h3 className="block-title">The thirteen pre-registered hypotheses</h3>
-            <div className="table-wrap">
+            <TableWrap label="The thirteen pre-registered hypotheses and their outcomes">
               <table className="data">
                 <caption>
                   Registered in commits {data.preregistration_commits.join(", ")} before any result was computed. The
@@ -158,7 +158,7 @@ export default function Methods({ data }) {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </TableWrap>
             <p className="caption">
               {unsupported.length} of {data.hypotheses.length} are not supported:{" "}
               {unsupported.map((hypothesis) => hypothesis.label).join(", ")}. Cutting the neck costs less flow than
@@ -266,6 +266,7 @@ export default function Methods({ data }) {
           </div>
 
           <Figure
+            number={13}
             title="Positions stand in for cable length between classes, not within them"
             caption={
               <>
@@ -277,7 +278,7 @@ export default function Methods({ data }) {
             }
           >
             <CableLength data={data} />
-            <More summary="Values behind the cable-length check">
+            <More summary="Values behind Figure 13">
               <CableTable data={data} />
             </More>
           </Figure>
@@ -296,7 +297,7 @@ export default function Methods({ data }) {
           <div className="block">
             <h3 className="block-title">Settings, software and files</h3>
             <More summary="Protocol settings">
-              <div className="table-wrap">
+              <TableWrap label="Protocol settings">
                 <table className="data">
                   <thead>
                     <tr>
@@ -313,10 +314,10 @@ export default function Methods({ data }) {
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </TableWrap>
             </More>
             <More summary="Software">
-              <div className="table-wrap">
+              <TableWrap label="Software versions">
                 <table className="data">
                   <thead>
                     <tr>
@@ -335,10 +336,10 @@ export default function Methods({ data }) {
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </TableWrap>
             </More>
             <More summary="Every number on this page, in the repository">
-              <div className="table-wrap">
+              <TableWrap label="Every number on this page, and the file in the repository that holds it">
                 <table className="data">
                   <thead>
                     <tr>
@@ -357,7 +358,7 @@ export default function Methods({ data }) {
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </TableWrap>
             </More>
             <More summary="Reproduce every result">
               <pre className="cmd">

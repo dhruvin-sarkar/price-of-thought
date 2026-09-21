@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { ChartFrame, Row, Tooltip, XAxis, barPath } from "../Chart.jsx";
+import { useRovingRows } from "./useRovingRows.js";
+import { TableWrap } from "../ui.jsx";
 import { count, micron, percent } from "../../lib/format.js";
+import { useMedia } from "../../lib/hooks.js";
 import { linear } from "../../lib/scales.js";
 
 const GROUP = 92;
@@ -18,12 +21,23 @@ const MEASURES = [
   { key: "cost_share", label: "share of wire", color: "var(--wire)" },
 ];
 
+/** A group's name, with the degree that defines the hub group spelled out. */
+const groupName = (row, threshold) =>
+  `${LABELS[row.label]}${row.label === "high-degree-incident" ? ` (degree ${threshold} or more)` : ""}`;
+
 export default function CostShare({ data }) {
   const [hover, setHover] = useState(null);
+  // Below this the name and the counts cannot share a line, so the counts take one of their own.
+  const wide = useMedia("(min-width: 700px)");
   const rows = data.cost_share.rows;
   const threshold = data.cost_share.degree_threshold;
   const margin = { top: 34, right: 24, bottom: 46, left: 12 };
-  const height = margin.top + margin.bottom + rows.length * GROUP;
+  const group = wide ? GROUP : GROUP + 16;
+  const height = margin.top + margin.bottom + rows.length * group;
+  const rowProps = useRovingRows(
+    rows.map((row) => row.label),
+    (label) => setHover(label == null ? null : rows.findIndex((row) => row.label === label)),
+  );
 
   return (
     <ChartFrame
@@ -66,18 +80,39 @@ export default function CostShare({ data }) {
             />
             {rows.map((row, i) => {
               const top = i * step;
+              const counts = `${count(row.edges)} connections, mean ${micron(row.mean_length_um)}`;
               return (
-                <g key={row.label}>
+                <g
+                  key={row.label}
+                  {...rowProps(row.label)}
+                  role="img"
+                  aria-label={`${groupName(row, threshold)}: ${percent(row.edge_share)} of connections, ${percent(
+                    row.cost_share,
+                  )} of the wire, ${counts}`}
+                >
+                  <rect
+                    className="row-band"
+                    x={-margin.left + 2}
+                    width={width + margin.left + margin.right - 4}
+                    y={top + 1}
+                    height={step - 2}
+                    rx={3}
+                  />
                   <text className="group-label" x={0} y={top + 12}>
-                    {LABELS[row.label]}
-                    {row.label === "high-degree-incident" ? ` (degree ${threshold} or more)` : ""}
+                    {groupName(row, threshold)}
                   </text>
-                  <text className="mark-label" x={width} y={top + 12} textAnchor="end">
-                    {count(row.edges)} connections, mean {micron(row.mean_length_um)}
-                  </text>
+                  {wide ? (
+                    <text className="mark-label" x={width} y={top + 12} textAnchor="end">
+                      {counts}
+                    </text>
+                  ) : (
+                    <text className="mark-label" x={0} y={top + 28}>
+                      {counts}
+                    </text>
+                  )}
                   {MEASURES.map((measure, m) => {
                     // A 2px gap of page between the two bars, so the pair reads as one group of two marks.
-                    const y = top + 26 + m * (BAR + 2);
+                    const y = top + (wide ? 26 : 42) + m * (BAR + 2);
                     return (
                       <g key={measure.key}>
                         <path data-mark="bar" d={barPath(0, y, x(row[measure.key]), BAR)} fill={measure.color} />
@@ -99,7 +134,7 @@ export default function CostShare({ data }) {
 
 export function CostShareTable({ data }) {
   return (
-    <div className="table-wrap">
+    <TableWrap label="Values behind Figure 7: the four groups of connections">
       <table className="data">
         <caption>The first three groups overlap; the last holds the connections in none of them.</caption>
         <thead>
@@ -131,6 +166,6 @@ export function CostShareTable({ data }) {
           ))}
         </tbody>
       </table>
-    </div>
+    </TableWrap>
   );
 }

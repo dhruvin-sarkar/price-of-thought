@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { ChartFrame, Row, Tooltip, XAxis, barPath } from "../Chart.jsx";
+import { useRovingRows } from "./useRovingRows.js";
+import { TableWrap } from "../ui.jsx";
 import { count, fixed, millimetre, percent, times } from "../../lib/format.js";
 import { useMedia } from "../../lib/hooks.js";
 import { linear, niceTicks } from "../../lib/scales.js";
@@ -20,6 +22,10 @@ export default function WireAtlas({ data }) {
   const step = wide ? ROW : ROW + 18;
   const height = margin.top + margin.bottom + rows.length * step;
   const top = rows[0].wire_share;
+  const rowProps = useRovingRows(
+    rows.map((row) => row.neuropil),
+    (neuropil) => setHover(neuropil == null ? null : rows.findIndex((row) => row.neuropil === neuropil)),
+  );
 
   return (
     <ChartFrame
@@ -73,7 +79,24 @@ export default function WireAtlas({ data }) {
               const barTop = wide ? rowTop + rowHeight / 2 - 8 : rowTop + rowHeight / 2 + 2;
               const label = wide ? row.neuropil : `${row.neuropil} (${compartmentName(row.compartment)})`;
               return (
-                <g key={row.neuropil}>
+                <g
+                  key={row.neuropil}
+                  {...rowProps(row.neuropil)}
+                  role="img"
+                  aria-label={`${row.neuropil}, ${compartmentName(row.compartment)}: ${percent(
+                    row.wire_share,
+                  )} of the budget, ${millimetre(row.wire_um)} over ${count(row.types)} cell types${
+                    row.cost_ratio == null ? "" : `, internal cost ${times(row.cost_ratio, 3)} its reshuffled mean`
+                  }`}
+                >
+                  <rect
+                    className="row-band"
+                    x={-margin.left + 2}
+                    width={width + margin.left + margin.right - 4}
+                    y={rowTop + 1}
+                    height={rowHeight - 2}
+                    rx={3}
+                  />
                   {wide ? (
                     <text className="row-label" x={-14} y={rowTop + rowHeight / 2} dy="0.32em" textAnchor="end">
                       {label}
@@ -108,7 +131,7 @@ export function AtlasTable({ data }) {
   const totals = data.atlas.totals;
   return (
     <>
-      <div className="table-wrap">
+      <TableWrap label="Values behind Figure 3: the twenty neuropils holding the most wire">
         <table className="data">
           <thead>
             <tr>
@@ -141,7 +164,7 @@ export function AtlasTable({ data }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableWrap>
       <p className="caption">
         The twenty neuropils holding the most wire, of {count(totals.neuropils_with_types)} that hold any. A
         connection lends half its length to the neuropil nearest each of its ends, so the shares add to one across

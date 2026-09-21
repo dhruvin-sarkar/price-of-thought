@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { ChartFrame, Row, Tooltip, XAxis, YAxis } from "../Chart.jsx";
+import { TableWrap } from "../ui.jsx";
 import { count, fixed, millimetre, pValue } from "../../lib/format.js";
 import { linear, log, logTicks, niceTicks } from "../../lib/scales.js";
 
@@ -19,7 +20,7 @@ function Panel({ title, points, test }) {
   return (
     <ChartFrame
       height={330}
-      margin={{ top: 40, right: 22, bottom: 50, left: 48 }}
+      margin={{ top: 56, right: 22, bottom: 50, left: 48 }}
       role="group"
       label={`${title}: total length of each cell type's neck-crossing wiring against the sensory-to-motor flow lost when that wiring alone is removed.`}
       onPointer={(px, py, inner) => {
@@ -61,8 +62,12 @@ function Panel({ title, points, test }) {
         const y = linear([0, valueMax], [height, 0]);
         return (
           <g>
-            <text className="axis-title" x={-40} y={-24}>
+            <text className="axis-title" x={-40} y={-40}>
               {title}
+            </text>
+            {/* Under the panel title, not in the plot, where the zero row of points already sits. */}
+            <text className="mark-label" x={-40} y={-24}>
+              {count(test.zero_value)} of {count(test.n)} lose no flow
             </text>
             <YAxis
               scale={y}
@@ -94,10 +99,6 @@ function Panel({ title, points, test }) {
                 ) : null,
               )}
             </g>
-            {/* Set beside the panel title rather than in the plot, where the zero row of points already sits. */}
-            <text className="mark-label" x={width} y={-24} textAnchor="end">
-              {count(test.zero_value)} of {count(test.n)} lose no flow
-            </text>
           </g>
         );
       }}
@@ -128,7 +129,7 @@ export default function PriceValue({ data }) {
 
 export function PriceTestsTable({ data }) {
   return (
-    <div className="table-wrap">
+    <TableWrap label="Values behind Figure 10: price against value in each direction">
       <table className="data">
         <thead>
           <tr>
@@ -166,6 +167,6 @@ export function PriceTestsTable({ data }) {
           })}
         </tbody>
       </table>
-    </div>
+    </TableWrap>
   );
 }

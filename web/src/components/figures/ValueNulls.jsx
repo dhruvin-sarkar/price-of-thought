@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChartFrame, Row, Tooltip, XAxis, YAxis } from "../Chart.jsx";
+import { TableWrap } from "../ui.jsx";
 import { count, fixed, pValue, percent } from "../../lib/format.js";
 import { linear, niceTicks } from "../../lib/scales.js";
 
@@ -20,8 +21,9 @@ function Histogram({ metric, result, intact, cut, marks }) {
   const lo = low - pad;
   const hi = high + pad;
 
-  // Each dashed mark gets a line of its own above the plot, so two close rules never write over each other.
-  const top = 46 + marks.length * 16;
+  // Everything above the plot is stacked on 16px lines: the panel name, what the cut costs as a share of the
+  // intact graph, then the cut's own rule and each dashed mark, so no two of them share a baseline.
+  const top = 62 + marks.length * 16;
 
   return (
     <ChartFrame
@@ -54,14 +56,18 @@ function Histogram({ metric, result, intact, cut, marks }) {
         const x = linear([lo, hi], [0, width]);
         const yMax = Math.max(...counts);
         const y = linear([0, yMax], [height, 0]);
-        // A rule near an edge would push a centred label off the chart, so the label turns to face inwards.
-        const anchor = (px) => (px < 100 ? "start" : px > width - 100 ? "end" : "middle");
+        // Every rule gets a line of its own above the plot and rises only to it. The labels all run away from
+        // the same edge, and the stack is ordered from that edge outwards, so no rule crosses a label below it.
+        const fromLeft = x(cut) < width / 2;
+        const stack = [...marks, { value: cut, label: `Cutting the neck: ${count(cut)}`, cut: true }].sort((a, b) =>
+          fromLeft ? a.value - b.value : b.value - a.value,
+        );
         return (
           <g>
             <text className="axis-title" x={-48} y={16 - top}>
               {metric.label}
             </text>
-            <text className="mark-label" x={width} y={16 - top} textAnchor="end">
+            <text className="mark-label" x={width} y={32 - top} textAnchor="end">
               {percent(cut / intact, 0)} of {count(intact)} intact
             </text>
             <YAxis scale={y} ticks={niceTicks([0, yMax], 5, { integer: true })} width={width} format={count} />
@@ -89,26 +95,31 @@ function Histogram({ metric, result, intact, cut, marks }) {
                 />
               );
             })}
-            {marks.map((mark, i) => (
-              <g key={mark.label}>
-                <line
-                  x1={x(mark.value)}
-                  x2={x(mark.value)}
-                  y1={-8 - i * 16}
-                  y2={height}
-                  stroke="var(--ink-3)"
-                  strokeWidth="1.5"
-                  strokeDasharray="4 3"
-                />
-                <text className="mark-label" x={x(mark.value)} y={-12 - i * 16} textAnchor={anchor(x(mark.value))}>
-                  {mark.label}
-                </text>
-              </g>
-            ))}
-            <line x1={x(cut)} x2={x(cut)} y1={30 - top} y2={height} stroke="var(--wire)" strokeWidth="2.5" />
-            <text className="mark-label" x={x(cut)} y={26 - top} textAnchor={anchor(x(cut))} fill="var(--wire-ink)">
-              Cutting the neck: {count(cut)}
-            </text>
+            {stack.map((mark, i) => {
+              const line = stack.length - 1 - i;
+              return (
+                <g key={mark.label}>
+                  <line
+                    x1={x(mark.value)}
+                    x2={x(mark.value)}
+                    y1={-8 - line * 16}
+                    y2={height}
+                    stroke={mark.cut ? "var(--wire)" : "var(--ink-3)"}
+                    strokeWidth={mark.cut ? 2.5 : 1.5}
+                    strokeDasharray={mark.cut ? undefined : "4 3"}
+                  />
+                  <text
+                    className="mark-label"
+                    x={fromLeft ? x(mark.value) + 6 : x(mark.value) - 6}
+                    y={-12 - line * 16}
+                    textAnchor={fromLeft ? "start" : "end"}
+                    fill={mark.cut ? "var(--wire-ink)" : undefined}
+                  >
+                    {mark.label}
+                  </text>
+                </g>
+              );
+            })}
           </g>
         );
       }}
@@ -181,7 +192,7 @@ export function ValueTable({ data }) {
   ];
   return (
     <>
-      <div className="table-wrap">
+      <TableWrap label="Values behind Figure 9: the neck against each matched comparison">
         <table className="data">
           <thead>
             <tr>
@@ -212,7 +223,7 @@ export function ValueTable({ data }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableWrap>
       <p className="caption">
         No sensory-motor pair is disconnected by the cut. The length-matched sets hold about{" "}
         {count(data.value.removal_sets.longest_non_connective.edges)} shorter connections each, against the{" "}

@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { ChartFrame, Row, Tooltip, XAxis, YAxis, spreadLabels } from "../Chart.jsx";
+import { useRovingRows } from "./useRovingRows.js";
+import { TableWrap } from "../ui.jsx";
 import { count, fixed, millimetre, percent, times } from "../../lib/format.js";
+import { useMedia } from "../../lib/hooks.js";
 import { linear, log, niceTicks } from "../../lib/scales.js";
 
 /** Neuropils big enough to have been given a within-neuropil placement test, largest first. */
@@ -26,6 +29,7 @@ function decadeTicks([lo, hi]) {
 
 export default function RegionEconomy({ data }) {
   const [hover, setHover] = useState(null);
+  const wide = useMedia("(min-width: 700px)");
   const rows = tested(data);
   const called = labelled(rows);
   const named = new Set(called.map((row) => row.neuropil));
@@ -33,7 +37,12 @@ export default function RegionEconomy({ data }) {
   const ratios = rows.map((row) => row.cost_ratio);
   const domain = [Math.min(...wires) * 0.7, Math.max(...wires) * 1.4];
   const span = [Math.min(0.4, Math.min(...ratios) - 0.05), Math.max(1.05, Math.max(...ratios) + 0.05)];
-  const margin = { top: 34, right: 24, bottom: 52, left: 56 };
+  // Deep enough at the top to carry the value-axis title on a line of its own, clear of the dashed rule at 1.0.
+  const margin = { top: 52, right: 24, bottom: 52, left: 56 };
+  const pointProps = useRovingRows(
+    rows.map((row) => row.neuropil),
+    (neuropil) => setHover(neuropil == null ? null : rows.findIndex((row) => row.neuropil === neuropil)),
+  );
 
   return (
     <ChartFrame
@@ -82,13 +91,10 @@ export default function RegionEconomy({ data }) {
         const y = linear(span, [height, 0]);
         return (
           <g>
-            <YAxis
-              scale={y}
-              ticks={niceTicks(span, 5)}
-              width={width}
-              format={(t) => t.toFixed(1)}
-              title="Internal cost as a share of its own reshuffled mean"
-            />
+            <text className="axis-title" x={-margin.left + 8} y={14 - margin.top}>
+              Internal cost as a share of its own reshuffled mean
+            </text>
+            <YAxis scale={y} ticks={niceTicks(span, 5)} width={width} format={(t) => t.toFixed(1)} />
             <XAxis
               scale={x}
               ticks={decadeTicks(domain)}
@@ -97,25 +103,35 @@ export default function RegionEconomy({ data }) {
               format={String}
               title="Wire held (mm, log scale)"
             />
-            {/* A region no better placed than chance against its own positions would sit on this line. */}
+            {/* A region no better placed than chance against its own positions would sit on this line. Its label */}
+            {/* sits at the left end, clear of the called-out regions, and shortens where there is no room for it. */}
             <line x1={0} x2={width} y1={y(1)} y2={y(1)} stroke="var(--rule-strong)" strokeDasharray="3 3" />
-            <text className="direct-label" x={width} y={y(1) - 8} textAnchor="end">
-              Reshuffled within the region
+            <text className="direct-label" x={0} y={y(1) - 8}>
+              {wide ? "Reshuffled within the region" : "Reshuffled"}
             </text>
 
             {rows.map((row, i) => (
-              <circle
+              <g
                 key={row.neuropil}
-                data-mark="dot"
-                style={{ "--mark-index": i }}
-                cx={x(wires[i])}
-                cy={y(row.cost_ratio)}
-                r={hover === i ? 7 : 5}
-                fill={row.compartment === "vnc" ? "var(--ink-3)" : "var(--wire)"}
-                stroke="var(--paper)"
-                strokeWidth="2"
-                opacity={hover === i || named.has(row.neuropil) ? 1 : 0.78}
-              />
+                {...pointProps(row.neuropil)}
+                role="img"
+                aria-label={`${row.neuropil}: internal cost ${times(row.cost_ratio, 3)} its reshuffled mean, over ${millimetre(
+                  row.wire_um,
+                )} of wire and ${count(row.edges_internal)} of its own connections, z ${fixed(row.z_score, 1)}`}
+              >
+                <circle className="row-band" cx={x(wires[i])} cy={y(row.cost_ratio)} r={11} />
+                <circle
+                  data-mark="dot"
+                  style={{ "--mark-index": i }}
+                  cx={x(wires[i])}
+                  cy={y(row.cost_ratio)}
+                  r={hover === i ? 7 : 5}
+                  fill={row.compartment === "vnc" ? "var(--ink-3)" : "var(--wire)"}
+                  stroke="var(--paper)"
+                  strokeWidth="2"
+                  opacity={hover === i || named.has(row.neuropil) ? 1 : 0.78}
+                />
+              </g>
             ))}
 
             {/* The two antennal lobes all but coincide, so their labels stack rather than overprint each other. */}
@@ -149,7 +165,7 @@ export function EconomyTable({ data }) {
 
   return (
     <>
-      <div className="table-wrap">
+      <TableWrap label="Values behind Figure 4: the most and least economical regions">
         <table className="data">
           <thead>
             <tr>
@@ -190,7 +206,7 @@ export function EconomyTable({ data }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableWrap>
       <p className="caption">
         The six most and six least economical of the {count(rows.length)} neuropils large enough to test. The
         reshuffle moves cell types only between positions inside the same neuropil, so it asks whether a region is

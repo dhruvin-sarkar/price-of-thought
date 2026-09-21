@@ -29,12 +29,6 @@ export function pValue(p) {
   return p.toFixed(2);
 }
 
-/** p-value as a clause for running text: "p = 0.036", or "p < 0.001". */
-export function pClause(p) {
-  const text = pValue(p);
-  return text.startsWith("<") ? `p ${text}` : `p = ${text}`;
-}
-
 /** Text with its first letter capitalized, for the start of a sentence or a label. */
 export const sentence = (text) => (text ? `${text[0].toUpperCase()}${text.slice(1)}` : text);
 

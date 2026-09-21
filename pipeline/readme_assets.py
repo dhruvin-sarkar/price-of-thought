@@ -492,6 +492,11 @@ def load_inputs(results: Path = RESULTS) -> dict:
         "robustness": read("threshold_robustness.json"),
         "distance": pd.read_csv(results / "distance_dependence.csv"),
         "front": read("front_view.json"),
+        "synapses": read("synapse_value.json"),
+        "tradeoff": read("length_tradeoff.json"),
+        "hubs": read("hub_placement.json"),
+        "symmetry": read("wire_symmetry.json"),
+        "regions": read("neuropil_network.json"),
     }
 
 
@@ -1168,6 +1173,288 @@ def figure_generative(data: dict, theme: str) -> tuple[str, str, str]:
     return svg.render("Figure 9. What the generative models reproduce", desc), desc, f"fig-generative-{theme}.svg"
 
 
+def log_ticks(svg: Svg, to_y: Callable, x: float, values: Sequence[float], labels: Sequence[str], y0: float,
+              y1: float, grid_right: float) -> None:
+    """Y axis whose ticks are given in data units but positioned by their base-10 logarithm."""
+    y_axis(svg, lambda v: to_y(math.log10(v)), x, values, labels, y0, y1, grid_right=grid_right)
+
+
+def key_row(svg: Svg, x: float, y: float, entries: Sequence[tuple[str, str, bool]]) -> None:
+    """A row of line keys: a short rule, dashed when the entry says so, followed by its label."""
+    for label, color, dashed in entries:
+        svg.line(x, y - 8, x + 34, y - 8, color, 3.5, dash="8 7" if dashed else None)
+        svg.text(x + 46, y, label, 23, "ink2")
+        x += 46 + text_width(label, 23) + 42
+
+
+def figure_synapses(data: dict, theme: str) -> tuple[str, str, str]:
+    """Figure 10: synapses per micrometre against synapses per connection, over the length deciles."""
+    svg = Svg(900, theme)
+    whole = data["synapses"]["groups"]["all"]
+    deciles = whole["deciles"]
+    correlation = whole["correlation"]
+    shortest, longest = deciles[0], deciles[-1]
+    heading(svg, 80, "Long connections cost more per synapse only because they are longer",
+            f"The {count(whole['edges'])} connections in ten equal groups by length. Left: synapses bought per "
+            "micrometre of wire. Right: synapses on the connection itself. Both vertical axes are logarithmic.")
+    panels = [
+        (170, 800, "Synapses per micrometre of wire", -1.1, 1.3, (0.1, 1, 10), ("0.1", "1", "10"),
+         [("synapses_per_um", "Observed", "wire", False),
+          ("expected_per_um", "If length did not matter", "null", True)]),
+        (1060, 1690, "Synapses on the connection itself", 1.0, 2.7, (10, 100, 500), ("10", "100", "500"),
+         [("mean_synapses", "Mean", "null", True), ("median_synapses", "Median", "wire", False)]),
+    ]
+    py0, py1 = 340, 690
+    for px0, px1, title, lo, hi, ticks, labels, series in panels:
+        to_y = linear(lo, hi, py1, py0)
+        to_x = linear(1, 10, px0 + 30, px1 - 30)
+        svg.text(px0 - 106, py0 - 90, title, 26, weight=600)
+        key_row(svg, px0 - 106, py0 - 46, [(label, color, dashed) for _, label, color, dashed in series])
+        log_ticks(svg, to_y, px0, ticks, labels, py0, py1, px1)
+        x_axis(svg, to_x, py1, range(1, 11), [str(k) for k in range(1, 11)], px0, px1,
+               "Length decile, shortest to longest")
+        for key, _, color, dashed in series:
+            xs = [to_x(row["decile"]) for row in deciles]
+            ys = [to_y(math.log10(row[key])) for row in deciles]
+            svg.polyline(xs, ys, color, 3.5, dash="8 7" if dashed else None)
+            for x, y in zip(xs, ys):
+                svg.dot(x, y, 7, color, hollow=dashed, ring=3)
+    note = (f"The numerator is flat. Over all {count(whole['edges'])} connections the rank correlation between "
+            f"length and synapse count is {signed(correlation['spearman_rho'], 3)}, and Pearson's r on the "
+            f"logarithm of both is {signed(correlation['pearson_log_r'], 3)}; the median connection carries "
+            f"{shortest['median_synapses']:.0f} synapses in the shortest tenth and "
+            f"{longest['median_synapses']:.0f} in the longest. What the extra wire buys is reach, not weight.")
+    for k, line in enumerate(wrap(note, 24, WIDTH - 2 * MARGIN)):
+        svg.text(MARGIN, 826 + k * 34, line, 24, "ink2")
+    desc = (
+        f"Figure 10. Two line charts over ten length deciles, both on logarithmic axes. Left: synapses bought per "
+        f"micrometre falls from {shortest['synapses_per_um']:.2f} in the shortest decile to "
+        f"{longest['synapses_per_um']:.2f} in the longest, close to the dashed line expected if synapse count did "
+        f"not depend on length at all. Right: synapses on the connection itself stay near flat, a median of "
+        f"{shortest['median_synapses']:.0f} in the shortest decile against {longest['median_synapses']:.0f} in the "
+        f"longest, while the mean falls from {shortest['mean_synapses']:.1f} to {longest['mean_synapses']:.1f}. Over "
+        f"all {count(whole['edges'])} connections the rank correlation between length and synapse count is "
+        f"{signed(correlation['spearman_rho'], 3)}."
+    )
+    return svg.render("Figure 10. What a micrometre of wire buys in synapses", desc), desc, f"fig-synapses-{theme}.svg"
+
+
+TRADEOFF_SERIES = (("longest first", "Longest first", "wire", None),
+                   ("shortest first", "Shortest first", "null", None),
+                   ("random, matched count", "At random", "ink3", "8 7"))
+
+
+def figure_tradeoff(data: dict, theme: str) -> tuple[str, str, str]:
+    """Figure 11: efficiency and component size as wire is removed from each end of the length distribution."""
+    svg = Svg(900, theme)
+    result = data["tradeoff"]
+    curves, comparison = result["curves"], result["comparison"]
+    reference = comparison["reference_wire_fraction"]
+    at = comparison["at_reference"]
+    per_metre = comparison["efficiency_lost_per_metre"]
+    long_end, short_end = at["longest first"], at["shortest first"]
+    heading(svg, 80, "Per micrometre, short connections buy far more connectivity than long ones",
+            "Connections are removed cumulatively from one end of the length distribution and the graph that is "
+            "left is measured. The horizontal axis is the wire removed, so the three schedules are compared "
+            "against the same budget.")
+    panels = [
+        (150, 1120, "efficiency_share", (0, 1), (0, 0.25, 0.5, 0.75, 1), ("0", "25", "50", "75", "100%"),
+         "Sensory-to-motor efficiency, share of the whole graph"),
+        (1310, 1690, "largest_component_share", (0.75, 1), (0.8, 0.9, 1), ("80", "90", "100%"),
+         "Largest component, share of nodes"),
+    ]
+    py0, py1 = 340, 690
+    for px0, px1, key, (lo, hi), ticks, labels, title in panels:
+        to_x = linear(0, 0.6, px0, px1)
+        to_y = linear(lo, hi, py1, py0)
+        svg.text(px0 - 60, py0 - 90, title, 26, weight=600)
+        y_axis(svg, to_y, px0, ticks, labels, py0, py1, grid_right=px1)
+        x_axis(svg, to_x, py1, [0, 0.2, 0.4, 0.6], ["0", "20", "40", "60%"], px0, px1, "Wire removed")
+        for name, label, color, dash in TRADEOFF_SERIES:
+            rows = curves[name]
+            svg.polyline([to_x(r["wire_removed_share"]) for r in rows],
+                         [to_y(max(min(r[key], hi), lo)) for r in rows], color, 3.5, dash=dash)
+            if px0 == 150:
+                last = rows[-1]
+                svg.text(to_x(last["wire_removed_share"]) + 16, to_y(max(min(last[key], hi), lo)) + 8, label, 24,
+                         color, 600)
+    to_x = linear(0, 0.6, 150, 1120)
+    to_y = linear(0, 1, py1, py0)
+    svg.line(to_x(reference), py0 - 30, to_x(reference), py1, "rule_strong", 2, dash="6 6")
+    svg.text(to_x(reference), py0 - 42, f"{pct(reference, 0)} of the wire", 22, "ink3", anchor="middle")
+    for row, color in ((long_end, "wire"), (short_end, "null")):
+        svg.dot(to_x(reference), to_y(row["efficiency_share"]), 10, color, ring=3)
+        svg.text(to_x(reference) + 20, to_y(row["efficiency_share"]) - 18, pct(row["efficiency_share"]), 24,
+                 color, 600, mono=True)
+    note = (f"At {pct(reference, 0)} of the wire removed, taking it from the long end costs "
+            f"{count(long_end['edges_removed'])} connections and leaves efficiency at "
+            f"{pct(long_end['efficiency_share'])}; the same wire from the short end costs "
+            f"{count(short_end['edges_removed'])} and leaves it at {pct(short_end['efficiency_share'])}. That is "
+            f"{pct(per_metre['longest first'], 2)} of the starting efficiency lost per metre from the long end "
+            f"against {pct(per_metre['shortest first'], 2)} from the short end, a factor of "
+            f"{per_metre['shortest first'] / per_metre['longest first']:.1f}. The largest weakly connected "
+            f"component barely moves under any schedule, so it says nothing either way.")
+    for k, line in enumerate(wrap(note, 24, WIDTH - 2 * MARGIN)):
+        svg.text(MARGIN, 826 + k * 34, line, 24, "ink2")
+    floor_component = min(row["largest_component_share"] for rows in curves.values() for row in rows)
+    desc = (
+        f"Figure 11. Two line charts against the share of the wire removed, from 0 to 60%. Left: sensory-to-motor "
+        f"efficiency as a share of the whole graph. Removing wire from the long end leaves "
+        f"{pct(long_end['efficiency_share'])} of it at the {pct(reference, 0)} mark, against "
+        f"{pct(short_end['efficiency_share'])} for the same wire taken from the short end and "
+        f"{pct(at['random, matched count']['efficiency_share'])} for the matched number of connections removed at "
+        f"random. Per metre of wire that is {pct(per_metre['longest first'], 2)} of the starting efficiency against "
+        f"{pct(per_metre['shortest first'], 2)}, a factor of "
+        f"{per_metre['shortest first'] / per_metre['longest first']:.1f}. Right: the largest weakly connected "
+        f"component never falls below {pct(floor_component)} of the nodes under any schedule."
+    )
+    return svg.render("Figure 11. What the length of a connection buys", desc), desc, f"fig-tradeoff-{theme}.svg"
+
+
+HUB_SCOPES = (("all", "All cell types", "wire"), ("brain", "Brain", "ink"), ("nerve cord", "Nerve cord", "null"))
+
+
+def figure_hubs(data: dict, theme: str) -> tuple[str, str, str]:
+    """Figure 12: distance from the compartment centre against degree, and distance to a type's own partners."""
+    svg = Svg(940, theme)
+    result = data["hubs"]
+    bins = result["degree_bins"]
+    partners = result["partners"]
+    correlations = {(row["scope"], row["measure"]): row for row in result["correlations"]}
+    whole = partners["scopes"]["all"]
+    heading(svg, 80, "Degree says nothing about how central a cell type sits, but a type sits among its partners",
+            "Left: cell types in ten equal groups by total degree. Right: the mean distance from a type to the "
+            "centroid of the partners it contacts, against 1000 redraws that keep its degree and take its partners "
+            "at random.")
+    px0, px1, py0, py1 = 150, 700, 340, 690
+    to_x = linear(1, 10, px0 + 30, px1 - 30)
+    to_y = linear(0, 340, py1, py0)
+    svg.text(px0 - 86, py0 - 90, "Median distance from the centre of the compartment", 26, weight=600)
+    y_axis(svg, to_y, px0, [0, 100, 200, 300], ["0", "100", "200", "300 µm"], py0, py1, grid_right=px1)
+    x_axis(svg, to_x, py1, range(1, 11), [str(k) for k in range(1, 11)], px0, px1,
+           "Degree decile, least connected to most")
+    ends = []
+    for scope, _, color in HUB_SCOPES:
+        rows = [row for row in bins if row["scope"] == scope]
+        ys = [to_y(row["median_distance_um"]) for row in rows]
+        svg.polyline([to_x(row["bin"]) for row in rows], ys, color, 3.5)
+        ends.append(ys[-1])
+    for (scope, label, color), y in zip(HUB_SCOPES, spread(ends, 34, py0, py1)):
+        svg.text(px1 + 16, y + 8, f"{label}, ρ {signed(correlations[(scope, 'degree')]['spearman_rho'], 3)}", 24,
+                 color, 600)
+
+    bx0, bx1, lx = 1190, 1540, 1150
+    to_d = linear(0, 500, bx0, bx1)
+    svg.text(lx - 130, py0 - 90, "Distance to a type's own partners", 26, weight=600)
+    x_axis(svg, to_d, py1, [0, 250, 500], ["0", "250", "500"], bx0, bx1,
+           "Mean distance to the partners' centroid, µm", grid_top=py0 - 30)
+    for i, (scope, label, _) in enumerate(HUB_SCOPES):
+        s = partners["scopes"][scope]
+        y = py0 + 46 + i * 108
+        svg.text(lx, y + 8, label, 24, "ink2", anchor="end")
+        svg.line(to_d(s["real_um"]), y, to_d(s["null_mean_um"]), y, "rule_strong", 2)
+        svg.dot(to_d(s["null_mean_um"]), y, 10, "null", ring=3)
+        svg.dot(to_d(s["real_um"]), y, 10, "wire", ring=3)
+        svg.text(to_d(s["real_um"]), y + 42, f"{s['real_um']:.0f}", 22, "wire_ink", 500, anchor="middle", mono=True)
+        svg.text(to_d(s["null_mean_um"]), y + 42, f"{s['null_mean_um']:.0f}", 22, "null", anchor="middle", mono=True)
+        svg.text(WIDTH - MARGIN, y + 8, f"{s['ratio']:.3f}×", 24, "ink2", anchor="end", mono=True)
+    svg.dot(lx - 130 + 9, py1 + 112, 9, "wire")
+    svg.text(lx - 130 + 28, py1 + 120, "real", 22, "ink2")
+    svg.dot(lx - 20, py1 + 112, 9, "null")
+    svg.text(lx, py1 + 120, "degree-matched random partners", 22, "ink2")
+    note = (f"Over all {count(result['totals']['types'])} cell types the rank correlation between total degree and "
+            f"distance from the centroid of the scope is {signed(correlations[('all', 'degree')]['spearman_rho'], 3)}, "
+            f"and the brain and the nerve cord lean opposite ways "
+            f"({signed(correlations[('brain', 'degree')]['spearman_rho'], 3)} and "
+            f"{signed(correlations[('nerve cord', 'degree')]['spearman_rho'], 3)}). The same types sit "
+            f"{whole['ratio']:.3f} times as far from their own partners as from random ones "
+            f"(z = {signed(whole['z_score'], 1)}), and {pct(partners['share_nearer_than_chance'])} of them are "
+            f"nearer their partners than their own null mean.")
+    for k, line in enumerate(wrap(note, 24, WIDTH - 2 * MARGIN)):
+        svg.text(MARGIN, 866 + k * 34, line, 24, "ink2")
+    desc = (
+        f"Figure 12. Left: a line chart of the median distance from the centre of the compartment against ten "
+        f"degree deciles, for all cell types and for the brain and the nerve cord separately. The lines are close "
+        f"to flat; the rank correlation between degree and distance is "
+        f"{signed(correlations[('all', 'degree')]['spearman_rho'], 3)} over all "
+        f"{count(result['totals']['types'])} types, "
+        f"{signed(correlations[('brain', 'degree')]['spearman_rho'], 3)} in the brain and "
+        f"{signed(correlations[('nerve cord', 'degree')]['spearman_rho'], 3)} in the nerve cord. Right: for each "
+        f"scope, the mean distance from a cell type to the centroid of its own partners against degree-matched "
+        f"random partners: all {whole['real_um']:.0f} against {whole['null_mean_um']:.0f} µm, brain "
+        f"{partners['scopes']['brain']['real_um']:.0f} against "
+        f"{partners['scopes']['brain']['null_mean_um']:.0f} µm, nerve cord "
+        f"{partners['scopes']['nerve cord']['real_um']:.0f} against "
+        f"{partners['scopes']['nerve cord']['null_mean_um']:.0f} µm, a ratio of {whole['ratio']:.3f} overall."
+    )
+    return svg.render("Figure 12. Degree, position and partners", desc), desc, f"fig-hubs-{theme}.svg"
+
+
+def figure_symmetry(data: dict, theme: str) -> tuple[str, str, str]:
+    """Figure 13: the left-right wire ratio of every paired neuropil, against a sign-flip null on their mean."""
+    svg = Svg(1190, theme)
+    result = data["symmetry"]
+    pairs = result["pairs"]
+    asymmetry = result["wire_asymmetry"]
+    totals = result["totals"]
+    widest = min(pairs, key=lambda row: row["log_ratio"])
+    heading(svg, 80, "The two sides hold the same wire, and neither side holds more than the other",
+            "One row per left-right pair of neuropils, ordered by the wire it holds. The natural logarithm of the "
+            "left side's wire over the right side's: zero is a pair in balance.")
+    bound = 0.9
+    columns = [(MARGIN, 300, 800), (900, 1140, 1640)]
+    top, step = 260, 26
+    half = (len(pairs) + 1) // 2
+    bottom = top + step * (half - 1) + 30
+    for c, (label_x, px0, px1) in enumerate(columns):
+        to_x = linear(-bound, bound, px0, px1)
+        x_axis(svg, to_x, bottom, [-0.5, 0, 0.5], ["−0.5", "0", "0.5"], px0, px1,
+               "Left wire over right wire, natural logarithm", grid_top=top - 24)
+        svg.line(to_x(0), top - 24, to_x(0), bottom, "rule_strong", 2)
+        for i, row in enumerate(pairs[c * half:(c + 1) * half]):
+            y = top + i * step
+            color = "null" if row["compartment"] == "vnc" else "wire"
+            svg.text(label_x, y + 8, row["neuropil"], 22, "ink2", mono=True)
+            value = row["log_ratio"]
+            clipped = max(min(value, bound), -bound)
+            svg.dot(to_x(clipped), y, 8, color, ring=3)
+            if value != clipped:
+                svg.text(to_x(clipped) + 16, y + 8, signed(value, 2), 20, "wire_ink", 500, mono=True)
+    sy = bottom + 210
+    px0, px1 = columns[0][1], columns[0][2]
+    to_x = linear(-bound, bound, px0, px1)
+    svg.text(MARGIN, sy - 54, f"Mean over the {asymmetry['pairs']} pairs, against a sign-flip null", 26, weight=600)
+    spread_95 = 1.96 * asymmetry["null_sd"]
+    svg.rect(to_x(-spread_95), sy - 20, to_x(spread_95) - to_x(-spread_95), 40, "null", rx=4, opacity=0.8)
+    x_axis(svg, to_x, sy + 34, [-0.5, 0, 0.5], ["−0.5", "0", "0.5"], px0, px1)
+    svg.line(to_x(0), sy - 34, to_x(0), sy + 34, "rule_strong", 2)
+    svg.dot(to_x(asymmetry["mean"]), sy, 11, "wire", ring=3)
+    svg.text(px1 + 40, sy + 9, f"mean {signed(asymmetry['mean'], 3)}, z = "
+             f"{signed(asymmetry['z_score'], 2)}, p = {asymmetry['p_value']:.3f}", 24, "ink2", mono=True)
+    svg.text(px1 + 40, sy + 47, f"Blue: the central 95% of {asymmetry['permutations']} sign flips of the same "
+             "ratios.", 22, "ink3")
+    note = (f"{count(totals['paired']['neuropils'])} of the {count(totals['neuropils'])} neuropils that hold cell "
+            f"types form {asymmetry['pairs']} pairs and carry {pct(totals['paired']['wire_share'])} of the wire; "
+            f"{count(totals['midline']['neuropils'])} carry no hemisphere suffix and "
+            f"{count(totals['unpaired_sides']['neuropils'])} are one side of a structure whose other side holds no "
+            f"cell type here. Within a pair the two sides differ by a median factor of "
+            f"{math.exp(asymmetry['median_absolute']):.2f}; the widest gap is {widest['neuropil']}, where the right "
+            f"copy holds {math.exp(-widest['log_ratio']):.1f} times the wire of the left.")
+    for k, line in enumerate(wrap(note, 24, WIDTH - 2 * MARGIN)):
+        svg.text(MARGIN, sy + 132 + k * 34, line, 24, "ink2")
+    desc = (
+        f"Figure 13. A dot chart of {asymmetry['pairs']} left-right pairs of neuropils in two columns, each dot the "
+        f"natural logarithm of the left side's wire over the right side's, against a line at zero. Most pairs lie "
+        f"within 0.5 of zero; the median pair differs by a factor of "
+        f"{math.exp(asymmetry['median_absolute']):.2f} and the widest, {widest['neuropil']}, by "
+        f"{math.exp(-widest['log_ratio']):.1f} in favour of the right. Below, the mean of the 36 ratios, "
+        f"{signed(asymmetry['mean'], 3)}, sits inside the central 95% of 1000 sign flips of the same ratios "
+        f"(z = {signed(asymmetry['z_score'], 2)}, two-sided p = {asymmetry['p_value']:.3f}), so there is no side "
+        f"bias in the wiring budget that this test can separate from chance."
+    )
+    return svg.render("Figure 13. The wiring budget of the two sides", desc), desc, f"fig-symmetry-{theme}.svg"
+
+
 def methods_pipeline(data: dict, theme: str) -> tuple[str, str, str]:
     """The analysis pipeline as eight numbered steps in two rows."""
     svg = Svg(660, theme)
@@ -1217,7 +1504,8 @@ def methods_pipeline(data: dict, theme: str) -> tuple[str, str, str]:
 
 
 THEMED = (stat_plate, figure_placement, figure_distance, figure_cost, figure_atlas, figure_concentration,
-          figure_routes, figure_value, figure_price, figure_generative, methods_pipeline)
+          figure_routes, figure_value, figure_price, figure_generative, figure_synapses, figure_tradeoff,
+          figure_hubs, figure_symmetry, methods_pipeline)
 
 
 def build_all(data: dict, out_dir: Path) -> list[Path]:

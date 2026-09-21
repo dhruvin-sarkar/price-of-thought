@@ -5,7 +5,7 @@ import pytest
 from PIL import Image
 
 from pipeline import poster
-from pipeline.common import RESULTS
+from pipeline.common import RESULTS, ROOT
 from pipeline.poster import (
     NBSP,
     REFERENCES,
@@ -44,9 +44,16 @@ def test_linear_scale_maps_endpoints_and_can_invert_direction():
 
 
 def test_figures_are_numbered_as_in_the_readme_and_read_in_order():
-    assert reading_order() == [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    assert reading_order() == [1, 2, 3, 4, 5, 6, 7, 8, 11]
     with pytest.raises(ValueError):
         reading_order((("b",), ("a",)), {"a": 1, "b": 2})
+
+
+def test_the_readme_figures_the_sheet_leaves_out_are_the_ones_it_does_not_draw():
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    numbered = {int(n) for n in re.findall(r"\*\*Figure (\d+)\.", readme)}
+    assert numbered == set(range(1, 14))
+    assert numbered - set(reading_order()) == {9, 10, 12, 13}
 
 
 def test_wrap_breaks_greedily_and_never_leaves_an_empty_line():

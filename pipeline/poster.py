@@ -61,15 +61,16 @@ WIRE = LIGHT["wire"]
 WIRE_INK = LIGHT["wire_ink"]
 NULL = LIGHT["null"]
 
-# Poster figures share their numbers with the README figures they redraw.
+# Poster figures share their numbers with the README figures they redraw. The sheet holds nine; the README
+# figures left off it are named in the captions of the panels that stand in for them.
 FIGURE_LAYOUT = (("placement", "distance", "cost"), ("atlas", "concentration", "routes"),
-                 ("value", "price", "generative"))
+                 ("value", "price", "tradeoff"))
 FIGURE_NUMBERS = {"placement": 1, "distance": 2, "cost": 3, "atlas": 4, "concentration": 5, "routes": 6,
-                  "value": 7, "price": 8, "generative": 9}
+                  "value": 7, "price": 8, "tradeoff": 11}
 # Each column carries a heading before the figure it names; the others continue the heading above them.
 COLUMN_HEADINGS = {"placement": "What the layout costs", "atlas": "Where the wire goes",
                    "routes": "The connective and its hubs", "value": "What the connective buys",
-                   "generative": "A model without degrees"}
+                   "tradeoff": "What length buys"}
 QUESTION = (
     "Nervous systems are thought to place their parts so as to keep wiring short,^2^ and in the human brain the "
     "best-connected regions are joined by long, costly connections that carry much of the traffic.^3^ The complete "
@@ -489,7 +490,6 @@ def figure_atlas(sheet: Sheet, data: dict, x0, x1, y) -> float:
     tested = [row for row in atlas["neuropils"] if "cost_ratio" in row]
     rows = atlas["neuropils"][:8]
     beyond = sum(1 for row in tested if row["n_at_or_below_real"] == 0)
-    closest = max(tested, key=lambda row: row["cost_ratio"])
     heaviest = atlas["pairs"][0]
     chart_title(sheet, x0, x1, y, "Wire held by each neuropil")
     x = swatch(sheet, x0, y + 50, WIRE, "brain")
@@ -522,10 +522,10 @@ def figure_atlas(sheet: Sheet, data: dict, x0, x1, y) -> float:
     return caption(sheet, x0, x1, bottom + 78, "atlas", "Every region large enough to test is packed cheaply.",
                    f"Each connection lends half its length to the neuropil nearest each end; only "
                    f"{ra.pct(totals['share_within_one_neuropil'])} of the wire stays inside one region, and "
-                   f"{heaviest['a']}\u2013{heaviest['b']} is the heaviest route between two at "
-                   f"{ra.count(round(heaviest['wire_um'] / 1000))}\u00a0mm. Reshuffling a region's own types "
-                   f"over its own positions puts all {len(tested)} below their permuted mean, {beyond} below every "
-                   f"permutation; {closest['neuropil']} comes closest at {closest['cost_ratio']:.3f}.^2^")
+                   f"{heaviest['a']}\u2013{heaviest['b']} carries the most between two, "
+                   f"{ra.count(round(heaviest['wire_um'] / 1000))}\u00a0mm. Reshuffling a region's own types over "
+                   f"its own positions puts all {len(tested)} below their permuted mean, {beyond} below every "
+                   f"permutation.^2^")
 
 
 def figure_concentration(sheet: Sheet, data: dict, x0, x1, y) -> float:
@@ -571,7 +571,7 @@ def figure_concentration(sheet: Sheet, data: dict, x0, x1, y) -> float:
 def figure_routes(sheet: Sheet, data: dict, x0, x1, y) -> float:
     rows = data["robustness"]["thresholds"]
     chart_title(sheet, x0, x1, y, "Rich-to-rich routes, real over rewired", "by edge threshold")
-    frame = axis_frame(sheet, x0 + 86, y + 48, x1, y + 232, (0, len(rows)), (0.8, 1.8), [], [0.8, 1.0, 1.4, 1.8],
+    frame = axis_frame(sheet, x0 + 86, y + 48, x1, y + 164, (0, len(rows)), (0.8, 1.8), [], [0.8, 1.0, 1.4, 1.8],
                        str, lambda t: f"{t:.1f}", xlabel="Edge threshold, share of the target's input")
     xs = [float(frame.sx(k + 0.5)) for k in range(len(rows))]
     lo, hi = [], []
@@ -588,11 +588,15 @@ def figure_routes(sheet: Sheet, data: dict, x0, x1, y) -> float:
         sheet.text(x, float(frame.sy(v)) - 26, f"{v:.3f}", 23, "mono", INK_2, ha="center")
         sheet.text(x, frame.y1 + 40, f"{100 * r['fraction']:g}%", TICK, "mono", INK_3, ha="center")
     rc = data["richclub"]["routes_top10"]
+    # The generative model has no panel of its own, so its one relevant success is given with its overall failure.
+    properties = data["comparison"]["models"]["G"]["properties"]
+    met = sum(1 for p in properties.values() if p["reproduced"])
     return caption(sheet, x0, x1, frame.y1 + 130, "routes", "The hub routing is modest and fragile.",
                    f"Routes from a rich partner on one side, through a connective type, to one on the other, "
                    f"against 1000 rewirings (blue: central 95%; filled: p{NBSP}<{NBSP}0.05). The "
                    f"{rc['total']['ratio']:.3f} excess at 1% vanishes at 0.5%, though connective types are "
-                   "over-represented among hubs, as Lin et al. expected.^4^")
+                   "over-represented among hubs, as Lin et al. expected.^4^ Distance and cell class alone "
+                   f"reproduce the count, but only {met} of {len(properties)} graph properties in all.")
 
 
 def figure_value(sheet: Sheet, data: dict, x0, x1, y) -> float:
@@ -664,40 +668,43 @@ def figure_price(sheet: Sheet, data: dict, x0, x1, y) -> float:
                    "wiring buys nothing more.")
 
 
-def figure_generative(sheet: Sheet, data: dict, x0, x1, y) -> float:
-    model = data["comparison"]["models"]["G"]
-    fits = data["fits"]["models"]["G"]
-    chart_title(sheet, x0, x1, y, "Real value over model G's synthetic mean", "log scale")
-    px0, px1 = x0 + 390, x1 - 108
-    sx = linear(-5, 5, px0, px1)
-    top, step = y + 56, 24
-    rows = list(ra.GENERATIVE_LABELS.items())
-    bottom = top + step * (len(rows) - 1) + 22
-    for t, label in ((-4, "1/16"), (-2, "1/4"), (0, "1"), (2, "4"), (4, "16")):
-        sheet.line([float(sx(t))] * 2, [top - 22, bottom], RULE_STRONG if t == 0 else RULE, 2 if t == 0 else 1.5)
-        sheet.text(float(sx(t)), bottom + 40, label, TICK, "mono", INK_3, ha="center")
-    for i, (key, label) in enumerate(rows):
-        prop = model["properties"][key]
-        yy = top + i * step
-        sheet.text(x0, yy + 8, label, 23, "sans", INK_2)
-        mean = prop["synthetic_mean"]
-        lo, hi = (math.log2(v / mean) for v in prop["interval_95"])
-        sheet.rect(float(sx(lo)) - 3, yy - 8, float(sx(hi)) + 3, yy + 8, NULL, zorder=3)
-        ratio = math.log2(prop["real"] / mean)
-        sheet.dot(float(sx(max(min(ratio, 5), -5))), yy, 9, INK if prop["reproduced"] else WIRE)
-        if abs(ratio) > 4.0:
-            sheet.text(x1, yy + 8, f"{2 ** ratio:.1f}×", 22, "mono", WIRE_INK, ha="right")
-    reproduced = sum(p["reproduced"] for p in model["properties"].values())
-    return caption(sheet, x0, x1, bottom + 74, "generative", "Distance and cell class reproduce the hub routes.",
-                   f"A logistic model of distance, compartment and class pairing (pseudo-R² "
-                   f"{fits['pseudo_r2_mcfadden']:.3f}) reproduces {reproduced} of {len(rows)} properties of 50 "
-                   "synthetic graphs (black: inside their central 95%, blue), the route count among them, without "
-                   "knowing a single degree.")
+def figure_tradeoff(sheet: Sheet, data: dict, x0, x1, y) -> float:
+    result = data["tradeoff"]
+    curves, comparison = result["curves"], result["comparison"]
+    reference = comparison["reference_wire_fraction"]
+    at, per_metre = comparison["at_reference"], comparison["efficiency_lost_per_metre"]
+    long_end, short_end = at["longest first"], at["shortest first"]
+    chart_title(sheet, x0, x1, y, "Sensory-to-motor efficiency left", "share of the whole graph")
+    x = x0
+    for _, label, color, dashed in ra.TRADEOFF_SERIES:
+        x = swatch(sheet, x, y + 52, {"wire": WIRE, "null": NULL, "ink3": INK_3}[color], label, "line")
+    frame = axis_frame(sheet, x0 + 96, y + 84, x1, y + 300, (0, 0.6), (0, 1), [0, 0.2, 0.4, 0.6],
+                       [0, 0.5, 1], lambda t: f"{100 * t:g}%", lambda t: f"{100 * t:g}%",
+                       xlabel="Wire removed, share of the whole budget")
+    for name, _, color, dashed in ra.TRADEOFF_SERIES:
+        rows = curves[name]
+        xs = [float(frame.sx(r["wire_removed_share"])) for r in rows]
+        ys = [float(frame.sy(r["efficiency_share"])) for r in rows]
+        artist = {"wire": WIRE, "null": NULL, "ink3": INK_3}[color]
+        sheet.line(xs, ys, artist, 3.6, dashes=(8, 7) if dashed else None, zorder=5, cap="round")
+    rx = float(frame.sx(reference))
+    sheet.line([rx, rx], [frame.y0 - 14, frame.y1], RULE_STRONG, 2, dashes=(7, 7), zorder=2)
+    for row, color, ink in ((long_end, WIRE, WIRE_INK), (short_end, NULL, NULL)):
+        ry = float(frame.sy(row["efficiency_share"]))
+        sheet.dot(rx, ry, 11, color)
+        sheet.text(rx + 20, ry - 14, ra.pct(row["efficiency_share"]), 23, "mono_medium", ink)
+    return caption(sheet, x0, x1, frame.y1 + 130, "tradeoff", "Short connections buy more per micrometre.",
+                   f"At {ra.pct(reference, 0)} of the wire removed, taking it from the long end costs "
+                   f"{ra.count(long_end['edges_removed'])} connections and leaves efficiency at "
+                   f"{ra.pct(long_end['efficiency_share'])}; from the short end it costs "
+                   f"{ra.count(short_end['edges_removed'])} and leaves {ra.pct(short_end['efficiency_share'])}, a "
+                   f"factor of {per_metre['shortest first'] / per_metre['longest first']:.1f} per metre. "
+                   "Exploratory, and run after the registered tests.")
 
 
 FIGURE_DRAW = {"placement": figure_placement, "distance": figure_distance, "cost": figure_cost,
                "atlas": figure_atlas, "concentration": figure_concentration, "routes": figure_routes,
-               "value": figure_value, "price": figure_price, "generative": figure_generative}
+               "value": figure_value, "price": figure_price, "tradeoff": figure_tradeoff}
 
 
 # Sections

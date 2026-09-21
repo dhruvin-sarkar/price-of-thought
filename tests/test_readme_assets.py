@@ -143,7 +143,8 @@ def test_every_asset_builds_from_the_committed_results(tmp_path):
     names = {p.name for p in written}
     assert "plate-title.svg" in names
     for stem in ("stat-plate", "fig-placement", "fig-distance", "fig-cost", "fig-atlas", "fig-concentration",
-                 "fig-routes", "fig-value", "fig-price", "fig-generative", "methods-pipeline"):
+                 "fig-routes", "fig-value", "fig-price", "fig-generative", "fig-synapses", "fig-tradeoff",
+                 "fig-hubs", "fig-symmetry", "methods-pipeline"):
         assert {f"{stem}-light.svg", f"{stem}-dark.svg"} <= names
     for path in written:
         text = path.read_text(encoding="utf-8")

@@ -2,9 +2,7 @@ import { useState } from "react";
 import Efficiency, { AXES, Component, ComponentTable, EfficiencyTable } from "./figures/Removal.jsx";
 import SynapseValue, { SynapseTable } from "./figures/SynapseValue.jsx";
 import { Figure, HeadingLevel, Keynote, More, Segmented, Sidenote, TextBlock, Unregistered } from "./ui.jsx";
-import { count, fixed, micron, percent, times } from "../lib/format.js";
-
-const metres = (um) => `${fixed(um / 1e6, 2)} m`;
+import { count, fixed, micron, millimetre, percent, times } from "../lib/format.js";
 
 const axisLabel = (value) => AXES.find((option) => option.value === value).label.toLowerCase();
 
@@ -69,7 +67,7 @@ export default function Buys({ data }) {
             ]}
           >
             <p>
-              The {count(all.edges)} connections of the cell-type graph hold {metres(all.wire_um)} of wire and{" "}
+              The {count(all.edges)} connections of the cell-type graph hold {millimetre(all.wire_um)} of wire and{" "}
               {count(all.synapses)} synapses between them, {fixed(all.synapses_per_um, 3)} synapses for every
               micrometre laid down. Sorting them by length into ten equal groups makes that rate look strongly
               dependent on length: the shortest tenth buys {fixed(shortest.synapses_per_um, 2)} synapses per
@@ -192,7 +190,7 @@ export default function Buys({ data }) {
             <p>
               Matched on the wire, the short end is far the better buy. Taking{" "}
               {percent(comparison.reference_wire_fraction, 0)} of the budget,{" "}
-              {metres(at["longest first"].wire_removed_um)}, from the long end costs{" "}
+              {millimetre(at["longest first"].wire_removed_um)}, from the long end costs{" "}
               {count(at["longest first"].edges_removed)} connections, {percent(at["longest first"].edges_removed_share)}{" "}
               of them, and leaves efficiency at {percent(at["longest first"].efficiency_share)}. The same wire from
               the short end costs {count(at["shortest first"].edges_removed)} connections,{" "}

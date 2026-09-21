@@ -2,10 +2,9 @@ import Lorenz, { TailTable } from "./figures/Lorenz.jsx";
 import RegionEconomy, { EconomyTable, tested } from "./figures/RegionEconomy.jsx";
 import Superclasses, { SuperclassTable } from "./figures/Superclasses.jsx";
 import WireAtlas, { AtlasTable, ranked } from "./figures/WireAtlas.jsx";
-import { Figure, HeadingLevel, Keynote, More, Sidenote, TextBlock } from "./ui.jsx";
-import { count, fixed, micron, percent, superclassName } from "../lib/format.js";
+import { Figure, HeadingLevel, Keynote, More, Sidenote, TextBlock, Unregistered } from "./ui.jsx";
+import { count, fixed, micron, millimetre, percent, superclassName } from "../lib/format.js";
 
-const metres = (um) => `${fixed(um / 1e6, 1)} m`;
 
 export default function Budget({ data }) {
   const { neuropils, pairs, totals } = data.atlas;
@@ -32,6 +31,14 @@ export default function Budget({ data }) {
             </p>
           </div>
 
+          <Unregistered>
+            The wire atlas, the {count(regions.length)} within-neuropil placement tests and the concentration of
+            the budget were all run after the thirteen registered hypotheses had been tested. None carries a
+            registered hypothesis, none had a direction fixed in advance, and the p-values of the region tests
+            are uncorrected. They describe where this animal&rsquo;s wire goes; they settle nothing that was
+            registered.
+          </Unregistered>
+
           <TextBlock
             notes={[
               <Keynote key="largest" value={percent(largest.wire_share)}>
@@ -40,7 +47,7 @@ export default function Budget({ data }) {
               </Keynote>,
               <Sidenote key="within" title="Between, not within">
                 Only {percent(totals.share_within_one_neuropil)} of the wire runs between two cell types nearest the
-                same neuropil. The rest of the {metres(totals.total_wire_um)} crosses from one region to another.
+                same neuropil. The rest of the {millimetre(totals.total_wire_um)} crosses from one region to another.
               </Sidenote>,
               <Sidenote key="exception" title="Three regions show no saving">
                 {loose.map((row) => row.neuropil).join(", ")} are not reliably cheaper than reshuffling their own
@@ -51,14 +58,14 @@ export default function Budget({ data }) {
             <p>
               A cell type is assigned to the neuropil whose surface lies nearest its position, and each connection
               lends half its length to the neuropil at each of its ends. That splits the{" "}
-              {metres(totals.total_wire_um)} of wire in the graph across {count(totals.neuropils_with_types)}{" "}
+              {millimetre(totals.total_wire_um)} of wire in the graph across {count(totals.neuropils_with_types)}{" "}
               regions, and asks which of them the animal is paying for.
             </p>
             <p>
               The answer is concentrated. The {shown.length} regions in the figure below hold {percent(inTop)} of
               the budget between them, led by the gnathal ganglion at {percent(largest.wire_share)} and the
               abdominal neuromere at {percent(neuropils[1].wire_share)}. The most expensive pair of regions is{" "}
-              {pairs[0].a} to {pairs[0].b}, carrying {metres(pairs[0].wire_um)} over {count(pairs[0].edges)}{" "}
+              {pairs[0].a} to {pairs[0].b}, carrying {millimetre(pairs[0].wire_um)} over {count(pairs[0].edges)}{" "}
               connections.
             </p>
             <p>
@@ -77,7 +84,7 @@ export default function Budget({ data }) {
             title="A tenth of all the wire ends in one region, and more than half of it in fourteen"
             caption={
               <>
-                Share of the {metres(totals.total_wire_um)} wiring budget held by each of the {shown.length}{" "}
+                Share of the {millimetre(totals.total_wire_um)} wiring budget held by each of the {shown.length}{" "}
                 neuropils holding the most, of {count(totals.neuropils_with_types)} that hold any. Each connection
                 lends half its length to the neuropil nearest each of its ends. Brain regions are drawn in copper
                 and nerve-cord regions in grey. Hover or focus a bar for its wire, its cell types and its internal

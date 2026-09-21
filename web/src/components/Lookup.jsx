@@ -24,10 +24,10 @@ const COLUMNS = [
   { key: "per_mm", label: "Flow per mm", numeric: true },
 ];
 
-/** Millimetres to two decimals: the shortest nodes hold a fifth of one and must not round to zero. */
+/** Millimetres to two decimals: the thriftiest cell types hold a fifth of one and must not round to zero. */
 const wire = (um) => `${fixed(um / 1000, 2)} mm`;
 
-/** Share of peers a node stands above, floored: only a node above every peer is allowed to read 100%. */
+/** Share of peers a cell type stands above, floored: only one above every peer is allowed to read 100%. */
 const over = (share) => `${Math.floor(100 * share)}%`;
 
 /** Flow bought per millimetre of neck-crossing wire, the ratio results/connective_price.csv reports. */
@@ -69,7 +69,7 @@ function Marked({ text, query }) {
 
 /**
  * Every descending and ascending cell type on one side, with what its neck-crossing wiring costs and what it
- * carries. Search by name, sort by any column, or open a node's ledger against the rest of its direction.
+ * carries. Search by name, sort by any column, or open one's ledger against the rest of its direction.
  */
 export default function Lookup({ data }) {
   const nodes = data.price.nodes;
@@ -92,9 +92,9 @@ export default function Lookup({ data }) {
   );
   const indexByNode = useMemo(() => new Map(nodes.map((row, i) => [row.node, i])), [nodes]);
 
-  // The page address holds the selection, so the hero and this table always show the same node.
+  // The page address holds the selection, so the hero and this table always show the same cell type.
   const { name: linked, index: selected, select } = useLinkedNode(nodes);
-  // A linked name matching no node; the address is left as the reader received it.
+  // A linked name matching no cell type; the address is left as the reader received it.
   const unknown = linked && selected < 0 ? linked : null;
 
   const rows = useMemo(() => {
@@ -119,8 +119,8 @@ export default function Lookup({ data }) {
 
   const countText =
     rows.length === nodes.length
-      ? `All ${count(nodes.length)} nodes listed.`
-      : `${count(rows.length)} of ${count(nodes.length)} nodes match.`;
+      ? `All ${count(nodes.length)} cell types listed.`
+      : `${count(rows.length)} of ${count(nodes.length)} cell types match.`;
   const [announced, setAnnounced] = useState(countText);
   useEffect(() => {
     const timer = setTimeout(() => setAnnounced(countText), 400);
@@ -138,7 +138,7 @@ export default function Lookup({ data }) {
     [select],
   );
 
-  // A node hidden by the direction filter would be selected with nothing on screen to show for it. This runs
+  // A cell type hidden by the direction filter would be selected with nothing on screen for it. This runs
   // for a selection made anywhere, including one arriving from the hero or from a link the reader followed.
   useEffect(() => {
     if (selected < 0) return;
@@ -291,7 +291,8 @@ export default function Lookup({ data }) {
 
       {unknown && (
         <p className="lk-unknown" role="status">
-          No node is named &ldquo;{unknown}&rdquo;. Search for another name above, or pick a row from the table.
+          No cell type is named &ldquo;{unknown}&rdquo;. Search for another name above, or pick a row from the
+          table.
           Names run <span className="id">DNg98</span> for a cell type and <span className="id">DNg98|L</span> for one
           side of it.
         </p>
@@ -319,7 +320,7 @@ export default function Lookup({ data }) {
         className="lk-scroll"
         tabIndex={0}
         role="region"
-        aria-label="Every connective node, by cell type and side"
+        aria-label="Every connective cell type, by name and side"
       >
         <table className="data lk-table">
           <caption className="visually-hidden">
@@ -376,7 +377,7 @@ export default function Lookup({ data }) {
             })}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={COLUMNS.length}>No node matches that name in this direction.</td>
+                <td colSpan={COLUMNS.length}>No cell type matches that name in this direction.</td>
               </tr>
             )}
           </tbody>
@@ -384,15 +385,15 @@ export default function Lookup({ data }) {
       </div>
 
       <p className="caption">
-        Value is the sensory-to-motor flow lost, in its own direction, when a node&rsquo;s neck-crossing connections
-        alone are removed. Arrow keys move down the table, Enter opens a row. Every row is in{" "}
+        Value is the sensory-to-motor flow lost, in its own direction, when a cell type&rsquo;s neck-crossing
+        connections alone are removed. Arrow keys move down the table, Enter opens a row. Every row is in{" "}
         <a href={blobUrl("results/connective_price.csv")}>results/connective_price.csv</a>.
       </p>
     </div>
   );
 }
 
-/** What one node costs and what it buys, set against every other node running the same way across the neck. */
+/** What one cell type costs and what it buys, against every other running the same way across the neck. */
 function Ledger({ node, nodes, tests }) {
   const test = tests[node.direction];
   const total = tests.descending.total_price_um + tests.ascending.total_price_um;
@@ -456,13 +457,14 @@ function Ledger({ node, nodes, tests }) {
         Its neck-crossing connections hold {percent(node.price_um / total, 2)} of all the wire that crosses the neck.{" "}
         {bought ? (
           <>
-            Removing them costs {count(node.value)} units of {node.direction} flow. Measured the same way, one node
-            at a time, the {count(test.n)} {node.direction} nodes lose {count(test.total_value)} units between them.
+            Removing them costs {count(node.value)} units of {node.direction} flow. Measured the same way, one cell
+            type at a time, the {count(test.n)} {node.direction} cell types lose {count(test.total_value)} units
+            between them.
           </>
         ) : (
           <>
             Removing them costs no flow at all, as it does for {count(test.zero_value)} of the {count(test.n)}{" "}
-            {node.direction} nodes: another route carries what they carried.
+            {node.direction} cell types: another route carries what they carried.
           </>
         )}
       </p>
@@ -478,14 +480,15 @@ function Ledger({ node, nodes, tests }) {
           text={
             bought
               ? `Rank ${count(peers.value.rank)} of ${count(peers.n)}, above ${over(peers.value.share)} of them`
-              : `Level with the ${count(test.zero_value)} nodes that buy none`
+              : `Level with the ${count(test.zero_value)} cell types that buy none`
           }
           share={peers.value.share}
         />
       </div>
       <p className="caption lk-peer-note">
-        Each bar is the share of {node.direction} nodes this one stands above: none at the left, all of them at the
-        right, the short rule halfway. Ranks count every {node.direction} node, {count(peers.n)} of them.
+        Each bar is the share of {node.direction} cell types this one stands above: none at the left, all of them
+        at the right, the short rule halfway. Ranks count every {node.direction} cell type, {count(peers.n)} of
+        them.
       </p>
 
       {peers.sides.length > 1 && (
@@ -536,7 +539,7 @@ function Ledger({ node, nodes, tests }) {
       )}
 
       <p className="caption lk-share">
-        This node is in the page address, so the link opens on it again:{" "}
+        This cell type is in the page address, so the link opens on it again:{" "}
         <span className="id">{`${NODE_HASH}${node.node}`}</span>
       </p>
     </article>

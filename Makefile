@@ -3,11 +3,12 @@ export PYTHONUTF8 = 1
 CHECKS := schema spatial_graph preregistration spatial_optimality richclub value wiring_economy cable_length price \
 	generative threshold_robustness wire_atlas wire_concentration hub_placement wire_symmetry synapse_value \
 	neuropil_network length_tradeoff \
-	hero readme_assets references citations document_numbers
+	hero readme_assets site_data references citations document_numbers
 
-.PHONY: reproduce data analyze hero readme poster export paper test verify clean
+.PHONY: reproduce data analyze hero readme poster social export paper test verify clean
 
-reproduce: data analyze hero readme paper test verify
+# paper comes last because it needs pandoc with typst, which the tests and checks do not.
+reproduce: data analyze hero readme poster social export test verify paper
 
 data:
 	$(PYTHON) -m pipeline.schema_discovery
@@ -49,6 +50,10 @@ paper:
 # One-page summary at print size, and the preview shown in the README.
 poster:
 	$(PYTHON) -m pipeline.poster
+
+# The card GitHub and link previews show, at the size they serve it.
+social:
+	$(PYTHON) -m pipeline.social_card
 
 test:
 	$(PYTHON) -m pytest -q

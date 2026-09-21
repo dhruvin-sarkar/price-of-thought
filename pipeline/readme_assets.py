@@ -1498,7 +1498,7 @@ def methods_pipeline(data: dict, theme: str) -> tuple[str, str, str]:
         f"3 pre-registration in commits {', '.join(PREREGISTRATION_COMMITS)} before any result; 4 placement, 1000 "
         "permutations and a swap search; 5 rich club, 1000 layer-preserving rewirings; 6 value, 1000 cost-matched "
         "removals; 7 generative model, four logistic fits and 100 synthetic graphs; 8 checks, three more edge "
-        "thresholds and a verification suite that recomputes every statistic."
+        "thresholds and a verification suite that re-reduces the saved draws and checks every committed result."
     )
     return svg.render("The analysis pipeline in eight steps", desc), desc, f"methods-pipeline-{theme}.svg"
 

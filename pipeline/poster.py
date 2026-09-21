@@ -232,11 +232,13 @@ def lede_findings(data: dict) -> list[tuple[str, str, str, str]]:
         ("Where the wire ends", ra.pct(top["wire_share"]),
          f"of the wiring budget ends in the gnathal ganglia ({top['neuropil']}), more than in any other region. "
          f"Inside all {len(tested)} regions large enough to test, the cell types are packed below their own "
-         f"permuted mean, {beyond} of them below every one of the 1000 permutations.", INK),
+         f"permuted mean, {beyond} of them below every one of the 1000 permutations. Exploratory, and run "
+         f"after the registered tests.", INK),
         ("How unevenly it is spread", ra.pct(curves["all"]["top_shares"]["0.1"]),
          f"of the wire lies in the longest tenth of the connections, a Gini coefficient of "
          f"{curves['all']['gini']:.3f}. The neck-crossing connections are the most uniform set of all, at "
-         f"{curves['across the neck']['gini']:.3f}: long, and nearly all of a length.", INK),
+         f"{curves['across the neck']['gini']:.3f}: long, and nearly all of a length. Exploratory, and run "
+         f"after the registered tests.", INK),
         ("What the longest wire buys", f"{families['flow']['ratio']:.2f}×",
          f"the sensory-to-motor routing that random ordinary wiring of the same total length carries. This was "
          f"registered to exceed 1 and does not; only from brain to nerve cord does the neck carry more, at "
@@ -709,8 +711,11 @@ FIGURE_DRAW = {"placement": figure_placement, "distance": figure_distance, "cost
 
 # Sections
 
-def draw_front(sheet: Sheet, front: dict, x0, y0, size) -> None:
-    """The CNS silhouette and the sampled neck-crossing wires, shortest first, fitted into a square box."""
+def draw_front(sheet: Sheet, front: dict, x0, y0, size, width: float = 1.1, alpha: float = 0.5) -> None:
+    """The CNS silhouette and the sampled neck-crossing wires, shortest first, fitted into a square box.
+
+    Parameters: ``width`` and ``alpha`` set the wire stroke, which a smaller box needs lighter.
+    """
     lo, hi = np.array(front["bounds"]["min"]), np.array(front["bounds"]["max"])
     scale = size / float((hi - lo).max())
     ox = x0 + (size - (hi[0] - lo[0]) * scale) / 2
@@ -725,8 +730,8 @@ def draw_front(sheet: Sheet, front: dict, x0, y0, size) -> None:
     starts = np.column_stack([ox + (wires[:, 0] - lo[0]) * scale, oy + (hi[1] - wires[:, 1]) * scale])
     ends = np.column_stack([ox + (wires[:, 2] - lo[0]) * scale, oy + (hi[1] - wires[:, 3]) * scale])
     colors = [ra.ramp_color(DARK["ramp"], (length - a) / (b - a)) for length in wires[:, 4]]
-    sheet.ax.add_collection(LineCollection(np.stack([starts, ends], axis=1), colors=colors, linewidths=1.1,
-                                           alpha=0.5, zorder=3, capstyle="round"))
+    sheet.ax.add_collection(LineCollection(np.stack([starts, ends], axis=1), colors=colors, linewidths=width,
+                                           alpha=alpha, zorder=3, capstyle="round"))
 
 
 def draw_band(sheet: Sheet, data: dict, edges) -> None:
@@ -876,7 +881,8 @@ def draw_footer(sheet: Sheet) -> None:
     sheet.text(x0, qy + 30, "Code, results and technical report", CAPTION, "sans_bold", INK)
     sheet.text(x0, qy + 72, REPO_URL.removeprefix("https://"), CAPTION, "sans_bold", WIRE_INK)
     yy = sheet.paragraph(x0, qy + 122, x1 - x0, "make reproduce rebuilds every number from neuPrint; make verify "
-                         "recomputes each statistic from its saved nulls.", 27, INK_2, leading=1.38)
+                         "re-reduces the saved draws and checks every committed result.", 27, INK_2,
+                         leading=1.38)
     sheet.paragraph(x0, yy + 8, x1 - x0, "Data: HHMI Janelia FlyEM and Google Research, CC-BY 4.0. Code: MIT.", 25,
                     INK_3, leading=1.38)
 

@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 from pipeline.build_spatial_graph import load_spatial_graph
-from pipeline.common import ASSETS, RESULTS, ROOT
+from pipeline.common import ASSETS, RESULTS, WEB_DATA
 from pipeline.connective_richclub import TOP_FRACTION, node_sets, partner_richness, rich_mask
 from pipeline.connective_value import neck_crossing_mask
 from pipeline.hero_render import load_all_meshes, simplify
@@ -16,7 +16,6 @@ from pipeline.poster import hypotheses, load_results
 from pipeline.readme_assets import PREREGISTRATION_COMMITS
 from pipeline.wiring_cost import edge_array, edge_costs, positions_array
 
-OUT = ROOT / "web" / "public" / "data"
 # Coarse enough that the merged shell stays under 65536 vertices and its triangles index as uint16.
 MESH_CELL_NM = 9000.0
 HIST_BINS = 40
@@ -303,23 +302,21 @@ def site_data(price: pd.DataFrame) -> dict:
         "hypotheses": [{"label": label, "statement": statement, "supported": bool(supported)}
                        for label, statement, supported in hypotheses(load_results())],
     }
-    robustness = RESULTS / "threshold_robustness.json"
-    if robustness.exists():
-        data["robustness"] = json.loads(robustness.read_text(encoding="utf-8"))
+    data["robustness"] = read_json("threshold_robustness.json")
     return data
 
 
 def main() -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
+    WEB_DATA.mkdir(parents=True, exist_ok=True)
     # The card link previews use. The page itself draws its own still from the exported front view.
-    shutil.copyfile(ASSETS / "hero.png", OUT.parent / "hero.png")
+    shutil.copyfile(ASSETS / "hero.png", WEB_DATA.parent / "hero.png")
     price = pd.read_csv(RESULTS / "connective_price.csv")
     data = site_data(price)
-    (OUT / "site.json").write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
+    (WEB_DATA / "site.json").write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     header = scene(load_spatial_graph(), price)
-    (OUT / "scene.json").write_text(json.dumps(header, separators=(",", ":")), encoding="utf-8")
-    print(f"site.json {(OUT / 'site.json').stat().st_size / 1e6:.2f} MB, scene.json "
-          f"{(OUT / 'scene.json').stat().st_size / 1e6:.2f} MB, {header['wires']:,} wires, "
+    (WEB_DATA / "scene.json").write_text(json.dumps(header, separators=(",", ":")), encoding="utf-8")
+    print(f"site.json {(WEB_DATA / 'site.json').stat().st_size / 1e6:.2f} MB, scene.json "
+          f"{(WEB_DATA / 'scene.json').stat().st_size / 1e6:.2f} MB, {header['wires']:,} wires, "
           f"{header['shell_triangles']:,} shell triangles")
 
 

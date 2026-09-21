@@ -98,15 +98,32 @@ def test_repairing_null_grows_when_the_neuropils_differ_in_size():
 
 def test_two_sided_p_counts_the_null_at_least_as_far_from_zero():
     null = np.array([-2.0, -1.0, 0.0, 1.0, 2.0])
-    assert two_sided_p(0.0, null) == pytest.approx(6 / 6)
+    assert two_sided_p(0.5, null) == pytest.approx(5 / 6)
     assert two_sided_p(1.5, null) == pytest.approx(3 / 6)
     assert two_sided_p(9.0, null) == pytest.approx(1 / 6)
+    # A draw exactly as far from zero as the observed value counts towards it.
+    assert two_sided_p(2.0, null) == pytest.approx(3 / 6)
+    # Only the distance from zero counts, so the sign of the observed value makes no difference.
+    assert two_sided_p(-1.5, null) == two_sided_p(1.5, null)
 
 
-def test_bias_test_reports_the_spread_of_the_values_it_was_given():
-    values = np.array([0.5, -0.5, 0.5, -0.5])
+def test_bias_test_weighs_the_mean_against_the_spread_of_its_own_sign_flip_null():
+    # Three pairs favour one side by 0.5 and one the other by 0.1: the mean is 0.35 and a sign-flip draw
+    # reaches 0.4, 0.35, 0.15 or 0.1 in absolute value, so a quarter of the null sits at or beyond 0.35.
+    values = np.array([0.5, 0.5, 0.5, -0.1])
     test = bias_test(values, seed=2)
+
     assert test["pairs"] == 4
+    assert test["permutations"] == PERMUTATIONS
+    assert test["mean"] == pytest.approx(0.35)
+    assert (test["mean_absolute"], test["median_absolute"], test["max_absolute"]) == (0.4, 0.5, 0.5)
+    assert test["null_sd"] == pytest.approx(math.sqrt((3 * 0.25 + 0.01) / 16), abs=0.02)
+    assert test["z_score"] == pytest.approx(0.35 / math.sqrt((3 * 0.25 + 0.01) / 16), abs=0.1)
+    assert test["p_value"] == pytest.approx(0.25, abs=0.05)
+
+
+def test_bias_test_reports_no_bias_when_every_pair_is_exactly_in_balance():
+    test = bias_test(np.array([0.5, -0.5, 0.5, -0.5]), seed=2)
     assert test["mean"] == 0.0
     assert (test["mean_absolute"], test["median_absolute"], test["max_absolute"]) == (0.5, 0.5, 0.5)
     assert test["z_score"] == 0.0
@@ -140,7 +157,30 @@ def test_a_perfectly_symmetric_atlas_shows_no_asymmetry_at_all():
     wire = symmetry(atlas(rows))["wire_asymmetry"]
     assert wire["mean"] == 0.0
     assert wire["max_absolute"] == 0.0
+    # Every neuropil holds the same wire, so no rematching of the two sides can open a gap either.
     assert wire["repaired_null_mean"] == 0.0
+    assert wire["repaired_n_at_or_below_observed"] == PERMUTATIONS
+    assert wire["repaired_p_value"] == 1.0
+
+
+def test_matching_each_left_neuropil_to_a_random_right_one_opens_a_far_wider_gap():
+    sizes = (("AL", (400_000.0, 380_000.0)), ("LO", (150_000.0, 160_000.0)),
+             ("LH", (60_000.0, 58_000.0)), ("MB", (20_000.0, 21_000.0)))
+    rows = [neuropil(f"{stem}({side})", wire) for stem, sides in sizes for side, wire in zip("LR", sides)]
+    wire = symmetry(atlas(rows))["wire_asymmetry"]
+
+    assert wire["pairs"] == 4
+    assert wire["mean_absolute"] < 0.1
+    # Matching AL against MB and the like opens gaps an order of magnitude wider than the real pairing.
+    assert wire["repaired_null_mean"] > 10 * wire["mean_absolute"]
+    assert wire["repaired_null_sd"] > 0
+    # Only a redraw that rebuilds the true pairing is as tight as it, which over four pairs is the
+    # 1 in 4! chance of drawing the identity permutation.
+    at_or_below = wire["repaired_n_at_or_below_observed"]
+    assert at_or_below == 41 == pytest.approx(PERMUTATIONS / 24, rel=0.2)
+    assert wire["repaired_p_value"] == pytest.approx((at_or_below + 1) / (PERMUTATIONS + 1), abs=5e-7)
+    # The sign-flip test asks whether one side is systematically larger, and finds nothing.
+    assert wire["p_value"] > 0.5
 
 
 def test_report_states_the_headline_numbers_it_was_given():

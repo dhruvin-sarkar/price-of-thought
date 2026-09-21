@@ -129,7 +129,9 @@ def symmetry(atlas: dict) -> dict:
     seed = SEED + NULL_SEED_OFFSET
     wire = bias_test(log_ratio, seed)
     scrambled = repairing_null(left, right, seed + 1)
-    observed_spread = float(np.abs(log_ratio).mean())
+    # From the raw lengths, not the rows' rounded log ratios, so the observed value is the null's
+    # own arithmetic under the identity permutation.
+    observed_spread = float(np.abs(np.log(left / right)).mean())
     wire |= {
         "repaired_null_mean": round(float(scrambled.mean()), 4),
         "repaired_null_sd": round(float(scrambled.std(ddof=1)), 4),

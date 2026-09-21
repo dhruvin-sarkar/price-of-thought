@@ -26,7 +26,9 @@ Second, the neck connective of descending and ascending neurons. Its neck-crossi
 
 Third, value. Cutting the connective removes 0.36 times the sensory-to-motor flow capacity lost with random wiring of equal total length (z = −42.5, p = 1.0 against the registered direction), but 1.83 times in the brain-to-nerve-cord direction (z = 48.2, p = 0.0010). Across cell types, wire length does not predict flow once the number of connections is controlled for (partial ρ = 0.044 descending, −0.122 ascending).
 
-Two exploratory analyses accompany these tests. Attributed to the neuropils, only 6.6% of the wiring budget stays inside one region, and all 48 regions large enough to test are wired internally more cheaply than permutations of their own cell types, the antennal lobes least clearly. Over connections the budget is unevenly but not extremely spread: the longest tenth hold 30.7% of it, and a lognormal fits the upper tail better than a power law.
+Seven exploratory analyses accompany these tests. Attributed to the neuropils, only 6.6% of the wiring budget stays inside one region, and all 48 regions large enough to test are wired internally more cheaply than permutations of their own cell types, the antennal lobes least clearly. Over connections the budget is unevenly but not extremely spread: the longest tenth hold 30.7% of it, and a lognormal fits the upper tail better than a power law.
+
+Five more were run once the registered tests were complete, and none had a direction fixed in advance. Degree does not predict how centrally a cell type sits (ρ = −0.043), but a type sits 127.3 µm from the centroid of its own partners against 320.7 µm for degree-matched random partners. The two hemispheres hold wire within a median factor of 1.13, with no side bias a sign-flip null can separate from chance. Connection length and synapse count are all but uncorrelated (ρ = −0.054), so the extra wire of a long connection buys reach and not synaptic weight. The 89 neuropils form a network that is dense, not small-world by wire (σ = 0.109), and split by Louvain into two communities that follow the brain and the nerve cord. Removing a quarter of the wire from the long end of the length distribution costs 6.5% of the graph's efficiency against 28.3% from the short end, although matched on connection count the longest connections are individually worth more.
 
 The fly concentrates its most expensive wiring on well-connected cell types. That wiring carries no more sensory-to-motor flow per unit length than ordinary long wiring, except from brain to nerve cord. Four of the thirteen registered hypotheses failed, and both the rich-to-rich excess and the direction it comes from change with the input threshold, so these are statements about one static wiring diagram under one set of definitions.
 
@@ -165,11 +167,52 @@ A secondary model, G+deg, adds the logarithms of source out-degree and target in
 
 Fifty synthetic graphs per model were drawn as independent Bernoulli trials, with a scalar shift solved so that the expected connection count equals the real one. Each synthetic graph was compared with the real graph on thirteen properties. A property counts as reproduced when the real value lies within the central 95% of the synthetic values.
 
+## Hub placement
+
+Two statistics over the same graph. The first is the rank correlation between a cell type's total degree and its distance from the centroid of the cell types of its scope, over all types, over brain types and over nerve-cord types. Each scope takes its own centroid: the brain and the nerve cord occupy different volumes, and a shared centre would rank a type by which compartment it belongs to rather than by where it sits inside it. The same correlation was taken for the summed length of the connections a type takes part in, and Pearson's r between distance and the base-10 logarithm of each measure over the types with a positive value.
+
+The second compares the distance from a cell type to the centroid of its partners with a null in which the type keeps its degree and draws that many partners uniformly at random from the other 23,072 cell types, with replacement and never itself; 1000 draws, seeded from 20360916. The three cell types with no connection are not tested. A scope's mean is compared with the mean of the same draws restricted to that scope.
+
+## Wire on the two sides
+
+A neuropil name ending in `(L)` or `(R)` was split into a stem and a side, and stems present on both sides form a pair. Each side's wire, share, cell types and internal cost ratio are read from `results/wire_atlas.json` rather than recomputed. A pair's log ratio is the natural logarithm of the left side's wire over the right side's, so it is zero for a pair in balance.
+
+Three nulls, seeded from 20410916, 20410917 and 20410918:
+
+- if the two hemispheres are wired alike, the sign of a pair's log ratio is arbitrary, so negating each of the 36 ratios at random gives the null distribution of their mean; 1000 sign flips, two-sided;
+- matching each left neuropil to a right neuropil drawn at random instead of to its own counterpart gives the asymmetry expected between two unrelated structures of this atlas, against which the observed mean absolute log ratio is one-sided over 1000 matchings. This null sets no scale for how alike two copies of one structure ought to be, so it can only rule out the case where the pairing carries no information at all;
+- the same sign flip applied to the left-minus-right difference in internal cost ratio, over the pairs whose within-neuropil placement test ran on both sides.
+
+Neuropils carrying no hemisphere suffix, and sides whose counterpart holds no cell type in this reconstruction, take no part in the three tests and are reported by name.
+
+## Synapses against length
+
+The weight of a connection is the number of synapses it carries between the typed neurons of its two cell types, the same weight the input threshold is computed from. Connections were sorted by length into ten equal groups, and each group's synapses per micrometre taken as its summed synapse count over its summed wire, against the density it would show if synapse count did not depend on length at all: the mean synapse count over all 490,884 connections divided by the group's mean length. Length and synapse count were correlated by Spearman's ρ and by Pearson's r on the base-10 logarithm of both, over all connections, over the 36,943 that cross the neck and over the 453,941 that do not. Nothing here is randomized and no null is drawn.
+
+## The neuropil network
+
+Cell types take the nearest of the 105 published neuropil surfaces and each connection lends half its length to the neuropil at each of its ends, by the rule of the wire atlas above. A connection with both ends in one region is that region's internal wire; the rest join two regions, and the summed length over a pair of regions is the wire of one undirected edge between them. The whole pair matrix is recomputed here because the atlas keeps only its 40 largest pairs, and the recomputation reproduces the atlas total and every pair it keeps.
+
+Clustering is the mean local clustering coefficient, a region with fewer than two partners contributing zero, and path length the mean shortest path over all pairs of regions. The weighted versions weigh a pair by its wire, a step along the heaviest pair of regions costing one and a thinner pair proportionally more. Two nulls of 1000 draws each, both preserving every region's number of partners exactly:
+
+- **rewired**: degree-preserving edge swaps randomize which pairs of regions are joined, at 10 swaps per edge and no multi-edges, and the multiset of per-pair wire values is then dealt out again over the rewired edges, so region strength is not preserved;
+- **weights shuffled**: the real topology is left alone and only the wire values are permuted over its edges, so the unweighted measures are the real ones by construction and the comparison isolates the arrangement of wire over a fixed structure.
+
+Null *i* of either kind is seeded from 20860916 + *i*, and p-values are two-sided, twice (1 + the smaller tail count) / (1 + 1000). Communities come from Louvain on the wire-weighted region graph under 100 seeds from 20910916, the partition reported being the one returned most often. Its agreement with compartment, with hemisphere and with thoracic segment is the adjusted Rand index and the normalized mutual information over the regions carrying that label.
+
+## Removal from each end of the length distribution
+
+Connections were removed cumulatively under three schedules — longest first, shortest first, and at random — and the graph left behind measured at 18 points placed at shares of the total wire from 0 to 0.6. At every point the longest-first and shortest-first schedules have removed the same amount of wire; the random schedule has removed the same *number* of connections as the longest-first one and is the mean of five draws, draw *i* seeded from 21010916 + *i*.
+
+Two measures. The first is sampled global efficiency: the mean of 1/d over ordered pairs of cell types, d the directed shortest path in connections, estimated on the rows of the distance matrix belonging to 300 source cell types drawn once without replacement from 20960916 and used at every point of every schedule, so the curves differ only in what was removed. Characteristic path length is the more familiar measure and the wrong one here, because removal is exactly what makes pairs unreachable and the mean of a set containing infinities is undefined, whereas an unreachable pair contributes a well-defined zero to efficiency. The matrix is 23,073 × 23,072 pairs at every point of every schedule, which is why it is sampled rather than computed whole. The second measure is the number of cell types in the largest weakly connected component.
+
 ## Robustness and multiple comparisons
 
 The placement, route and hub tests were repeated at input thresholds of 0.5%, 2% and 5%, with positions and compartments unchanged. Empirical one-sided p-values are (1 + null values at least as extreme) / (1 + N), so the smallest attainable with 1000 draws is 0.0010.
 
-Two families of tests are larger than the hypotheses that govern them. The rich-to-rich route statistic was computed at seven richness thresholds, of which only the top 10% is pre-registered; the other six are exploratory. Their p-values are reported uncorrected and beside a Bonferroni threshold across the seven, α = 0.05/7 = 0.0071. The within-neuropil placement tests cover 48 regions and carry no registered hypothesis; they are likewise reported uncorrected and beside α = 0.05/48 = 0.00104. No other analysis in this report involves a family of tests.
+Two families of tests are larger than the hypotheses that govern them. The rich-to-rich route statistic was computed at seven richness thresholds, of which only the top 10% is pre-registered; the other six are exploratory. Their p-values are reported uncorrected and beside a Bonferroni threshold across the seven, α = 0.05/7 = 0.0071. The within-neuropil placement tests cover 48 regions and carry no registered hypothesis; they are likewise reported uncorrected and beside α = 0.05/48 = 0.00104.
+
+The five analyses added after the registered tests do not make a third family of that kind. Each computes a different statistic on a different object, rather than one statistic over a sweep of a nuisance parameter or over a list of regions; none was selected for reporting on its p-value, and every statistic computed is reported whether or not it reaches one. Two of the five draw nulls. The three partner-distance comparisons of the hub-placement analysis all sit at the smallest one-sided value 1000 draws allow, 0.0010. Of the eight region-network comparisons, the six that are not fixed by construction sit at the smallest two-sided value, 0.0020, which is below a Bonferroni threshold across the eight, α = 0.05/8 = 0.0063; the other two are reproduced exactly by the weight-shuffled null and return p = 1. The three side-symmetry nulls are reported individually and two of them return nothing. No other analysis in this report involves a family of tests.
 
 ## Pre-registration
 
@@ -194,6 +237,8 @@ Thirteen hypotheses were registered across three commits. Each was written into 
 Table: The thirteen registered hypotheses and their outcomes, as indexed in `results/preregistration.md`. The generative model was registered as a protocol without a hypothesis: which of thirteen properties the model reproduces was to be reported either way.
 
 The wire atlas, the concentration of the wiring budget and the within-neuropil placement tests carry no registered hypothesis. All three were run after the registered tests and are reported as exploratory description.
+
+Five further analyses — hub placement, the wire on the two sides, synapses against length, the neuropil network, and removal from each end of the length distribution — were run later still, after all thirteen registered tests had been computed. None had a direction fixed in advance and none carries a hypothesis. They add nothing to the thirteen and change none of the four failures.
 
 ## Software
 
@@ -221,6 +266,8 @@ Software versions are listed in Table 2 and every dependency is pinned in `requi
 | `make analyze` | placement permutations, rich club, value, wiring-economy extensions |
 | | cable length, price against value, input-threshold robustness |
 | | generative model and comparison, wire atlas, wire concentration |
+| | hub placement, wire on the two sides, synapses against length |
+| | the neuropil network, removal from each end of the length distribution |
 | `make hero` | the hero rendering and the front view of the connective |
 | `make readme` | README plates and figures, drawn from `results/` |
 | `make export` | data for the interactive site |
@@ -233,9 +280,9 @@ Table: Make targets.
 
 `make reproduce` runs `data`, `analyze`, `hero`, `readme`, `paper`, `test` and `verify` in that order and rebuilds every result from neuPrint.
 
-**Randomness.** The base seed is 20260916, and each analysis adds a fixed offset to it so that no two draw the same stream. The 1000 placement permutations are seeded from 20560916 and the greedy swap search from 21060916; the within-compartment placement permutations use 21110916 plus the compartment index. Layer randomization *i* of the rich-club test uses 20660916 + 10*i*, the partner-redraw null of the endpoint-enrichment test 20660923, and whole-graph randomization *i* 20710916 + *i*. The value nulls use 20760916 plus a per-family and per-draw offset, the generative model's negative sampling 20860916, synthetic graph *i* of a model 20960916 plus a per-model and per-draw offset, and the cable-length sample 21160916. Within-neuropil permutation *i* uses 20260916 + *i*. The input-threshold repeats reuse the seeds of the analyses they repeat.
+**Randomness.** The base seed is 20260916, and each analysis adds a fixed offset to it. The 1000 placement permutations are seeded from 20560916 and the greedy swap search from 21060916; the within-compartment placement permutations use 21110916 plus the compartment index. Layer randomization *i* of the rich-club test uses 20660916 + 10*i*, the partner-redraw null of the endpoint-enrichment test 20660923, and whole-graph randomization *i* 20710916 + *i*. The value nulls use 20760916 plus a per-family and per-draw offset, the generative model's negative sampling 20860916, synthetic graph *i* of a model 20960916 plus a per-model and per-draw offset, and the cable-length sample 21160916. Within-neuropil permutation *i* uses 20260916 + *i*. The input-threshold repeats reuse the seeds of the analyses they repeat. Of the five analyses added afterwards, the partner-redraw null of the hub-placement analysis uses 20360916; the side-symmetry nulls use 20410916 for the sign flip of the pairs' wire, 20410917 for the random re-matching and 20410918 for the sign flip of their internal cost ratios; region-network null *i* uses 20860916 + *i* and Louvain seed *i* 20910916 + *i*; the 300 sources of the removal schedules are drawn once from 20960916 and random draw *i* of those schedules uses 21010916 + *i*; synapses against length draws nothing. Two offsets are used twice: the region-network nulls share 20860916 with the generative model's negative sampling, and the removal-schedule sources share 20960916 with the first synthetic graph of model G. In each case the two draw different objects from separate generators, and neither analysis takes any input from the other.
 
-**Verification.** `make verify` runs eighteen check scripts in `verify/`, one for each result plus `check_preregistration.py`, `check_references.py`, `check_citations.py` and `check_document_numbers.py`. They check each result file against its own invariants and against the others, that the pre-registration sections are unchanged since their registration commits, that every file path named in the README, this report and the result files resolves, that every reference here is one verified in `results/prior_art.md` and is cited in the text, and that every headline number in this report and the README is the number in the result file it comes from. Checks whose inputs are absent report SKIP rather than failing. Twenty-two test modules in `tests/` cover graph construction, wiring cost, the placement permutation, the connective set, the rich-club and value statistics, the price analysis, rewiring, the connectivity metrics, the generative model, the input-threshold repeats, the wire atlas and wire concentration, the wiring-economy extensions, the cable-length check, the renderings and the site export. `pytest` and `make verify` run in continuous integration on every push, alongside a build of the site. Every number reported here is read from a file under `results/`.
+**Verification.** `make verify` runs twenty-three check scripts in `verify/`, one for each result plus `check_preregistration.py`, `check_references.py`, `check_citations.py` and `check_document_numbers.py`. They check each result file against its own invariants and against the others, that the pre-registration sections are unchanged since their registration commits, that every file path named in the README, this report and the result files resolves, that every reference here is one verified in `results/prior_art.md` and is cited in the text, and that every headline number in this report and the README is the number in the result file it comes from. Checks whose inputs are absent report SKIP rather than failing. Twenty-seven test modules in `tests/` cover graph construction, wiring cost, the placement permutation, the connective set, the rich-club and value statistics, the price analysis, rewiring, the connectivity metrics, the generative model, the input-threshold repeats, the wire atlas and wire concentration, the wiring-economy extensions, the cable-length check, hub placement, side symmetry, synapses against length, the neuropil network, the removal schedules, the renderings and the site export. `pytest` and `make verify` run in continuous integration on every push, alongside a build of the site. Every number reported here is read from a file under `results/`.
 
 **Availability.** Code, derived results, figures and site data are available at <https://github.com/dhruvin-sarkar/price-of-thought> under the MIT license, with citation metadata in `CITATION.cff`; the raw neuPrint cache is not redistributed and is rebuilt by `make data`. An interactive presentation of the results is available at <https://dhruvin-sarkar.github.io/price-of-thought/>.
 
@@ -465,6 +512,97 @@ Neither model reproduces the local structure of the real graph, which has 21 and
 
 ![Thirteen properties of the real graph against 50 synthetic graphs from each generative model.](../results/generative_comparison.png){width=95%}
 
+## Degree says nothing about where a cell type sits, but a type sits among its partners
+
+This analysis and the four that follow it were run after all thirteen registered tests had been computed. None carries a registered hypothesis, none had a direction fixed in advance, and every p-value below is uncorrected.
+
+A heavily connected cell type pays for its position on every one of its connections, so wiring economy predicts that the best connected types sit centrally. They do not. Over all 23,073 cell types the rank correlation between total degree and distance from the centroid of the types in the same scope is −0.043. Split by compartment the two halves do not agree in sign: +0.018 over the 16,052 brain types and −0.144 over the 7,021 nerve-cord types, the largest of the six correlations taken and still small. Distance is measured from the centroid of the scope rather than of the whole specimen, because a shared centre would rank a type by which compartment it belongs to rather than by where it sits inside it; the median type lies 297.1 µm from the centre of the whole graph, 162.5 µm from the centre of the brain and 157.8 µm from the centre of the nerve cord. The summed length of a type's connections behaves no differently: ρ = 0.002 over all types, −0.098 in the brain and −0.054 in the nerve cord. How well connected a cell type is says next to nothing about how far from the middle of its compartment it sits.
+
+The second test is not a null (Figure 10). Each type keeps its degree and draws that many partners uniformly at random from the other 23,072, with replacement and never itself. Over 1000 such draws the mean distance from a type to the centroid of its real partners is 127.3 µm against 320.7 µm for random partners, a ratio of 0.397 (z = −622.7, no draw as near, p = 0.0010). Within the brain it is 120.6 against 259.3 µm and within the nerve cord 142.6 against 460.9 µm, ratios of 0.465 and 0.309. Of the 23,070 cell types with at least one connection, 95.4% sit nearer their own partners than their own null mean. The type furthest below its own null is the nerve-cord type SNppxx on the right, 18.4 µm from the centroid of the 402 partners it contacts, 29.1 null standard deviations below its own mean.
+
+The two results are compatible, and together they say what kind of economy this is. Placement economy at cell-type resolution is local rather than radial: a type sits among the cells it contacts, and being well connected does not pull it towards the middle of its compartment.
+
+![Median distance from the centre of the compartment against degree, and each cell type's distance to the centroid of its own partners against degree-matched random partners.](../results/hub_placement.png){width=85%}
+
+## The two sides of the body hold the same wire
+
+Exploratory, with no registered hypothesis and uncorrected p-values, like the four analyses either side of it.
+
+Of the 89 neuropils that hold cell types, 72 form 36 left–right pairs and carry 75.4% of the wire between them. Within a pair the two sides hold wire within a factor of 1.13 of each other at the median and 1.30 on average, and over all 36 pairs the right side holds a geometric mean of 1.132 times the wire of the left (Figure 11). The widest gap is LA, where the right copy holds 6.80 mm over four cell types against 0.50 mm over one, a factor of 13.5; the next widest are FLA at 2.3 and AME at 2.1, both again in favour of the right.
+
+Two nulls, because the question has two halves. If the two hemispheres are wired alike then the sign of a pair's log ratio is arbitrary, so negating each of the 36 ratios at random gives the null distribution of their mean. The observed mean is −0.124 against a null spread of 0.0836 (z = −1.49, two-sided p = 0.109 over 1000 sign flips). There is no side bias in the wiring budget that this test can separate from chance. The second null matches each left neuropil to a right neuropil drawn at random instead of to its own counterpart: the observed mean absolute log ratio is 0.260 against 1.869 ± 0.179, and none of 1000 matchings is as small (p = 0.0010). Counterparts are far more alike than arbitrary neuropils, which is what the naming asserts and is worth confirming, but the null is weak in a specific way. It sets no scale for how alike two copies of one structure ought to be, so it can rule out only the case where the pairing carries no information at all, and it cannot say whether a factor of 1.13 between two copies is small.
+
+Placement economy is as symmetric as the budget. Twenty pairs have an internal cost ratio on both sides, from the within-neuropil permutation test above. Their mean left-minus-right difference is −0.0074 against a sign-flip null spread of 0.0132 (z = −0.56, p = 0.607), and the mean absolute difference is 0.0389 on ratios that all sit below one. Whatever placement economy a neuropil has, its opposite copy has about the same amount of it.
+
+Seventeen neuropils take no part in these tests and are named here rather than dropped. Twelve carry no hemisphere suffix and hold 24.6% of the wire between them: GNG, ANm, SAD, PB, IB, PRW, IntTct, LTct, CV-anterior, CRN, FB and EB, a set that includes the largest single holder of wire in the specimen. Five are one side of a structure whose other side holds no cell type in this reconstruction, and hold 29.2 mm, 0.03% of the wire, between them: bL(R), AB(L), SCL(R), VES(R) and b'L(L).
+
+On neither test is the observed asymmetry larger than expected, and the direction of the differences is not consistent enough across pairs to register. The left–right difference in this specimen's wiring budget is a null result.
+
+![The wire held by the two copies of each of the 36 paired neuropils, and the log ratios of the most lopsided pairs.](../results/wire_symmetry.png){width=85%}
+
+## A long connection carries about as many synapses as a short one
+
+Exploratory, with no registered hypothesis and uncorrected p-values. The result is a null, and it carries the section.
+
+The 490,884 connections hold 78,192,944 synapses over 93,095 mm of wire, 0.840 synapses per micrometre. Sorted by length into ten equal groups, the shortest tenth buys 13.37 synapses per micrometre and the longest 0.11, a factor of 117 (Figure 12). Almost all of that fall is the length in the denominator.
+
+Length and synapse count are all but uncorrelated. Spearman's ρ between a connection's length and the number of synapses it carries is −0.054 over all 490,884 connections, and Pearson's r between the logarithms of the two is −0.063. With this many connections a correlation that small still returns a p-value at the floor of double precision, which is a statement about the number of connections and not about the size of the effect; it is reported here as one and nothing is inferred from it. The median connection carries 40 synapses in the shortest decile and 37 in the longest, a ratio of 0.93. The decile means fall much further, from 349.8 to 66.5, and the distance between mean and median says those means are set by a small number of very heavy connections rather than by the typical one.
+
+The numerator is flat, but it is not perfectly flat, and the decile table says by how much. Dividing each decile's density by the density it would show if synapse count did not depend on length at all leaves a residual that runs from 2.20 in the shortest decile to 0.42 in the longest, non-monotonically: deciles two to five sit between 1.09 and 1.38 and deciles seven to ten between 0.42 and 0.56. A connection under 46 µm long therefore does carry more synapses than its length alone would predict, by a factor of about two, and one over 360 µm rather fewer. That is a 5.3-fold spread against the 117-fold fall in the raw density, and it is carried by the means rather than the medians: the shortest decile averages 349.8 synapses per connection against 159.3 over the whole graph, while its median is 40 against 40.
+
+The same holds between the two groups of connections that differ most in length. Neck-crossing connections average 606 µm against 156 µm elsewhere. They hold 24.0% of the wire and 2.9% of the synapses, so they buy 0.103 synapses per micrometre against 1.073 elsewhere, a factor of 10.4, and yet they carry a median of 37 synapses against 40. Within the neck-crossing connections the correlation between length and synapse count is +0.089 and within the rest it is −0.048. Both are negligible, so inside each group as well as across the whole graph the price per micrometre is set by the length and not by what the connection carries.
+
+Synapses per micrometre is therefore a ratio whose numerator is flat and whose denominator spans the length distribution, and its decline with length is closer to arithmetic than to a discovered relationship. The finding worth stating is the flat numerator. A cell type pays for reach by the micrometre and receives, for each connection it makes, a synaptic contact of much the same size wherever the partner sits. The null also bears on the value tests above, where flow capacity counts a connection once whatever its weight: treating connections as unweighted discards no systematic relationship between a connection's length and its synaptic load, because there is none to discard.
+
+![Synapses bought per micrometre of wire by length decile, and the synapses carried by a single connection in each decile.](../results/synapse_value.png){width=85%}
+
+## The regions form a dense network that is not small-world by wire
+
+Exploratory, with no registered hypothesis and uncorrected p-values.
+
+Collapsing the cell-type graph onto the neuropils gives a network of 89 regions joined by 2,698 weighted edges, 68.9% of the 3,916 pairs that could be joined. 93.4% of the wire runs between two regions, 86,941 mm of it, and the remaining 6,154 mm stays inside one. The gnathal ganglia are the largest hub, holding 16,058 mm of wire to 85 of the other 88 regions, 9.2% of all between-region wire, and the fifteen largest regions hold 56.8% of it between them. Degree separates the regions far less than wire does: the median region has 69 partners and the least connected has two.
+
+The network is not small-world by wire (Table 12). Against 1000 degree-preserving rewirings with the wire redealt it is 1.099 times as clustered, but its weighted paths are 10.1 times longer rather than shorter, which puts the wire-weighted small-world ratio at 0.109, far below the value a small-world network would give. The second null, which keeps the real topology and permutes only the wire over it, reproduces the same direction at 9.9 times its mean, so the long weighted paths follow from heavy pairs of regions sitting together rather than bridging the network. The unweighted version of the question is degenerate at this density and cannot answer it either way: with 68.9% of pairs already joined, unweighted clustering is 0.872 against a null mean of 0.862 and the mean path is 1.32 steps against 1.31.
+
+| metric | real | rewired null | real / rewired | weight-shuffled null | real / shuffled |
+|---|---|---|---|---|---|
+| clustering | 0.872 | 0.862 ± 0.002 | 1.011 | 0.872 ± 0.000 | 1.000 |
+| path length | 1.319 | 1.312 ± 0.001 | 1.005 | 1.319 ± 0.000 | 1.000 |
+| weighted clustering | 0.947 | 0.862 ± 0.005 | 1.099 | 0.872 ± 0.005 | 1.086 |
+| weighted path length | 292.4 | 29.0 ± 13.9 | 10.100 | 29.6 ± 14.4 | 9.888 |
+
+Table: The 89-region network against two nulls of 1000 draws each, both preserving every region's number of partners. Every ratio has a two-sided p of 0.0020 except the two the weight-shuffled null reproduces by construction, which have p = 1.
+
+Louvain on the wire-weighted region graph returns exactly two communities, modularity 0.229, and all 100 random seeds return the same partition. They follow the split between brain and nerve cord and nothing else. The adjusted Rand index against compartment is 0.626 over all 89 regions; against hemisphere it is −0.010 over the 77 regions carrying a side suffix and against thoracic segment 0.000 over the 18 regions naming one, both at chance. Of the 36 neuropils present on both sides only ICL has its two copies in different communities, and the leg neuropils of all three thoracic segments sit together. The wire that joins a region to its mirror image, or to its neighbour one segment along, does not separate either from the rest of its compartment.
+
+The correspondence with the compartment is strong but not exact. The second community holds all 23 nerve-cord neuropils together with nine brain neuropils — GNG, SAD, IB, ICL(R), CV-anterior, CRN, FLA(R), FLA(L) and VES(R) — the gnathal and ventral-posterior regions that lie against the neck. On wire alone they group with the nerve cord rather than with the rest of the brain. These two communities are a partition of anatomy by wire; nothing here identifies a functional module.
+
+## Per micrometre, short connections buy more connectivity than long ones
+
+Exploratory, with no registered hypothesis and no direction fixed in advance.
+
+Connections were removed cumulatively from one end of the length distribution and the graph left behind measured at each of 18 points (Figure 13). The whole graph has a sampled global efficiency of 0.2152 and holds 23,070 of its 23,073 cell types in one weakly connected component.
+
+At the reference point, a quarter of the wire removed, the two ends of the distribution are not comparable (Table 13). Taking that 23,274 mm from the long end costs 35,849 connections, 7.3% of them, and leaves efficiency at 93.5% of the whole graph's. Taking the same wire from the short end costs 255,849 connections, 52.1%, and leaves it at 71.7%. The first removal costs 6.5% of the starting efficiency and the second 28.3%, a factor of 4.4 for the same wire. Efficiency falls to half its starting value once 38.9% of the wire has been taken from the short end, and not within the 60% sampled from the long end, where it still stands at 69.5%.
+
+| schedule | connections removed | share of connections | efficiency | share of the starting value | largest component |
+|---|---|---|---|---|---|
+| longest first | 35,849 | 7.3% | 0.2013 | 93.5% | 99.99% |
+| shortest first | 255,849 | 52.1% | 0.1544 | 71.7% | 98.94% |
+| at random, matched on count | 35,849 | 7.3% | 0.2105 | 97.8% ± 0.2% | 99.99% |
+
+Table: What removing a quarter of the wire, 23,274 mm, costs from each end of the length distribution, against the same number of connections removed at random. The random row is the mean of five draws.
+
+The reason is arithmetic rather than subtle. The median connection is 154.3 µm long against a mean of 189.6 µm, so the same budget taken from the short end removes 7.1 times as many connections. Wire spent on the long tail is not the cheapest way to keep the graph short-pathed.
+
+Matched on the number of connections instead, the comparison reverses, and the countervailing result is as clear as the first. Removing the 35,849 longest connections leaves efficiency at 93.5%, while removing the same number at random leaves 97.8% ± 0.2% over five draws. Individually the longest connections are worth more to the graph than typical ones. They are simply not worth their length.
+
+The third measure returns nothing, and its silence is worth as much space as the rest. None of the three schedules breaks the graph apart over the range sampled. The largest weakly connected component holds 99.99% of the cell types after a quarter of the wire is taken from the long end, 98.94% after the same wire is taken from the short end and 99.99% after the matched number of random removals. At the far end of the range, with 60% of the wire gone, the long-end schedule has cost 31% of the efficiency while leaving 99.90% of the types in one component, and the short-end schedule has cost 86% of the efficiency while still leaving 79.5% of them in one. Component size is a blunt instrument at this density: efficiency has collapsed while the graph is still almost entirely one piece. That is a null for the component measure rather than evidence that the graph is robust in any useful sense.
+
+Efficiency here is a graph measure over shortest paths in a static wiring diagram. It says what removal does to the lengths of those paths and nothing about signalling.
+
+![Efficiency against the wire removed and against the connections removed under three removal schedules, and the size of the largest weakly connected component.](../results/length_tradeoff.png){width=95%}
+
 ## Sensitivity and robustness checks
 
 - **Input threshold.** Placement holds at every threshold tested, with a cost ratio between 0.460 and 0.439, and hub over-representation holds with an odds ratio falling from 3.99 to 1.33. Rich-to-rich routing fails at 0.5% and its ascending–descending split reverses between thresholds, so H11 is not supported (Table 8).
@@ -475,6 +613,11 @@ Neither model reproduces the local structure of the real graph, which has 21 and
 - **Position measure.** Skeleton cable length tracks soma-to-output distance across classes (ρ = 0.428) but not within them (|ρ| < 0.12), so cost differences between classes are supported and differences between individual neurons of one class are not.
 - **Swap search.** The greedy search was stopped before convergence, with the last 100,000 proposals still saving 0.33%, so the 33.64% reduction is a lower bound and not an estimate of the optimum.
 - **Tail fit.** The power-law fit of the length distribution loses to both a lognormal and a truncated power law, and the longest connection is within 1% of the longest axis the somata span, so the tail is treated as bounded rather than scale-free.
+- **Scope of the hub-placement correlations.** Degree against distance from the centre was taken over all types and over each compartment, with each scope measured from its own centroid. The two compartments do not agree in sign (+0.018 brain, −0.144 nerve cord), so they are reported apart: pooling them would cancel two weak tendencies into one number belonging to neither.
+- **Null construction for side symmetry.** Of the two nulls, only the sign flip tests a direction. The random re-matching establishes that named counterparts are more alike than arbitrary neuropils and nothing more, so the size of a pair's difference is described rather than tested against an expectation.
+- **Effect size against sample size.** The correlation between connection length and synapse count returns a p-value at the floor of double precision at ρ = −0.054. Over 490,884 connections that reflects the number of connections and not the size of the effect, and the correlation is read as the null it is.
+- **Weighting of the region network.** Only the wire-weighted comparisons of the 89-region network carry information. At 68.9% density the unweighted clustering and path length are within 1% of their nulls, so the unweighted small-world question is degenerate rather than answered.
+- **Matching for the removal schedules.** Matched on wire, the short end of the length distribution buys 4.4 times more efficiency per unit removed; matched on the number of connections, the longest connections are individually worth more than typical ones. Both matchings are reported, and the largest component distinguishes none of the three schedules.
 
 # Discussion
 
@@ -506,16 +649,19 @@ The fly places its most expensive wiring on well-connected cell types, as the hu
 
 # What this does and does not show
 
-This analysis shows four things about one male fly CNS:
+This analysis shows five things about one male fly CNS:
 
 - the placement of its cell types is cheaper than random placement, and far from the cheapest arrangement reachable by swaps;
 - the placement is economical inside the neuropils as well as across them, in every region large enough to test but the antennal lobes;
 - the connective's cell types sit among its hubs, and its connections favour well-connected partners;
-- how much the connective's wiring contributes to one measure of sensory-to-motor routing, measured against three explicitly constructed comparison sets.
+- how much the connective's wiring contributes to one measure of sensory-to-motor routing, measured against three explicitly constructed comparison sets;
+- five further descriptions of the same wiring, added after the registered tests: where the best connected cell types sit, how the wire divides between the two sides of the body, what a micrometre of it buys in synapses, how the neuropils are arranged as a network, and what each end of the length distribution is worth to the graph.
 
 Four of the thirteen registered hypotheses failed, and the failures are as much a part of the result as the successes. H4: cutting the neck costs less flow than random wiring of the same total length, not more, so the connective does not buy above-average sensory-to-motor capacity for what it spends. H10 and H10b: across individual connective cell types, wire length does not predict flow, and the correlation that exists among descending types is carried by the number of connections rather than by their length. H11: the rich-to-rich route excess does not hold at a 0.5% input threshold, and the direction it comes from changes across the sweep, so neither the excess nor its ascending origin is a threshold-independent property of the connective.
 
-It does not show that wiring economy is a law of nervous-system organization, or that the placement is optimal. The generative model reproduces or fails to reproduce specific statistics; it does not describe how the nervous system develops. Flow capacity is a structural count of disjoint paths, not a measure of information transmitted, of behaviour, or of anything cognitive, and a cell type that costs no flow when removed from the graph has not been shown to be dispensable to an animal. The results extend the FlyWire brain analyses cited above to data those studies did not have; they do not revise them.
+The five later analyses are descriptions of this specimen rather than tests of a hypothesis, and three of them return a null where a wiring-economy reading would have predicted something: degree does not predict how centrally a cell type sits, the two hemispheres differ no more than chance allows, and length does not predict synapse count. None of the five changes the thirteen registered hypotheses or the four that failed.
+
+It does not show that wiring economy is a law of nervous-system organization, or that the placement is optimal. The generative model reproduces or fails to reproduce specific statistics; it does not describe how the nervous system develops. Flow capacity is a structural count of disjoint paths, not a measure of information transmitted, of behaviour, or of anything cognitive, and a cell type that costs no flow when removed from the graph has not been shown to be dispensable to an animal. The efficiency of the removal schedules is the same kind of measure, over shortest paths rather than disjoint ones, and the two communities of the region network are a grouping of anatomy by wire, not functional modules. The results extend the FlyWire brain analyses cited above to data those studies did not have; they do not revise them.
 
 # Limitations
 
@@ -530,7 +676,10 @@ It does not show that wiring economy is a law of nervous-system organization, or
 - **Comparability with Fault Lines.** The flow metric and its code are those of Fault Lines, but the sets are not. Descending neurons, counted there among motor outputs, are excluded here because they are part of what is removed, and the graph is resolved by hemisphere rather than pooled across sides. Intact flow capacity is 8,731 here against 10,647 there, so capacities and losses cannot be compared between the two studies.
 - **Swap search.** The search is greedy and was stopped before convergence. It also ignores the physical constraints that fix where neuropils and cell-body layers can lie.
 - **Generative models.** Both draw each ordered pair independently, so they cannot produce reciprocity or clustering, and the central-95% criterion for reproducing a property is strict enough that a model can be within a per cent of the real value and still fail it.
-- **Exploratory additions.** The wire atlas, the concentration of the wiring budget and the within-neuropil placement tests were added after the registered analyses were run. They carry no hypothesis, were not corrected for multiplicity, and are reported as description.
+- **Exploratory additions.** The wire atlas, the concentration of the wiring budget, the within-neuropil placement tests and five further analyses — hub placement, the wire on the two sides, synapses against length, the neuropil network, and removal from each end of the length distribution — were added after the registered analyses were run. They carry no hypothesis, no direction fixed in advance and no correction for multiplicity, and are reported as description.
+- **Sampled efficiency.** The removal curves estimate global efficiency from one fixed sample of 300 source cell types, used at every point of every schedule. The curves are therefore comparable with each other, but each point is an estimate of the whole-graph value rather than the value itself.
+- **The region network.** It inherits the neuropil attribution above, so a region's wire follows where the cell bodies of its types sit. At 68.9% density its unweighted structure carries almost no information and only the wire-weighted comparisons say anything, and its two communities are a partition of anatomy by wire.
+- **Side symmetry.** Neither null establishes how alike two copies of one structure should be. The sign flip can show a consistent bias and does not, and the random re-matching compares counterparts with unrelated neuropils, which is a much weaker standard.
 - **Data.** The data are one animal, one sex and one static reconstruction.
 - **Source version.** The flow analysis of Berg et al. (2026) was read in its bioRxiv version (v2, October 2025); the published version could differ.
 

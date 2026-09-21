@@ -160,6 +160,25 @@ export function Outcome({ supported }) {
   );
 }
 
+/**
+ * Marks a section as description rather than a test. It carries no registered hypothesis, no direction was fixed
+ * in advance, and its p-values are uncorrected, which the reader has to know before reading any number in it.
+ */
+export function Unregistered({ children }) {
+  return (
+    <div className="callout">
+      <p className="callout-title">
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M4.2 11.8 11.8 4.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+        No registered hypothesis
+      </p>
+      <p>{children}</p>
+    </div>
+  );
+}
+
 /** A disclosure holding the values behind a figure, closed by default, as in the README. */
 export function More({ summary, children }) {
   return (

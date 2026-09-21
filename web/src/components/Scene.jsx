@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { sceneUrl } from "../lib/data.js";
 import { count, micron, millimetre, percent, times } from "../lib/format.js";
 import { useIdle, useMedia, useNear, useReducedMotion } from "../lib/hooks.js";
+import { useLinkedNode } from "../lib/nodeLink.js";
 import FrontView from "./FrontView.jsx";
 import { Segmented } from "./ui.jsx";
 
@@ -85,6 +86,13 @@ export default function Scene({ nodes, neck, front, atlas }) {
   );
   const byLabel = useMemo(() => new Map(entries.map((entry) => [entry.label.toLowerCase(), entry])), [entries]);
   const selected = byLabel.get(picked.trim().toLowerCase()) ?? null;
+  const { index: linked } = useLinkedNode(nodes);
+
+  // A shared address names one cell type; the picker follows it, so the link opens the hero on the same type
+  // as the table below. It never clears the box, so a name typed here is left alone.
+  useEffect(() => {
+    if (linked >= 0) setPicked(entries[linked].label);
+  }, [linked, entries]);
 
   const supported = useMemo(webglAvailable, []);
   // The 2 MB scene and the three.js chunk are fetched and parsed on the main thread, which in front of the first

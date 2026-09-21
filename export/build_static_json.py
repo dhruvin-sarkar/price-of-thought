@@ -27,6 +27,15 @@ def read_json(name: str) -> dict:
     return json.loads((RESULTS / name).read_text(encoding="utf-8"))
 
 
+def pick(row: dict, keys) -> dict:
+    """One record narrowed to the fields the page draws; a field the record leaves out is carried as null."""
+    return {key: row.get(key) for key in keys}
+
+
+def picks(rows, keys) -> list[dict]:
+    return [pick(row, keys) for row in rows]
+
+
 def histogram(values, bins: int = HIST_BINS) -> dict:
     """Bin edges and counts of a sample, rounded for a compact payload."""
     counts, edges = np.histogram(np.asarray(values, dtype=float), bins=bins)
@@ -129,6 +138,100 @@ def front_view(front: dict) -> dict:
     }
 
 
+DECILE_KEYS = ("decile", "edges", "min_length_um", "max_length_um", "mean_length_um", "synapses", "mean_synapses",
+               "median_synapses", "synapses_per_um", "expected_per_um", "observed_over_expected")
+SYNAPSE_GROUP_KEYS = ("edges", "wire_um", "synapses", "synapses_per_um", "mean_synapses", "median_synapses",
+                      "mean_length_um", "correlation", "longest_over_shortest_per_um",
+                      "longest_over_shortest_median")
+CURVE_KEYS = ("wire_removed_share", "edges_removed", "edges_removed_share", "largest_component_share",
+              "efficiency_share")
+SCOPE_KEYS = ("scope", "types", "median_distance_um", "max_distance_um")
+CORRELATION_KEYS = ("scope", "measure", "spearman_rho", "spearman_p", "pearson_log_r")
+DEGREE_BIN_KEYS = ("scope", "bin", "types", "median_value", "median_distance_um")
+EXTREME_KEYS = ("cell_type", "side", "compartment", "degree", "distance_to_partners_um", "z_score")
+PAIR_KEYS = ("neuropil", "compartment", "types_left", "types_right", "wire_left_um", "wire_right_um", "log_ratio",
+             "cost_ratio_left", "cost_ratio_right")
+SIDE_KEYS = ("neuropil", "compartment", "types", "wire_um", "wire_share")
+REGION_KEYS = ("neuropil", "compartment", "community", "types", "degree", "strength_um", "strength_share",
+               "internal_um")
+COMMUNITY_KEYS = ("community", "regions", "brain_regions", "vnc_regions", "strength_um")
+EXTREMES_SHOWN = 6
+REGIONS_SHOWN = 15
+
+
+def synapses(result: dict) -> dict:
+    """Length deciles of the whole graph, and the three groups compared against each other without their own."""
+    return {
+        "totals": result["totals"],
+        "deciles": picks(result["groups"]["all"]["deciles"], DECILE_KEYS),
+        "groups": {name: pick(group, SYNAPSE_GROUP_KEYS) for name, group in result["groups"].items()},
+    }
+
+
+def tradeoff(result: dict) -> dict:
+    """The three removal schedules at the sampled points, and the comparison at a quarter of the wire."""
+    curves = {}
+    for name, points in result["curves"].items():
+        rows = picks(points, CURVE_KEYS)
+        # The random schedule is a mean of repeats and is the only one carrying a spread.
+        if "efficiency_share_sd" in points[0]:
+            for row, point in zip(rows, points):
+                row["efficiency_share_sd"] = point["efficiency_share_sd"]
+        curves[name] = rows
+    return {
+        "graph": result["graph"],
+        "baseline": result["baseline"],
+        "sampling": {k: v for k, v in result["sampling"].items() if k != "wire_fractions"},
+        "curves": curves,
+        "comparison": result["comparison"],
+    }
+
+
+def hubs(result: dict) -> dict:
+    """Degree against distance from the centre of a compartment, and distance to a type's own partners."""
+    partners = result["partners"]
+    return {
+        "totals": result["totals"],
+        "scopes": picks(result["scopes"], SCOPE_KEYS),
+        "correlations": picks(result["correlations"], CORRELATION_KEYS),
+        "degree_bins": picks(result["degree_bins"], DEGREE_BIN_KEYS),
+        "partners": {
+            **{k: partners[k] for k in ("scopes", "types_tested", "share_nearer_than_chance", "seed")},
+            "extremes": picks(partners["extremes"][:EXTREMES_SHOWN], EXTREME_KEYS),
+        },
+    }
+
+
+def symmetry(result: dict) -> dict:
+    """The left-right pairs and the neuropils that are not part of one, which are named rather than dropped."""
+    return {
+        "totals": result["totals"],
+        "pairs": picks(result["pairs"], PAIR_KEYS),
+        "midline": picks(result["midline"], SIDE_KEYS),
+        "unpaired_sides": picks(result["unpaired_sides"], SIDE_KEYS),
+        "wire_asymmetry": result["wire_asymmetry"],
+        "cost_ratio_asymmetry": result["cost_ratio_asymmetry"],
+    }
+
+
+def regions(result: dict) -> dict:
+    """The largest regions by wire, both small-world nulls, and the two communities the wire splits them into."""
+    cord = next(community for community in result["communities"] if community["vnc_regions"])
+    compartment = {row["neuropil"]: row["compartment"] for row in result["regions"]}
+    return {
+        "totals": result["totals"],
+        "atlas_agreement": result["atlas_agreement"],
+        "top_regions": picks(result["regions"][:REGIONS_SHOWN], REGION_KEYS),
+        "small_world": result["small_world"],
+        "partition": result["partition"],
+        "communities": picks(result["communities"], COMMUNITY_KEYS),
+        # The brain regions the wire groups with the nerve cord rather than with the rest of the brain.
+        "brain_with_cord": [name for name in cord["members"] if compartment[name] == "brain"],
+        "anatomy": result["anatomy"],
+        "mirrored": result["mirrored"],
+    }
+
+
 def site_data(price: pd.DataFrame) -> dict:
     """Every number and chart series the page text and charts use."""
     spatial = read_json("spatial_optimality.json")
@@ -190,6 +293,12 @@ def site_data(price: pd.DataFrame) -> dict:
         "front": front_view(read_json("front_view.json")),
         "atlas": read_json("wire_atlas.json"),
         "concentration": read_json("wire_concentration.json"),
+        # The five analyses run after the registered tests, each narrowed to what the page draws.
+        "synapses": synapses(read_json("synapse_value.json")),
+        "tradeoff": tradeoff(read_json("length_tradeoff.json")),
+        "hubs": hubs(read_json("hub_placement.json")),
+        "symmetry": symmetry(read_json("wire_symmetry.json")),
+        "regions": regions(read_json("neuropil_network.json")),
         # The same list the poster prints, so the site cannot drift from it or from the pre-registration index.
         "hypotheses": [{"label": label, "statement": statement, "supported": bool(supported)}
                        for label, statement, supported in hypotheses(load_results())],

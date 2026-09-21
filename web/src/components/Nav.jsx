@@ -7,6 +7,8 @@ const LINKS = [
   ["budget", "The budget"],
   ["connective", "The connective"],
   ["model", "A wiring model"],
+  ["buys", "What it buys"],
+  ["anatomy", "The anatomy"],
   ["methods", "Methods"],
 ];
 

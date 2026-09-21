@@ -16,6 +16,11 @@ const PROTOCOL = [
   ["generative sampling", "all edges and 2,454,420 uniform non-edges; 5-fold cross-validated AUC"],
   ["synthetic graphs", "50 per model, independent Bernoulli draws with a shift fixing the expected edge count"],
   ["empirical p", "(1 + null values at least as extreme) / (1 + N), one-sided, α = 0.05"],
+  ["partner null", "1000 redraws per cell type, degree kept, partners drawn with replacement, never itself"],
+  ["symmetry nulls", "1000 sign flips of the 36 pair log ratios, and 1000 random left-to-right matchings"],
+  ["length deciles", "the 490,884 connections in ten equal groups by length, 49,088 or 49,089 each"],
+  ["removal schedules", "18 points to 60% of the wire; efficiency from 300 sources drawn once, 5 random draws"],
+  ["region nulls", "1000 degree-preserving rewirings and 1000 weight permutations of the 89-region graph"],
   ["seeds", "base 20260916 plus a fixed offset per analysis, set in each module"],
 ];
 
@@ -43,6 +48,11 @@ const FILES = [
   ["results/threshold_robustness.md", "the headline tests at three other edge thresholds"],
   ["results/wire_atlas.md", "the wire held by each neuropil and how economically each is wired inside"],
   ["results/wire_concentration.md", "how unevenly the budget is spread over connections and over cell classes"],
+  ["results/synapse_value.md", "what a micrometre of wire buys in synapses, by length decile and by group"],
+  ["results/length_tradeoff.md", "what removing wire from each end of the length distribution costs"],
+  ["results/hub_placement.md", "degree against distance from the centre, and distance to a type's own partners"],
+  ["results/wire_symmetry.md", "the wire held by each side of the 36 left-right pairs of neuropils"],
+  ["results/neuropil_network.md", "the 89 regions as a weighted network, its nulls and its communities"],
   ["results/prior_art.md", "the prior work checked before any claim was made"],
   ["paper/report.md", "the technical report"],
 ];
@@ -73,6 +83,10 @@ const LIMITS = [
     "Greedy, stopped before convergence, and blind to the physical constraints on where neuropils and cell bodies can lie.",
   ],
   ["Generative models.", "Both draw each pair independently, so neither can produce reciprocity or clustering."],
+  [
+    "After the fact.",
+    "Five analyses were run once the registered tests were done: what a micrometre buys in synapses, what its length buys in connectivity, where the best connected types sit, the two sides of the body, and the regions as a network. None had a direction fixed in advance and their p-values are uncorrected, so they are description rather than tests.",
+  ],
   ["One animal.", "A single male fly and one static reconstruction."],
   ["Review.", "None of this has been peer reviewed."],
 ];
@@ -135,9 +149,12 @@ export default function Methods({ data }) {
                 <caption>
                   Registered in commits {data.preregistration_commits.join(", ")} before any result was computed. The
                   full index, with each hypothesis as it was written, is in{" "}
-                  <a href={blobUrl("results/preregistration.md")}>results/preregistration.md</a>. The wire atlas and
-                  the concentration of the budget carry no registered hypothesis: both were run after these tests
-                  and are reported as description.
+                  <a href={blobUrl("results/preregistration.md")}>results/preregistration.md</a>. The wire atlas,
+                  the concentration of the budget and the five analyses under{" "}
+                  <a href="#buys">what a micrometre of wire buys</a> and{" "}
+                  <a href="#anatomy">the anatomy</a> carry no registered hypothesis: all were run after these
+                  tests, with no direction fixed in advance and no correction for multiplicity, and are reported
+                  as description.
                 </caption>
                 <thead>
                   <tr>
@@ -266,7 +283,7 @@ export default function Methods({ data }) {
           </div>
 
           <Figure
-            number={13}
+            number={19}
             title="Positions stand in for cable length between classes, not within them"
             caption={
               <>
@@ -278,7 +295,7 @@ export default function Methods({ data }) {
             }
           >
             <CableLength data={data} />
-            <More summary="Values behind Figure 13">
+            <More summary="Values behind Figure 19">
               <CableTable data={data} />
             </More>
           </Figure>

@@ -63,8 +63,11 @@ export function ChartFrame({
   );
 }
 
-/** Value axis with light gridlines; the title sits horizontally above the top tick, read before the data. */
-export function YAxis({ scale, ticks, width, format = String, title, grid = true, inset = 48 }) {
+/**
+ * Value axis with light gridlines; the title sits horizontally above the top tick, read before the data.
+ * `titleGap` lifts it clear of anything else a chart draws on that line.
+ */
+export function YAxis({ scale, ticks, width, format = String, title, grid = true, inset = 48, titleGap = 14 }) {
   return (
     <g>
       {ticks.map((t) => (
@@ -76,7 +79,7 @@ export function YAxis({ scale, ticks, width, format = String, title, grid = true
         </g>
       ))}
       {title && (
-        <text className="axis-title" x={-inset} y={Math.min(...ticks.map((t) => scale(t))) - 14} textAnchor="start">
+        <text className="axis-title" x={-inset} y={Math.min(...ticks.map((t) => scale(t))) - titleGap} textAnchor="start">
           {title}
         </text>
       )}
@@ -84,12 +87,24 @@ export function YAxis({ scale, ticks, width, format = String, title, grid = true
   );
 }
 
-export function XAxis({ scale, ticks, height, format = String, title, width }) {
+// Advance width of one character of the tabular monospace the tick labels are set in, at the axis font size.
+const TICK_CHAR = 6.6;
+
+/**
+ * Category or value axis along the bottom of the plot. Given `margin`, a tick label centred close enough to an
+ * end of a short axis to cross the edge of the SVG is nudged back until it sits flush inside it.
+ */
+export function XAxis({ scale, ticks, height, format = String, title, width, margin }) {
+  const place = (text, x) => {
+    if (!margin) return x;
+    const half = (text.length * TICK_CHAR) / 2;
+    return Math.min(Math.max(x, half - margin.left), width + margin.right - half);
+  };
   return (
     <g transform={`translate(0,${height})`}>
       <line className="axis-line" x2={width} />
       {ticks.map((t) => (
-        <text className="value" key={t} x={scale(t)} y={20} textAnchor="middle">
+        <text className="value" key={t} x={place(format(t), scale(t))} y={20} textAnchor="middle">
           {format(t)}
         </text>
       ))}

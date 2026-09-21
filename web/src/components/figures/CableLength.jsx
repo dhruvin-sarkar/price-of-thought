@@ -126,7 +126,7 @@ export default function CableLength({ data }) {
 
 export function CableTable({ data }) {
   return (
-    <TableWrap label="Values behind Figure 13: cable length against soma-to-output distance by class">
+    <TableWrap label="Values behind Figure 19: cable length against soma-to-output distance by class">
       <table className="data">
         <caption>
           Skeleton cable length against soma-to-output distance for {count(data.cable.analysed)} sampled neurons.

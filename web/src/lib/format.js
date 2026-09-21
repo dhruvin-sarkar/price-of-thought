@@ -21,6 +21,11 @@ export const millimetre = (value_um, digits = 0) => `${count(Number(value_um) / 
 export const signed = (value, digits = 3) =>
   value > 0 ? `+${fixed(value, digits)}` : fixed(value, digits);
 
+const NAMES = new Intl.ListFormat("en-GB", { style: "long", type: "conjunction" });
+
+/** Names run together as prose: "a", "a and b", "a, b and c". */
+export const list = (values) => NAMES.format(values);
+
 /** p-value: "< 0.001" below 0.001, three decimals below 0.1, two decimals above. */
 export function pValue(p) {
   if (p == null || Number.isNaN(p)) return "n/a";

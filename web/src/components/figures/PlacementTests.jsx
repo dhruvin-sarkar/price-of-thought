@@ -83,6 +83,7 @@ export default function PlacementTests({ data }) {
               ticks={[0, 0.25, 0.5, 0.75, 1]}
               height={inner}
               width={width}
+              margin={margin}
               format={(t) => (t === 1 ? "1.0" : t.toFixed(2))}
               title="Cost as a share of the permuted mean"
             />

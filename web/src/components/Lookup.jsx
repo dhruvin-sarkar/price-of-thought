@@ -2,9 +2,9 @@ import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useSt
 import { Segmented, TableWrap } from "./ui.jsx";
 import { blobUrl } from "../lib/data.js";
 import { count, fixed, percent } from "../lib/format.js";
+import { NODE_HASH, useLinkedNode } from "../lib/nodeLink.js";
 import "../styles/lookup.css";
 
-const HASH = "#lookup/";
 const SUGGESTIONS = 8;
 
 const SIDES = { L: "left", R: "right", M: "midline" };
@@ -34,28 +34,6 @@ const over = (share) => `${Math.floor(100 * share)}%`;
 const perMm = (row) => row.value / (row.price_um / 1000);
 
 const nodeLabel = (row) => `${row.cell_type} ${row.side}`;
-
-function hashTarget() {
-  if (typeof window === "undefined" || !window.location.hash.startsWith(HASH)) return null;
-  try {
-    return decodeURIComponent(window.location.hash.slice(HASH.length)).trim() || null;
-  } catch {
-    return null;
-  }
-}
-
-/** Index of the node a link names: its full node id, else the first node of a bare cell type. Separators are loose. */
-function resolve(nodes, target) {
-  if (!target) return -1;
-  const wanted = target.toLowerCase().replace(/[\s_-]+/g, "|");
-  let bare = -1;
-  for (let i = 0; i < nodes.length; i += 1) {
-    const row = nodes[i];
-    if (row.node.toLowerCase() === wanted) return i;
-    if (bare < 0 && row.cell_type.toLowerCase() === wanted) bare = i;
-  }
-  return bare;
-}
 
 /** Prefix matches first, shortest name first; then substring matches by where the match falls. */
 function search(entries, query) {
@@ -114,15 +92,10 @@ export default function Lookup({ data }) {
   );
   const indexByNode = useMemo(() => new Map(nodes.map((row, i) => [row.node, i])), [nodes]);
 
-  const [selected, setSelected] = useState(() => {
-    const found = resolve(nodes, hashTarget());
-    return found >= 0 ? found : -1;
-  });
+  // The page address holds the selection, so the hero and this table always show the same node.
+  const { name: linked, index: selected, select } = useLinkedNode(nodes);
   // A linked name matching no node; the address is left as the reader received it.
-  const [unknown, setUnknown] = useState(() => {
-    const target = hashTarget();
-    return target && resolve(nodes, target) < 0 ? target : null;
-  });
+  const unknown = linked && selected < 0 ? linked : null;
 
   const rows = useMemo(() => {
     const needle = deferred.trim().toLowerCase();
@@ -155,35 +128,22 @@ export default function Lookup({ data }) {
   }, [countText]);
 
   const choose = useCallback(
-    (index, { link = true } = {}) => {
+    (index) => {
       if (index == null || index < 0) return;
-      setSelected(index);
-      setUnknown(null);
       setQuery("");
       setOpen(false);
       setActive(-1);
-      // A node hidden by the direction filter would be selected with nothing on screen to show for it.
-      setDirection((current) => (current === "all" || current === nodes[index].direction ? current : "all"));
-      if (link) {
-        const { pathname, search: params } = window.location;
-        const target = encodeURIComponent(nodes[index].node);
-        window.history.replaceState(null, "", `${pathname}${params}${HASH}${target}`);
-      }
+      select(index);
     },
-    [nodes],
+    [select],
   );
 
+  // A node hidden by the direction filter would be selected with nothing on screen to show for it. This runs
+  // for a selection made anywhere, including one arriving from the hero or from a link the reader followed.
   useEffect(() => {
-    const onHash = () => {
-      const target = hashTarget();
-      if (target == null) return;
-      const found = resolve(nodes, target);
-      if (found >= 0) choose(found, { link: false });
-      else setUnknown(target);
-    };
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, [nodes, choose]);
+    if (selected < 0) return;
+    setDirection((current) => (current === "all" || current === nodes[selected].direction ? current : "all"));
+  }, [selected, nodes]);
 
   useEffect(() => {
     if (active >= 0) document.getElementById(`${base}-option-${active}`)?.scrollIntoView({ block: "nearest" });
@@ -577,7 +537,7 @@ function Ledger({ node, nodes, tests }) {
 
       <p className="caption lk-share">
         This node is in the page address, so the link opens on it again:{" "}
-        <span className="id">{`${HASH}${node.node}`}</span>
+        <span className="id">{`${NODE_HASH}${node.node}`}</span>
       </p>
     </article>
   );

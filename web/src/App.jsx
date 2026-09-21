@@ -1,4 +1,6 @@
+import Anatomy from "./components/Anatomy.jsx";
 import Budget from "./components/Budget.jsx";
+import Buys from "./components/Buys.jsx";
 import Connective from "./components/Connective.jsx";
 import Hero from "./components/Hero.jsx";
 import Methods, { Footer } from "./components/Methods.jsx";
@@ -45,6 +47,12 @@ export default function App() {
             </SectionBoundary>
             <SectionBoundary id="model">
               <Model data={data} />
+            </SectionBoundary>
+            <SectionBoundary id="buys">
+              <Buys data={data} />
+            </SectionBoundary>
+            <SectionBoundary id="anatomy">
+              <Anatomy data={data} />
             </SectionBoundary>
             <SectionBoundary id="methods">
               <Methods data={data} />

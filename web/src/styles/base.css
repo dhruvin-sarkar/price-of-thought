@@ -444,6 +444,38 @@ input[type="search"]::placeholder {
   flex: none;
 }
 
+/* A callout that carries a caution the reader must not skip past. */
+.callout {
+  max-width: 46rem;
+  margin-bottom: 2.5rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--paper-raised);
+}
+
+.callout-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 650;
+  color: var(--wire-ink);
+}
+
+.callout-title svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
+.callout p {
+  max-width: none;
+  font-size: var(--step--1);
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
 .pending {
   max-width: var(--measure);
   padding-top: 0.9rem;
